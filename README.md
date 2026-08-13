@@ -1,36 +1,178 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Quiz Platform
 
-## Getting Started
+Local-network quiz platform for classroom use. One teacher runs the app on their device; students join from phones or tablets on the same Wi‑Fi using their student ID.
 
-First, run the development server:
+## Stack
+
+- Next.js 16 (App Router)
+- PostgreSQL 18
+- Drizzle ORM
+- Docker Compose
+
+## Quick start (Docker)
+
+1. Install [Docker Desktop](https://www.docker.com/products/docker-desktop/).
+
+2. Copy environment variables:
+
+```bash
+cp .env.example .env
+```
+
+3. Start the platform:
+
+**First time, or after changing code / Dockerfile:**
+
+```bash
+docker compose up --build
+# or
+npm run docker:build
+```
+
+**Normal daily use (faster — reuses existing image):**
+
+```bash
+docker compose up
+# or
+npm run docker
+```
+
+Stop with `Ctrl+C`, then optionally:
+
+```bash
+npm run docker:down
+```
+
+### What runs on every start
+
+When the web container starts, it automatically:
+
+1. Waits for PostgreSQL to be ready
+2. Runs database migrations
+3. Seeds the default teacher (skipped if `admin` already exists)
+4. Starts the app on port **3000** (or `APP_PORT` from `.env`)
+
+Open the teacher console:
+
+```
+http://localhost:3000/login
+```
+
+Default credentials (change in `.env` before first run):
+
+- **Username:** `admin`
+- **Password:** `admin123`
+
+## LAN access for students
+
+Students connect using the teacher device's local IP address, not `localhost`.
+
+### Find your LAN IP
+
+**Windows (PowerShell):**
+
+```powershell
+Get-NetIPAddress -AddressFamily IPv4 | Where-Object { $_.InterfaceAlias -notmatch 'Loopback' } | Select-Object IPAddress, InterfaceAlias
+```
+
+**macOS / Linux:**
+
+```bash
+ip addr show | grep "inet "
+```
+
+Share this link with students (replace with your IP):
+
+```
+http://192.168.1.100:3000/join
+```
+
+> Student join flow is implemented in Increment 4. The `/join` route will be available then.
+
+## Local development (without Docker)
+
+1. Start PostgreSQL locally (or run only the database container):
+
+```bash
+docker compose up postgres -d
+```
+
+2. Copy and configure environment:
+
+```bash
+cp .env.example .env.local
+```
+
+Set `DATABASE_URL` for local Postgres (host is `localhost`, not `postgres`):
+
+```
+DATABASE_URL=postgresql://quiz:quizpassword@localhost:5432/quiz_platform
+```
+
+3. Install dependencies and migrate:
+
+```bash
+npm install
+npm run db:migrate
+npm run db:seed
+```
+
+4. Start the dev server:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000/login](http://localhost:3000/login).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Database commands
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| Command               | Description                                |
+| --------------------- | ------------------------------------------ |
+| `npm run db:generate` | Generate migration SQL from schema changes |
+| `npm run db:migrate`  | Apply pending migrations                   |
+| `npm run db:seed`     | Seed default teacher account               |
+| `npm run db:studio`   | Open Drizzle Studio (local dev)            |
 
-## Learn More
+## Project structure
 
-To learn more about Next.js, take a look at the following resources:
+```
+src/
+  app/
+    login/              Teacher login
+    teacher/            Protected teacher console
+  db/
+    schema.ts           Drizzle table definitions
+    relations.ts        Drizzle relations
+    seed.ts             Default teacher seed
+  lib/
+    auth.ts             Session helpers
+    session.ts          Iron session config
+  server/actions/       Server actions
+drizzle/                SQL migrations
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Increments
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+This project is built in 8 increments. **Increment 1** (current) includes:
 
-## Deploy on Vercel
+- Docker Compose (web + PostgreSQL)
+- Full Drizzle schema and migrations
+- Teacher username/password login
+- Protected teacher shell (Dashboard, Students, Quizzes)
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+See `docs/PROJECT_PLAN.md` for the full roadmap (added in Increment 8).
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Environment variables
+
+| Variable            | Description                                                                 |
+| ------------------- | --------------------------------------------------------------------------- |
+| `POSTGRES_USER`     | PostgreSQL username                                                         |
+| `POSTGRES_PASSWORD` | PostgreSQL password                                                         |
+| `POSTGRES_DB`       | Database name                                                               |
+| `POSTGRES_PORT`     | Host port for Postgres (default `5432`)                                     |
+| `APP_PORT`          | Host port for the web app (default `3000`)                                  |
+| `TEACHER_USERNAME`  | Seed teacher username                                                       |
+| `TEACHER_PASSWORD`  | Seed teacher password                                                       |
+| `SESSION_SECRET`    | Cookie encryption secret (32+ characters)                                   |
+| `DATABASE_URL`      | Local dev only — use `localhost` as host (Docker builds this automatically) |
