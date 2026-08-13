@@ -116,10 +116,17 @@ This project is built in 8 increments.
 
 - **Increment 1** — Docker, Drizzle, teacher login, protected shell
 - **Increment 2** — Student roster CRUD + bulk import at `/teacher/students`
+- **Increment 3** — MCQ quiz creation at `/teacher/quizzes` (paste, mark correct, save/list/edit/delete)
 
 **Increment 2** includes:
 
 - Student roster: add, edit name, delete, search, bulk import
+
+**Increment 3** includes:
+
+- Create MCQ quizzes via **manual builder** (Google Forms style) or **paste import**
+- Paste format: blank line between questions, `A)` options (count auto-detected)
+- Quiz list, detail view, edit, and delete (blocked if quiz has sessions)
 
 See `docs/PROJECT_PLAN.md` for the full roadmap (added in Increment 8).
 

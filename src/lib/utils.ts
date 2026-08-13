@@ -26,6 +26,11 @@ export const linkClassName = "ui-link";
 
 export const panelClassName = "ui-panel";
 
+export const methodCardClassName = cn(
+  panelClassName,
+  "ui-method-card ui-btn ui-press",
+);
+
 export const statCardClassName = cn("ui-panel ui-stat");
 
 export const pageTitleClassName =
