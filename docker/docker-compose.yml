@@ -17,7 +17,9 @@ services:
       retries: 10
 
   web:
-    build: .
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
     restart: unless-stopped
     depends_on:
       postgres:

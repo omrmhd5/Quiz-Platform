@@ -1,5 +1,6 @@
 import { drizzle, type PostgresJsDatabase } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
+import { getDatabaseUrl } from "@/lib/db-url";
 import * as relations from "./relations";
 import * as schema from "./schema";
 
@@ -13,11 +14,7 @@ declare global {
 }
 
 function createDb() {
-  const connectionString = process.env.DATABASE_URL;
-
-  if (!connectionString) {
-    throw new Error("DATABASE_URL is not set");
-  }
+  const connectionString = getDatabaseUrl();
 
   const client = postgres(connectionString, { max: 10 });
   const database = drizzle(client, { schema: fullSchema });

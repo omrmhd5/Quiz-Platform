@@ -21,7 +21,7 @@ cp .env.example .env
 
 3. Start the platform:
 
-**First time, or after changing code / Dockerfile:**
+**First time, or after changing code / `docker/Dockerfile`:**
 
 ```bash
 docker compose up --build
@@ -94,7 +94,7 @@ http://192.168.1.100:3000/join
 1. Start PostgreSQL locally (or run only the database container):
 
 ```bash
-docker compose up postgres -d
+docker compose -f docker/docker-compose.yml --project-directory . up postgres -d
 ```
 
 2. Copy and configure environment:
@@ -106,7 +106,7 @@ cp .env.example .env.local
 Set `DATABASE_URL` for local Postgres (host is `localhost`, not `postgres`):
 
 ```
-DATABASE_URL=postgresql://quiz:quizpassword@localhost:5432/quiz_platform
+DATABASE_URL=postgresql://quiz:quizpassword@localhost:5433/quiz_platform
 ```
 
 3. Install dependencies and migrate:
@@ -137,6 +137,10 @@ Open [http://localhost:3000/login](http://localhost:3000/login).
 ## Project structure
 
 ```
+docker/
+  docker-compose.yml    Compose stack (web + postgres)
+  Dockerfile            App image build
+  entrypoint.sh         Migrate, seed, start on boot
 src/
   app/
     login/              Teacher login
@@ -154,12 +158,14 @@ drizzle/                SQL migrations
 
 ## Increments
 
-This project is built in 8 increments. **Increment 1** (current) includes:
+This project is built in 8 increments.
 
-- Docker Compose (web + PostgreSQL)
-- Full Drizzle schema and migrations
-- Teacher username/password login
-- Protected teacher shell (Dashboard, Students, Quizzes)
+- **Increment 1** — Docker, Drizzle, teacher login, protected shell
+- **Increment 2** — Student roster CRUD + bulk import at `/teacher/students`
+
+**Increment 2** includes:
+
+- Student roster: add, edit name, delete, search, bulk import
 
 See `docs/PROJECT_PLAN.md` for the full roadmap (added in Increment 8).
 
@@ -170,7 +176,7 @@ See `docs/PROJECT_PLAN.md` for the full roadmap (added in Increment 8).
 | `POSTGRES_USER`     | PostgreSQL username                                                         |
 | `POSTGRES_PASSWORD` | PostgreSQL password                                                         |
 | `POSTGRES_DB`       | Database name                                                               |
-| `POSTGRES_PORT`     | Host port for Postgres (default `5432`)                                     |
+| `POSTGRES_PORT`     | Host port for Postgres (use `5433` if local Postgres already uses `5432`)   |
 | `APP_PORT`          | Host port for the web app (default `3000`)                                  |
 | `TEACHER_USERNAME`  | Seed teacher username                                                       |
 | `TEACHER_PASSWORD`  | Seed teacher password                                                       |

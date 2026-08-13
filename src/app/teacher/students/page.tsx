@@ -1,4 +1,11 @@
-export default function StudentsPage() {
+import { AddStudentForm } from "@/components/students/add-student-form";
+import { ImportStudentsForm } from "@/components/students/import-students-form";
+import { StudentsTable } from "@/components/students/students-table";
+import { getStudents } from "@/server/actions/students";
+
+export default async function StudentsPage() {
+  const studentRows = await getStudents();
+
   return (
     <div className="space-y-6">
       <div>
@@ -8,11 +15,12 @@ export default function StudentsPage() {
         </p>
       </div>
 
-      <div className="rounded-xl border border-dashed border-zinc-300 bg-white p-10 text-center">
-        <p className="text-sm text-zinc-500">
-          Student management will be available in the next increment.
-        </p>
+      <div className="grid gap-6 lg:grid-cols-2">
+        <AddStudentForm />
+        <ImportStudentsForm />
       </div>
+
+      <StudentsTable students={studentRows} />
     </div>
   );
 }

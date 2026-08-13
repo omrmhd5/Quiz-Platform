@@ -2,14 +2,11 @@ import bcrypt from "bcryptjs";
 import { eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
+import { getDatabaseUrl } from "@/lib/db-url";
 import { teachers } from "./schema";
 
 async function seed() {
-  const connectionString = process.env.DATABASE_URL;
-
-  if (!connectionString) {
-    throw new Error("DATABASE_URL is not set");
-  }
+  const connectionString = getDatabaseUrl();
 
   const username = process.env.TEACHER_USERNAME ?? "admin";
   const password = process.env.TEACHER_PASSWORD ?? "admin123";

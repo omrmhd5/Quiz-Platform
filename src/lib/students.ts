@@ -1,0 +1,97 @@
+export const STUDENT_ID_PATTERN = /^[a-zA-Z0-9]+$/;
+
+export function validateStudentId(id: string): string | null {
+  const trimmed = id.trim();
+
+  if (!trimmed) {
+    return "Student ID is required.";
+  }
+
+  if (trimmed.length > 32) {
+    return "Student ID must be 32 characters or fewer.";
+  }
+
+  if (!STUDENT_ID_PATTERN.test(trimmed)) {
+    return "Student ID must contain only letters and numbers.";
+  }
+
+  return null;
+}
+
+export function validateStudentName(name: string): string | null {
+  const trimmed = name.trim();
+
+  if (!trimmed) {
+    return "Name is required.";
+  }
+
+  if (trimmed.length > 100) {
+    return "Name must be 100 characters or fewer.";
+  }
+
+  return null;
+}
+
+export type ParsedStudentRow = {
+  id: string;
+  name: string;
+  line: number;
+};
+
+export type StudentActionState = {
+  error?: string;
+  success?: string;
+};
+
+export const studentActionInitialState: StudentActionState = {};
+
+export function parseBulkImport(text: string): {
+  rows: ParsedStudentRow[];
+  errors: string[];
+} {
+  const lines = text.split(/\r?\n/);
+  const rows: ParsedStudentRow[] = [];
+  const errors: string[] = [];
+  const seenIds = new Set<string>();
+
+  lines.forEach((line, index) => {
+    const lineNumber = index + 1;
+    const trimmedLine = line.trim();
+
+    if (!trimmedLine) {
+      return;
+    }
+
+    const commaIndex = trimmedLine.indexOf(",");
+
+    if (commaIndex === -1) {
+      errors.push(`Line ${lineNumber}: use the format id,name`);
+      return;
+    }
+
+    const id = trimmedLine.slice(0, commaIndex).trim();
+    const name = trimmedLine.slice(commaIndex + 1).trim();
+
+    const idError = validateStudentId(id);
+    if (idError) {
+      errors.push(`Line ${lineNumber}: ${idError}`);
+      return;
+    }
+
+    const nameError = validateStudentName(name);
+    if (nameError) {
+      errors.push(`Line ${lineNumber}: ${nameError}`);
+      return;
+    }
+
+    if (seenIds.has(id)) {
+      errors.push(`Line ${lineNumber}: duplicate ID "${id}" in import list.`);
+      return;
+    }
+
+    seenIds.add(id);
+    rows.push({ id, name, line: lineNumber });
+  });
+
+  return { rows, errors };
+}

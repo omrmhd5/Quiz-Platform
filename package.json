@@ -11,9 +11,9 @@
     "db:migrate": "drizzle-kit migrate",
     "db:seed": "tsx src/db/seed.ts",
     "db:studio": "drizzle-kit studio",
-    "docker": "docker compose up",
-    "docker:build": "docker compose up --build",
-    "docker:down": "docker compose down"
+    "docker": "docker compose -f docker/docker-compose.yml --project-directory . up",
+    "docker:build": "docker compose -f docker/docker-compose.yml --project-directory . up --build",
+    "docker:down": "docker compose -f docker/docker-compose.yml --project-directory . down"
   },
   "dependencies": {
     "bcryptjs": "^3.0.3",

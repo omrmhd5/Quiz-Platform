@@ -16,8 +16,7 @@ export function LoginForm() {
       <div className="space-y-2">
         <label
           htmlFor="username"
-          className="block text-sm font-medium text-zinc-700"
-        >
+          className="block text-sm font-medium text-zinc-700">
           Username
         </label>
         <input
@@ -34,8 +33,7 @@ export function LoginForm() {
       <div className="space-y-2">
         <label
           htmlFor="password"
-          className="block text-sm font-medium text-zinc-700"
-        >
+          className="block text-sm font-medium text-zinc-700">
           Password
         </label>
         <input
@@ -58,8 +56,7 @@ export function LoginForm() {
       <button
         type="submit"
         disabled={isPending}
-        className="w-full rounded-lg bg-zinc-900 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-zinc-800 disabled:cursor-not-allowed disabled:opacity-70"
-      >
+        className="w-full rounded-lg bg-zinc-900 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-zinc-800 disabled:cursor-not-allowed disabled:opacity-70">
         {isPending ? "Signing in..." : "Sign in"}
       </button>
     </form>
