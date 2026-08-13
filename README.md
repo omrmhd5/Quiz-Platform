@@ -9,9 +9,9 @@ Local-network quiz platform for classroom use. One teacher runs the app on their
 - Drizzle ORM
 - Docker Compose
 
-## Quick start (Docker)
+## Quick start (development)
 
-1. Install [Docker Desktop](https://www.docker.com/products/docker-desktop/).
+1. Install [Docker Desktop](https://www.docker.com/products/docker-desktop/) and Node.js.
 
 2. Copy environment variables:
 
@@ -19,49 +19,39 @@ Local-network quiz platform for classroom use. One teacher runs the app on their
 cp .env.example .env
 ```
 
-3. Start the platform:
-
-**First time, or after changing code / `docker/Dockerfile`:**
+3. Start PostgreSQL (Docker, background):
 
 ```bash
-docker compose up --build
-# or
-npm run docker:build
-```
-
-**Normal daily use (faster — reuses existing image):**
-
-```bash
-docker compose up
-# or
 npm run docker
 ```
 
-Stop with `Ctrl+C`, then optionally:
+4. First time only — migrate and seed:
+
+```bash
+npm run db:migrate
+npm run db:seed
+```
+
+5. Start the app with hot reload:
+
+```bash
+npm run dev
+```
+
+Open [http://localhost:3000/login](http://localhost:3000/login).
+
+Default teacher credentials (from `.env`):
+
+- **Username:** `admin` (or your `TEACHER_USERNAME`)
+- **Password:** `admin123` (or your `TEACHER_PASSWORD`)
+
+Stop the database when done:
 
 ```bash
 npm run docker:down
 ```
 
-### What runs on every start
-
-When the web container starts, it automatically:
-
-1. Waits for PostgreSQL to be ready
-2. Runs database migrations
-3. Seeds the default teacher (skipped if `admin` already exists)
-4. Starts the app on port **3000** (or `APP_PORT` from `.env`)
-
-Open the teacher console:
-
-```
-http://localhost:3000/login
-```
-
-Default credentials (change in `.env` before first run):
-
-- **Username:** `admin`
-- **Password:** `admin123`
+> **Production Docker** (web + postgres in containers) will be added later. For now, Docker runs **Postgres only**; use `npm run dev` for the app.
 
 ## LAN access for students
 
@@ -89,42 +79,6 @@ http://192.168.1.100:3000/join
 
 > Student join flow is implemented in Increment 4. The `/join` route will be available then.
 
-## Local development (without Docker)
-
-1. Start PostgreSQL locally (or run only the database container):
-
-```bash
-docker compose -f docker/docker-compose.yml --project-directory . up postgres -d
-```
-
-2. Copy and configure environment:
-
-```bash
-cp .env.example .env.local
-```
-
-Set `DATABASE_URL` for local Postgres (host is `localhost`, not `postgres`):
-
-```
-DATABASE_URL=postgresql://quiz:quizpassword@localhost:5433/quiz_platform
-```
-
-3. Install dependencies and migrate:
-
-```bash
-npm install
-npm run db:migrate
-npm run db:seed
-```
-
-4. Start the dev server:
-
-```bash
-npm run dev
-```
-
-Open [http://localhost:3000/login](http://localhost:3000/login).
-
 ## Database commands
 
 | Command               | Description                                |
@@ -138,9 +92,9 @@ Open [http://localhost:3000/login](http://localhost:3000/login).
 
 ```
 docker/
-  docker-compose.yml    Compose stack (web + postgres)
-  Dockerfile            App image build
-  entrypoint.sh         Migrate, seed, start on boot
+  docker-compose.yml    Postgres only (dev)
+  Dockerfile            Production app image (later)
+  entrypoint.sh         Production startup (later)
 src/
   app/
     login/              Teacher login

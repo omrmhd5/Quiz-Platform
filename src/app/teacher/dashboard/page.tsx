@@ -1,9 +1,15 @@
+import {
+  pageDescriptionClassName,
+  pageTitleClassName,
+  statCardClassName,
+} from "@/lib/utils";
+
 export default function DashboardPage() {
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <div>
-        <h1 className="text-2xl font-semibold text-zinc-900">Dashboard</h1>
-        <p className="mt-1 text-sm text-zinc-500">
+        <h1 className={pageTitleClassName}>Dashboard</h1>
+        <p className={pageDescriptionClassName}>
           General stats and recent activity will appear here.
         </p>
       </div>
@@ -15,12 +21,11 @@ export default function DashboardPage() {
           "Sessions run",
           "Overall average score",
         ].map((label) => (
-          <div
-            key={label}
-            className="rounded-xl border border-zinc-200 bg-white p-5 shadow-sm"
-          >
-            <p className="text-sm text-zinc-500">{label}</p>
-            <p className="mt-2 text-3xl font-semibold text-zinc-900">—</p>
+          <div key={label} className={statCardClassName}>
+            <p className="text-sm text-zinc-600">{label}</p>
+            <p className="mt-3 text-3xl font-semibold tabular-nums tracking-tight text-zinc-300">
+              0
+            </p>
           </div>
         ))}
       </div>

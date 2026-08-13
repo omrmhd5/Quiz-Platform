@@ -2,6 +2,11 @@
 
 import { useActionState } from "react";
 import { loginTeacher, type LoginState } from "@/server/actions/auth";
+import {
+  alertErrorClassName,
+  buttonPrimaryClassName,
+  inputClassName,
+} from "@/lib/utils";
 
 const initialState: LoginState = {};
 
@@ -12,7 +17,7 @@ export function LoginForm() {
   );
 
   return (
-    <form action={formAction} className="space-y-4">
+    <form action={formAction} className="space-y-5">
       <div className="space-y-2">
         <label
           htmlFor="username"
@@ -25,7 +30,7 @@ export function LoginForm() {
           type="text"
           autoComplete="username"
           required
-          className="w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm outline-none ring-zinc-900 focus:ring-2"
+          className={inputClassName}
           placeholder="Enter your username"
         />
       </div>
@@ -42,13 +47,13 @@ export function LoginForm() {
           type="password"
           autoComplete="current-password"
           required
-          className="w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm outline-none ring-zinc-900 focus:ring-2"
+          className={inputClassName}
           placeholder="Enter your password"
         />
       </div>
 
       {state.error ? (
-        <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">
+        <p role="alert" className={alertErrorClassName}>
           {state.error}
         </p>
       ) : null}
@@ -56,7 +61,7 @@ export function LoginForm() {
       <button
         type="submit"
         disabled={isPending}
-        className="w-full rounded-lg bg-zinc-900 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-zinc-800 disabled:cursor-not-allowed disabled:opacity-70">
+        className={`${buttonPrimaryClassName} w-full`}>
         {isPending ? "Signing in..." : "Sign in"}
       </button>
     </form>

@@ -16,24 +16,27 @@ services:
       timeout: 5s
       retries: 10
 
-  web:
-    build:
-      context: .
-      dockerfile: docker/Dockerfile
-    restart: unless-stopped
-    depends_on:
-      postgres:
-        condition: service_healthy
-    environment:
-      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
-      TEACHER_USERNAME: ${TEACHER_USERNAME}
-      TEACHER_PASSWORD: ${TEACHER_PASSWORD}
-      SESSION_SECRET: ${SESSION_SECRET}
-      NODE_ENV: production
-      PORT: 3000
-      HOSTNAME: 0.0.0.0
-    ports:
-      - "${APP_PORT}:3000"
+  # Web service disabled for now — use `npm run dev` for the app (hot reload).
+  # Production stack (web + postgres in Docker) will be re-enabled later.
+  #
+  # web:
+  #   build:
+  #     context: .
+  #     dockerfile: docker/Dockerfile
+  #   restart: unless-stopped
+  #   depends_on:
+  #     postgres:
+  #       condition: service_healthy
+  #   environment:
+  #     DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+  #     TEACHER_USERNAME: ${TEACHER_USERNAME}
+  #     TEACHER_PASSWORD: ${TEACHER_PASSWORD}
+  #     SESSION_SECRET: ${SESSION_SECRET}
+  #     NODE_ENV: production
+  #     PORT: 3000
+  #     HOSTNAME: 0.0.0.0
+  #   ports:
+  #     - "${APP_PORT}:3000"
 
 volumes:
   pgdata:

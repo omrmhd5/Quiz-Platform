@@ -1,4 +1,13 @@
+"use client";
+
 import Link from "next/link";
+import { usePathname } from "next/navigation";
+import {
+  brandLinkClassName,
+  buttonGhostClassName,
+  cn,
+  navLinkClassName,
+} from "@/lib/utils";
 
 const links = [
   { href: "/teacher/dashboard", label: "Dashboard" },
@@ -12,37 +21,43 @@ type TeacherNavProps = {
 };
 
 export function TeacherNav({ username, logoutAction }: TeacherNavProps) {
+  const pathname = usePathname();
+
   return (
-    <header className="border-b border-zinc-200 bg-white">
-      <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 px-4 py-4">
-        <div>
-          <p className="text-sm font-semibold uppercase tracking-wide text-zinc-500">
+    <header className="border-b border-zinc-200/80 bg-white/95 backdrop-blur-sm">
+      <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 px-4 py-3 sm:px-6">
+        <Link href="/teacher/dashboard" className={brandLinkClassName}>
+          <p className="ui-brand-title truncate text-lg font-semibold tracking-tight text-zinc-900">
             Quiz Platform
           </p>
-          <p className="text-lg font-semibold text-zinc-900">Teacher Console</p>
-        </div>
+          <p className="text-sm text-zinc-500">Teacher console</p>
+        </Link>
 
-        <nav className="flex flex-wrap items-center gap-1">
-          {links.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className="rounded-md px-3 py-2 text-sm font-medium text-zinc-600 transition-colors hover:bg-zinc-100 hover:text-zinc-900"
-            >
-              {link.label}
-            </Link>
-          ))}
+        <nav
+          aria-label="Teacher sections"
+          className="flex flex-wrap items-center gap-1 rounded-lg bg-zinc-100/90 p-1">
+          {links.map((link) => {
+            const isActive =
+              pathname === link.href || pathname.startsWith(`${link.href}/`);
+
+            return (
+              <Link
+                key={link.href}
+                href={link.href}
+                aria-current={isActive ? "page" : undefined}
+                className={cn(navLinkClassName, isActive && "is-active")}>
+                {link.label}
+              </Link>
+            );
+          })}
         </nav>
 
         <div className="flex items-center gap-3">
-          <span className="hidden text-sm text-zinc-500 sm:inline">
-            Signed in as {username}
+          <span className="hidden text-sm text-zinc-600 sm:inline">
+            {username}
           </span>
           <form action={logoutAction}>
-            <button
-              type="submit"
-              className="rounded-md border border-zinc-300 px-3 py-2 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-50"
-            >
+            <button type="submit" className={buttonGhostClassName}>
               Sign out
             </button>
           </form>

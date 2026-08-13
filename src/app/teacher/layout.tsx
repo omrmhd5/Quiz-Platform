@@ -8,9 +8,11 @@ export default async function TeacherLayout({
   const session = await requireTeacherSession();
 
   return (
-    <div className="min-h-full bg-zinc-50">
+    <div className="flex min-h-dvh flex-col bg-zinc-50">
       <TeacherNav username={session.username} logoutAction={logoutTeacher} />
-      <main className="mx-auto max-w-6xl px-4 py-8">{children}</main>
+      <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-8 sm:px-6">
+        {children}
+      </main>
     </div>
   );
 }

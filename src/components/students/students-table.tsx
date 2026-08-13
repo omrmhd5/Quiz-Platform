@@ -2,6 +2,15 @@
 
 import { useActionState, useEffect, useMemo, useState } from "react";
 import type { StudentActionState } from "@/lib/students";
+import {
+  buttonDangerClassName,
+  buttonPrimaryClassName,
+  buttonSecondaryClassName,
+  cn,
+  inputClassName,
+  panelClassName,
+} from "@/lib/utils";
+import { ConfirmDialog } from "@/components/confirm-dialog";
 import { deleteStudent, updateStudent } from "@/server/actions/students";
 
 type Student = {
@@ -33,13 +42,13 @@ export function StudentsTable({ students }: StudentsTableProps) {
   }, [query, students]);
 
   return (
-    <div className="space-y-4 rounded-xl border border-zinc-200 bg-white p-5 shadow-sm">
+    <div className={`${panelClassName} space-y-4`}>
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h2 className="text-base font-semibold text-zinc-900">
             Student roster
           </h2>
-          <p className="mt-1 text-sm text-zinc-500">
+          <p className="mt-1 text-sm text-zinc-600">
             {students.length} registered · {filteredStudents.length} shown
           </p>
         </div>
@@ -49,12 +58,12 @@ export function StudentsTable({ students }: StudentsTableProps) {
           value={query}
           onChange={(event) => setQuery(event.target.value)}
           placeholder="Search by ID or name"
-          className="w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm outline-none ring-zinc-900 focus:ring-2 sm:max-w-xs"
+          className={`${inputClassName} sm:max-w-xs`}
         />
       </div>
 
       {filteredStudents.length === 0 ? (
-        <p className="rounded-lg border border-dashed border-zinc-300 px-4 py-8 text-center text-sm text-zinc-500">
+        <p className="rounded-lg border border-dashed border-zinc-300 px-4 py-8 text-center text-sm text-zinc-600">
           {students.length === 0
             ? "No students yet. Add one above or import a list."
             : "No students match your search."}
@@ -79,7 +88,7 @@ export function StudentsTable({ students }: StudentsTableProps) {
                     onSaved={() => setEditingId(null)}
                   />
                 ) : (
-                  <tr key={student.id}>
+                  <tr key={student.id} className="ui-table-row">
                     <td className="px-3 py-3 font-mono text-zinc-900">
                       {student.id}
                     </td>
@@ -89,10 +98,13 @@ export function StudentsTable({ students }: StudentsTableProps) {
                         <button
                           type="button"
                           onClick={() => setEditingId(student.id)}
-                          className="rounded-md border border-zinc-300 px-2.5 py-1.5 text-xs font-medium text-zinc-700 hover:bg-zinc-50">
+                          className={cn(buttonSecondaryClassName, "ui-btn-sm")}>
                           Edit
                         </button>
-                        <DeleteStudentButton studentId={student.id} />
+                        <DeleteStudentButton
+                          studentId={student.id}
+                          studentName={student.name}
+                        />
                       </div>
                     </td>
                   </tr>
@@ -128,7 +140,7 @@ function EditStudentRow({
   }, [state.success, onSaved]);
 
   return (
-    <tr>
+    <tr className="ui-table-row">
       <td className="px-3 py-3 font-mono text-zinc-900">{student.id}</td>
       <td className="px-3 py-3" colSpan={2}>
         <form action={formAction} className="flex flex-col gap-2 sm:flex-row">
@@ -137,19 +149,19 @@ function EditStudentRow({
             type="text"
             defaultValue={student.name}
             required
-            className="w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm outline-none ring-zinc-900 focus:ring-2"
+            className={inputClassName}
           />
           <div className="flex gap-2">
             <button
               type="submit"
               disabled={isPending}
-              className="rounded-md bg-zinc-900 px-3 py-2 text-xs font-medium text-white hover:bg-zinc-800 disabled:opacity-70">
+              className={cn(buttonPrimaryClassName, "ui-btn-sm")}>
               Save
             </button>
             <button
               type="button"
               onClick={onCancel}
-              className="rounded-md border border-zinc-300 px-3 py-2 text-xs font-medium text-zinc-700 hover:bg-zinc-50">
+              className={cn(buttonSecondaryClassName, "ui-btn-sm")}>
               Cancel
             </button>
           </div>
@@ -162,34 +174,52 @@ function EditStudentRow({
   );
 }
 
-function DeleteStudentButton({ studentId }: { studentId: string }) {
+function DeleteStudentButton({
+  studentId,
+  studentName,
+}: {
+  studentId: string;
+  studentName: string;
+}) {
+  const [open, setOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
 
-  async function handleDelete() {
-    const confirmed = window.confirm(
-      `Delete student ${studentId}? This cannot be undone.`,
-    );
-
-    if (!confirmed) {
-      return;
-    }
-
+  async function handleConfirm() {
     setIsDeleting(true);
 
     try {
       await deleteStudent(studentId);
+      setOpen(false);
     } finally {
       setIsDeleting(false);
     }
   }
 
   return (
-    <button
-      type="button"
-      onClick={handleDelete}
-      disabled={isDeleting}
-      className="rounded-md border border-red-200 px-2.5 py-1.5 text-xs font-medium text-red-700 hover:bg-red-50 disabled:opacity-70">
-      {isDeleting ? "Deleting..." : "Delete"}
-    </button>
+    <>
+      <button
+        type="button"
+        onClick={() => setOpen(true)}
+        disabled={isDeleting}
+        className={cn(buttonDangerClassName, "ui-btn-sm")}>
+        Delete
+      </button>
+
+      <ConfirmDialog
+        open={open}
+        title={`Delete student ${studentId}?`}
+        description={`${studentName} will be permanently removed. This cannot be undone.`}
+        confirmLabel={isDeleting ? "Deleting..." : "Delete student"}
+        cancelLabel="Cancel"
+        variant="danger"
+        isPending={isDeleting}
+        onConfirm={handleConfirm}
+        onCancel={() => {
+          if (!isDeleting) {
+            setOpen(false);
+          }
+        }}
+      />
+    </>
   );
 }

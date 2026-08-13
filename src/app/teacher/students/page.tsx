@@ -1,16 +1,17 @@
 import { AddStudentForm } from "@/components/students/add-student-form";
 import { ImportStudentsForm } from "@/components/students/import-students-form";
 import { StudentsTable } from "@/components/students/students-table";
+import { pageDescriptionClassName, pageTitleClassName } from "@/lib/utils";
 import { getStudents } from "@/server/actions/students";
 
 export default async function StudentsPage() {
   const studentRows = await getStudents();
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <div>
-        <h1 className="text-2xl font-semibold text-zinc-900">Students</h1>
-        <p className="mt-1 text-sm text-zinc-500">
+        <h1 className={pageTitleClassName}>Students</h1>
+        <p className={pageDescriptionClassName}>
           Manage your student roster by ID and name.
         </p>
       </div>
