@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { ConfirmDialog } from "@/components/confirm-dialog";
+import { LiveJoinedCount } from "@/components/sessions/live-joined-count";
 import type { ActiveSessionInfo } from "@/lib/sessions";
 import {
   buttonPrimaryClassName,
@@ -75,9 +75,12 @@ export function ActiveSessionBanner({
               {activeSession.quizTitle}
             </Link>
           </p>
-          <p className="text-sm text-zinc-600">
-            {joinedCount} student{joinedCount === 1 ? "" : "s"} joined
-          </p>
+          <LiveJoinedCount
+            key={activeSession.sessionId}
+            sessionId={activeSession.sessionId}
+            initialCount={joinedCount}
+            className="text-sm text-zinc-600"
+          />
         </div>
 
         <div className="flex flex-wrap gap-2">

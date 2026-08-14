@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { ConfirmDialog } from "@/components/confirm-dialog";
+import { LiveJoinedCount } from "@/components/sessions/live-joined-count";
 import type { ActiveSessionInfo } from "@/lib/sessions";
 import {
   alertErrorClassName,
@@ -13,10 +14,7 @@ import {
   inputClassName,
   panelClassName,
 } from "@/lib/utils";
-import {
-  closeQuizSession,
-  launchQuizSession,
-} from "@/server/actions/sessions";
+import { closeQuizSession, launchQuizSession } from "@/server/actions/sessions";
 
 type LaunchQuizPanelProps = {
   quizId: string;
@@ -58,7 +56,9 @@ export function LaunchQuizPanel({
         return;
       }
 
-      setSuccess(`"${quizTitle}" is now live. Share the join link with students.`);
+      setSuccess(
+        `"${quizTitle}" is now live. Share the join link with students.`,
+      );
       setReplaceDialogOpen(false);
       router.refresh();
     } catch (launchError) {
@@ -139,12 +139,18 @@ export function LaunchQuizPanel({
               <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-green-500" />
             </span>
             <span className="text-sm font-medium text-green-800">Live now</span>
-            <span className="text-sm text-zinc-500">
-              · {joinedCount} student{joinedCount === 1 ? "" : "s"} joined
-            </span>
+            <LiveJoinedCount
+              key={activeSession!.sessionId}
+              sessionId={activeSession!.sessionId}
+              initialCount={joinedCount}
+              prefix="· "
+              className="text-sm text-zinc-500"
+            />
           </div>
 
-          <label htmlFor="join-url" className="block text-sm font-medium text-zinc-700">
+          <label
+            htmlFor="join-url"
+            className="block text-sm font-medium text-zinc-700">
             Student join link
           </label>
           <div className="flex flex-col gap-2 sm:flex-row">
@@ -157,8 +163,7 @@ export function LaunchQuizPanel({
             <button
               type="button"
               onClick={handleCopy}
-              className={cn(buttonSecondaryClassName, "shrink-0")}
-            >
+              className={cn(buttonSecondaryClassName, "shrink-0")}>
               {copyLabel}
             </button>
           </div>
@@ -171,8 +176,7 @@ export function LaunchQuizPanel({
             type="button"
             onClick={handleClose}
             disabled={isClosing}
-            className={buttonSecondaryClassName}
-          >
+            className={buttonSecondaryClassName}>
             {isClosing ? "Closing..." : "Close session"}
           </button>
         </div>
@@ -188,8 +192,7 @@ export function LaunchQuizPanel({
 
             void handleLaunch(false);
           }}
-          className={buttonPrimaryClassName}
-        >
+          className={buttonPrimaryClassName}>
           {isLaunching ? "Launching..." : "Launch quiz"}
         </button>
       )}
@@ -200,9 +203,7 @@ export function LaunchQuizPanel({
         </p>
       ) : null}
 
-      {success ? (
-        <p className={alertSuccessClassName}>{success}</p>
-      ) : null}
+      {success ? <p className={alertSuccessClassName}>{success}</p> : null}
 
       <ConfirmDialog
         open={replaceDialogOpen}

@@ -130,6 +130,7 @@ This project is built in 8 increments.
 - **Increment 2** — Student roster CRUD + bulk import at `/teacher/students`
 - **Increment 3** — MCQ quiz creation at `/teacher/quizzes` (paste, mark correct, save/list/edit/delete)
 - **Increment 4** — Launch live sessions, student join at `/join`, attempt placeholder at `/quiz/[attemptId]`
+- **Increment 5** — Shuffled MCQ quiz taking, submit, auto-grading, student score screen
 
 **Increment 2** includes:
 
@@ -147,6 +148,13 @@ This project is built in 8 increments.
 - Copyable join URL for the classroom network
 - Students join at `/join` with their registered ID
 - Attempt created or resumed; placeholder start screen at `/quiz/[attemptId]`
+
+**Increment 5** includes:
+
+- Questions and answer options shuffled per student attempt
+- Full quiz UI at `/quiz/[attemptId]` with radio MCQ answers
+- Submit with confirmation; server-side grading
+- Results screen: score %, correct, wrong, and skipped counts (no answer review)
 
 See `docs/PROJECT_PLAN.md` for the full roadmap (added in Increment 8).
 

@@ -4,12 +4,7 @@ import { and, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { notFound, redirect } from "next/navigation";
 import { db } from "@/db";
-import {
-  attempts,
-  quizSessions,
-  quizzes,
-  students,
-} from "@/db/schema";
+import { attempts, quizSessions, quizzes, students } from "@/db/schema";
 import { requireTeacherSession } from "@/lib/auth";
 import type { ActiveSessionInfo } from "@/lib/sessions";
 import { validateStudentId } from "@/lib/students";
@@ -199,6 +194,9 @@ export async function joinByStudentId(
       status: "in_progress",
     })
     .returning({ id: attempts.id });
+
+  revalidatePath("/teacher/quizzes");
+  revalidatePath(`/teacher/quizzes/${activeSession.quizId}`);
 
   redirect(`/quiz/${attempt.id}`);
 }
