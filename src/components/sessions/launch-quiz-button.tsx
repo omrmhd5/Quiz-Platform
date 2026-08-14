@@ -7,7 +7,7 @@ import { ConfirmDialog } from "@/components/confirm-dialog";
 import type { ActiveSessionInfo } from "@/lib/sessions";
 import {
   buttonPrimaryClassName,
-  buttonSecondaryClassName,
+  buttonSuccessClassName,
   cn,
 } from "@/lib/utils";
 import { launchQuizSession } from "@/server/actions/sessions";
@@ -55,10 +55,7 @@ export function LaunchQuizButton({
     return (
       <Link
         href={`/teacher/quizzes/${quizId}`}
-        className={cn(
-          buttonSecondaryClassName,
-          "ui-btn-sm border-green-200 bg-green-50 text-green-800 hover:bg-green-100",
-        )}>
+        className={cn(buttonSuccessClassName, "ui-btn-sm")}>
         Live
       </Link>
     );

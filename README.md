@@ -131,6 +131,7 @@ This project is built in 8 increments.
 - **Increment 3** — MCQ quiz creation at `/teacher/quizzes` (paste, mark correct, save/list/edit/delete)
 - **Increment 4** — Launch live sessions, student join at `/join`, attempt placeholder at `/quiz/[attemptId]`
 - **Increment 5** — Shuffled MCQ quiz taking, submit, auto-grading, student score screen
+- **Increment 6** — Session results on each quiz detail page with live updates
 
 **Increment 2** includes:
 
@@ -155,6 +156,13 @@ This project is built in 8 increments.
 - Full quiz UI at `/quiz/[attemptId]` with radio MCQ answers
 - Submit with confirmation; server-side grading
 - Results screen: score %, correct, wrong, and skipped counts (no answer review)
+
+**Increment 6** includes:
+
+- Results section on `/teacher/quizzes/[id]` for every session of that quiz
+- Student scores, status, and summary stats per session
+- Live refresh while a session is active
+- Jump links from the launch panel and live banner
 
 See `docs/PROJECT_PLAN.md` for the full roadmap (added in Increment 8).
 

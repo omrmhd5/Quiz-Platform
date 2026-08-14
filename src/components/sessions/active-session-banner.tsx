@@ -6,13 +6,12 @@ import { useState } from "react";
 import { LiveJoinedCount } from "@/components/sessions/live-joined-count";
 import type { ActiveSessionInfo } from "@/lib/sessions";
 import {
-  buttonPrimaryClassName,
   buttonSecondaryClassName,
   cn,
   inputClassName,
   panelClassName,
 } from "@/lib/utils";
-import { closeQuizSession, launchQuizSession } from "@/server/actions/sessions";
+import { closeQuizSession } from "@/server/actions/sessions";
 
 type ActiveSessionBannerProps = {
   activeSession: ActiveSessionInfo;
@@ -85,9 +84,9 @@ export function ActiveSessionBanner({
 
         <div className="flex flex-wrap gap-2">
           <Link
-            href={`/teacher/quizzes/${activeSession.quizId}`}
+            href={`/teacher/quizzes/${activeSession.quizId}#session-${activeSession.sessionId}`}
             className={cn(buttonSecondaryClassName, "ui-btn-sm")}>
-            Manage
+            View live results
           </Link>
           <button
             type="button"

@@ -11,6 +11,8 @@ import {
   panelClassName,
 } from "@/lib/utils";
 import { ConfirmDialog } from "@/components/confirm-dialog";
+import { PaginationControls } from "@/components/pagination-controls";
+import { STUDENTS_PAGE_SIZE, paginateSlice } from "@/lib/pagination";
 import { deleteStudent, updateStudent } from "@/server/actions/students";
 
 type Student = {
@@ -26,6 +28,7 @@ type StudentsTableProps = {
 export function StudentsTable({ students }: StudentsTableProps) {
   const [query, setQuery] = useState("");
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [page, setPage] = useState(1);
 
   const filteredStudents = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase();
@@ -40,6 +43,15 @@ export function StudentsTable({ students }: StudentsTableProps) {
         student.name.toLowerCase().includes(normalizedQuery),
     );
   }, [query, students]);
+
+  useEffect(() => {
+    setPage(1);
+  }, [query]);
+
+  const pagination = useMemo(
+    () => paginateSlice(filteredStudents, page, STUDENTS_PAGE_SIZE),
+    [filteredStudents, page],
+  );
 
   return (
     <div className={`${panelClassName} space-y-4`}>
@@ -69,17 +81,26 @@ export function StudentsTable({ students }: StudentsTableProps) {
             : "No students match your search."}
         </p>
       ) : (
-        <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-zinc-200 text-sm">
-            <thead>
-              <tr className="text-left text-zinc-500">
-                <th className="px-3 py-2 font-medium">ID</th>
-                <th className="px-3 py-2 font-medium">Name</th>
-                <th className="px-3 py-2 font-medium">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-zinc-100">
-              {filteredStudents.map((student) =>
+        <div className="space-y-4">
+          <PaginationControls
+            page={pagination.page}
+            pageCount={pagination.pageCount}
+            totalItems={filteredStudents.length}
+            pageSize={STUDENTS_PAGE_SIZE}
+            onPageChange={setPage}
+          />
+
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-zinc-200 text-sm">
+              <thead>
+                <tr className="text-left text-zinc-500">
+                  <th className="px-3 py-2 font-medium">ID</th>
+                  <th className="px-3 py-2 font-medium">Name</th>
+                  <th className="px-3 py-2 font-medium">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-zinc-100">
+                {pagination.items.map((student) =>
                 editingId === student.id ? (
                   <EditStudentRow
                     key={student.id}
@@ -112,6 +133,15 @@ export function StudentsTable({ students }: StudentsTableProps) {
               )}
             </tbody>
           </table>
+          </div>
+
+          <PaginationControls
+            page={pagination.page}
+            pageCount={pagination.pageCount}
+            totalItems={filteredStudents.length}
+            pageSize={STUDENTS_PAGE_SIZE}
+            onPageChange={setPage}
+          />
         </div>
       )}
     </div>

@@ -1,16 +1,16 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { DeleteQuizButton } from "@/components/quizzes/delete-quiz-button";
-import { LaunchQuizPanel } from "@/components/sessions/launch-quiz-panel";
+import { QuizDetailBody } from "@/components/quizzes/quiz-detail-body";
 import { getJoinUrl } from "@/lib/join-url";
 import {
   buttonSecondaryClassName,
   cn,
   pageDescriptionClassName,
   pageTitleClassName,
-  panelClassName,
 } from "@/lib/utils";
 import { getQuizById } from "@/server/actions/quizzes";
+import { getQuizSessionsResults } from "@/server/actions/session-results";
 import {
   getActiveSession,
   getActiveSessionAttemptCount,
@@ -22,10 +22,11 @@ type QuizDetailPageProps = {
 
 export default async function QuizDetailPage({ params }: QuizDetailPageProps) {
   const { id } = await params;
-  const [quiz, activeSession, joinUrl] = await Promise.all([
+  const [quiz, activeSession, joinUrl, sessionResults] = await Promise.all([
     getQuizById(id),
     getActiveSession(),
     getJoinUrl(),
+    getQuizSessionsResults(id),
   ]);
 
   if (!quiz) {
@@ -38,6 +39,17 @@ export default async function QuizDetailPage({ params }: QuizDetailPageProps) {
     isThisQuizLive && activeSession
       ? await getActiveSessionAttemptCount(activeSession.sessionId)
       : 0;
+
+  const questionViews = quiz.questions.map((question) => ({
+    id: question.id,
+    prompt: question.prompt,
+    options: question.options.map((option) => ({
+      id: option.id,
+      text: option.text,
+      orderIndex: option.orderIndex,
+      isCorrect: option.isCorrect,
+    })),
+  }));
 
   return (
     <div className="space-y-8">
@@ -86,56 +98,15 @@ export default async function QuizDetailPage({ params }: QuizDetailPageProps) {
         </p>
       ) : null}
 
-      <LaunchQuizPanel
+      <QuizDetailBody
         quizId={quiz.id}
         quizTitle={quiz.title}
         joinUrl={joinUrl}
         activeSession={activeSession}
         joinedCount={joinedCount}
+        questions={questionViews}
+        sessions={sessionResults}
       />
-
-      <div className="space-y-4">
-        {quiz.questions.map((question, index) => {
-          const correctOption = question.options.find(
-            (option) => option.isCorrect,
-          );
-
-          return (
-            <article
-              key={question.id}
-              className={`${panelClassName} space-y-3`}>
-              <h2 className="font-medium text-zinc-900">
-                {index + 1}. {question.prompt}
-              </h2>
-              <ul className="space-y-2">
-                {question.options.map((option) => {
-                  const letter = String.fromCharCode(65 + option.orderIndex);
-                  const isCorrect = option.id === correctOption?.id;
-
-                  return (
-                    <li
-                      key={option.id}
-                      className={cn(
-                        "rounded-lg border px-3 py-2 text-sm",
-                        isCorrect
-                          ? "border-green-200 bg-green-50 text-green-900"
-                          : "border-zinc-200 bg-zinc-50 text-zinc-800",
-                      )}>
-                      <span className="font-mono font-medium">{letter})</span>{" "}
-                      {option.text}
-                      {isCorrect ? (
-                        <span className="ml-2 text-xs font-medium uppercase tracking-wide text-green-700">
-                          Correct
-                        </span>
-                      ) : null}
-                    </li>
-                  );
-                })}
-              </ul>
-            </article>
-          );
-        })}
-      </div>
     </div>
   );
 }

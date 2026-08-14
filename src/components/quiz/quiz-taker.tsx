@@ -1,12 +1,15 @@
 "use client";
 
-import { useActionState, useRef, useState } from "react";
+import { useActionState, useMemo, useRef, useState } from "react";
 import { ConfirmDialog } from "@/components/confirm-dialog";
+import { PaginationControls } from "@/components/pagination-controls";
 import type { AttemptQuizView } from "@/lib/attempts";
 import { submitAttemptInitialState } from "@/lib/attempts";
+import { QUESTIONS_PAGE_SIZE, paginateSlice } from "@/lib/pagination";
 import {
   alertErrorClassName,
   buttonPrimaryClassName,
+  buttonSecondaryClassName,
   cn,
   enterClassName,
   pageDescriptionClassName,
@@ -26,6 +29,20 @@ export function QuizTaker({ quiz }: QuizTakerProps) {
     submitAttemptInitialState,
   );
   const [confirmOpen, setConfirmOpen] = useState(false);
+  const [page, setPage] = useState(1);
+  const [answers, setAnswers] = useState<Record<string, string>>({});
+
+  const pagination = useMemo(
+    () => paginateSlice(quiz.questions, page, QUESTIONS_PAGE_SIZE),
+    [page, quiz.questions],
+  );
+
+  function handleAnswerChange(questionId: string, optionId: string) {
+    setAnswers((current) => ({
+      ...current,
+      [questionId]: optionId,
+    }));
+  }
 
   return (
     <div
@@ -43,8 +60,24 @@ export function QuizTaker({ quiz }: QuizTakerProps) {
 
       <form ref={formRef} action={formAction} className="space-y-4">
         <input type="hidden" name="attemptId" value={quiz.attemptId} />
-
         {quiz.questions.map((question) => (
+          <input
+            key={question.id}
+            type="hidden"
+            name={`answer-${question.id}`}
+            value={answers[question.id] ?? ""}
+          />
+        ))}
+
+        <PaginationControls
+          page={pagination.page}
+          pageCount={pagination.pageCount}
+          totalItems={quiz.questions.length}
+          pageSize={QUESTIONS_PAGE_SIZE}
+          onPageChange={setPage}
+        />
+
+        {pagination.items.map((question) => (
           <article key={question.id} className={`${panelClassName} space-y-4`}>
             <h2 className="text-base font-medium leading-snug text-zinc-900">
               {question.number}. {question.prompt}
@@ -61,8 +94,9 @@ export function QuizTaker({ quiz }: QuizTakerProps) {
                   )}>
                   <input
                     type="radio"
-                    name={`answer-${question.id}`}
                     value={option.id}
+                    checked={answers[question.id] === option.id}
+                    onChange={() => handleAnswerChange(question.id, option.id)}
                     className="mt-0.5 shrink-0"
                   />
                   <span>
@@ -77,19 +111,45 @@ export function QuizTaker({ quiz }: QuizTakerProps) {
           </article>
         ))}
 
+        <PaginationControls
+          page={pagination.page}
+          pageCount={pagination.pageCount}
+          totalItems={quiz.questions.length}
+          pageSize={QUESTIONS_PAGE_SIZE}
+          onPageChange={setPage}
+        />
+
         {state.error ? (
           <p role="alert" className={alertErrorClassName}>
             {state.error}
           </p>
         ) : null}
 
-        <button
-          type="button"
-          disabled={isPending}
-          onClick={() => setConfirmOpen(true)}
-          className={cn(buttonPrimaryClassName, "w-full sm:w-auto")}>
-          {isPending ? "Submitting..." : "Submit quiz"}
-        </button>
+        <div className="flex flex-wrap gap-2">
+          {pagination.page > 1 ? (
+            <button
+              type="button"
+              onClick={() => setPage((current) => current - 1)}
+              className={cn(buttonSecondaryClassName, "sm:w-auto")}>
+              Previous questions
+            </button>
+          ) : null}
+          {pagination.page < pagination.pageCount ? (
+            <button
+              type="button"
+              onClick={() => setPage((current) => current + 1)}
+              className={cn(buttonSecondaryClassName, "sm:w-auto")}>
+              Next questions
+            </button>
+          ) : null}
+          <button
+            type="button"
+            disabled={isPending}
+            onClick={() => setConfirmOpen(true)}
+            className={cn(buttonPrimaryClassName, "w-full sm:ml-auto sm:w-auto")}>
+            {isPending ? "Submitting..." : "Submit quiz"}
+          </button>
+        </div>
 
         <ConfirmDialog
           open={confirmOpen}

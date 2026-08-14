@@ -37,8 +37,7 @@ export default async function EditQuizPage({ params }: EditQuizPageProps) {
         </div>
         <Link
           href={`/teacher/quizzes/${quiz.id}`}
-          className={cn(buttonSecondaryClassName, "inline-flex items-center")}
-        >
+          className={cn(buttonSecondaryClassName, "inline-flex items-center")}>
           Cancel
         </Link>
       </div>

@@ -14,6 +14,8 @@ export const buttonPrimaryClassName = cn("ui-btn ui-btn-primary ui-press");
 
 export const buttonSecondaryClassName = cn("ui-btn ui-btn-secondary ui-press");
 
+export const buttonSuccessClassName = cn("ui-btn ui-btn-success ui-press");
+
 export const buttonGhostClassName = cn("ui-btn ui-btn-ghost ui-press");
 
 export const buttonDangerClassName = cn("ui-btn ui-btn-danger ui-press");

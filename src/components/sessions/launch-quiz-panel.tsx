@@ -22,6 +22,7 @@ type LaunchQuizPanelProps = {
   joinUrl: string;
   activeSession: ActiveSessionInfo | null;
   joinedCount: number;
+  onViewLiveResults?: () => void;
 };
 
 export function LaunchQuizPanel({
@@ -30,6 +31,7 @@ export function LaunchQuizPanel({
   joinUrl,
   activeSession,
   joinedCount,
+  onViewLiveResults,
 }: LaunchQuizPanelProps) {
   const isThisQuizLive = activeSession?.quizId === quizId;
   const otherQuizLive =
@@ -172,13 +174,21 @@ export function LaunchQuizPanel({
             phone or tablet and enter their ID.
           </p>
 
-          <button
-            type="button"
-            onClick={handleClose}
-            disabled={isClosing}
-            className={buttonSecondaryClassName}>
-            {isClosing ? "Closing..." : "Close session"}
-          </button>
+          <div className="flex flex-wrap gap-2">
+            <button
+              type="button"
+              onClick={onViewLiveResults}
+              className={cn(buttonSecondaryClassName, "ui-btn-sm")}>
+              View live results
+            </button>
+            <button
+              type="button"
+              onClick={handleClose}
+              disabled={isClosing}
+              className={buttonSecondaryClassName}>
+              {isClosing ? "Closing..." : "Close session"}
+            </button>
+          </div>
         </div>
       ) : (
         <button

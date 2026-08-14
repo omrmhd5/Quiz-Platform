@@ -291,6 +291,7 @@ export async function submitAttempt(
   });
 
   revalidatePath(`/quiz/${attemptId}`);
+  revalidatePath(`/teacher/quizzes/${attempt.session.quiz.id}`);
 
   redirect(`/quiz/${attemptId}`);
 }

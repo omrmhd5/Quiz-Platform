@@ -76,7 +76,7 @@ export function ConfirmDialog({
         aria-modal="true"
         aria-labelledby={titleId}
         aria-describedby={descriptionId}
-        className="ui-modal-panel ui-enter">
+        className="ui-modal-panel ui-enter max-w-md">
         <h2
           id={titleId}
           className="text-lg font-semibold tracking-tight text-zinc-900">
