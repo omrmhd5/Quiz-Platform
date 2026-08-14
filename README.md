@@ -77,7 +77,19 @@ Share this link with students (replace with your IP):
 http://192.168.1.100:3000/join
 ```
 
-> Student join flow is implemented in Increment 4. The `/join` route will be available then.
+Students open `/join` on the teacher's LAN IP, enter their student ID, and join the active quiz session. When you use the teacher console on `localhost`, the join link automatically uses your machine's LAN IP (e.g. `http://192.168.1.100:3000/join`). Set `LAN_HOST` in `.env` to override if you have multiple network adapters.
+
+> **Phone can't load the page?** The app works on any phone browser — there is no mobile app and **HTTP is fine** on a local network (HTTPS is not required). Use `/join` (not `/`, which goes to teacher login). Phone and PC must be on the **same Wi‑Fi** (not guest/isolated Wi‑Fi, not mobile data).
+
+**Most common fix on Windows:** your PC allows `localhost` but blocks other devices. Open **PowerShell as Administrator** in the project folder and run:
+
+```powershell
+npm run dev:firewall
+```
+
+Then restart `npm run dev` and try `http://YOUR_LAN_IP:3000/join` on the phone again.
+
+If it still fails: confirm the phone is on Wi‑Fi (not cellular), disable VPN on the phone, and check the router does not use "AP isolation" / "client isolation".
 
 ## Database commands
 
@@ -117,6 +129,7 @@ This project is built in 8 increments.
 - **Increment 1** — Docker, Drizzle, teacher login, protected shell
 - **Increment 2** — Student roster CRUD + bulk import at `/teacher/students`
 - **Increment 3** — MCQ quiz creation at `/teacher/quizzes` (paste, mark correct, save/list/edit/delete)
+- **Increment 4** — Launch live sessions, student join at `/join`, attempt placeholder at `/quiz/[attemptId]`
 
 **Increment 2** includes:
 
@@ -127,6 +140,13 @@ This project is built in 8 increments.
 - Create MCQ quizzes via **manual builder** (Google Forms style) or **paste import**
 - Paste format: blank line between questions, `A)` options (count auto-detected)
 - Quiz list, detail view, edit, and delete (blocked if quiz has sessions)
+
+**Increment 4** includes:
+
+- Teacher launches a quiz from the quiz detail page (one active session globally)
+- Copyable join URL for the classroom network
+- Students join at `/join` with their registered ID
+- Attempt created or resumed; placeholder start screen at `/quiz/[attemptId]`
 
 See `docs/PROJECT_PLAN.md` for the full roadmap (added in Increment 8).
 
@@ -139,6 +159,7 @@ See `docs/PROJECT_PLAN.md` for the full roadmap (added in Increment 8).
 | `POSTGRES_DB`       | Database name                                                               |
 | `POSTGRES_PORT`     | Host port for Postgres (use `5433` if local Postgres already uses `5432`)   |
 | `APP_PORT`          | Host port for the web app (default `3000`)                                  |
+| `LAN_HOST`          | Optional LAN IP or host for student join links (auto-detected if omitted)   |
 | `TEACHER_USERNAME`  | Seed teacher username                                                       |
 | `TEACHER_PASSWORD`  | Seed teacher password                                                       |
 | `SESSION_SECRET`    | Cookie encryption secret (32+ characters)                                   |

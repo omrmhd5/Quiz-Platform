@@ -3,7 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev -H 0.0.0.0",
+    "dev:firewall": "powershell -ExecutionPolicy Bypass -File scripts/allow-lan-firewall.ps1",
+    "dev:firewall:remove": "powershell -ExecutionPolicy Bypass -File scripts/remove-lan-firewall.ps1",
     "build": "next build",
     "start": "next start -H 0.0.0.0",
     "lint": "eslint",
