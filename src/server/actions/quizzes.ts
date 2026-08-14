@@ -1,10 +1,10 @@
 "use server";
 
-import { and, desc, eq } from "drizzle-orm";
+import { and, count, desc, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { notFound, redirect } from "next/navigation";
 import { db } from "@/db";
-import { questionOptions, questions, quizzes } from "@/db/schema";
+import { questionOptions, questions, quizSessions, quizzes } from "@/db/schema";
 import { requireTeacherSession } from "@/lib/auth";
 import {
   validateQuizQuestions,
@@ -109,9 +109,18 @@ export async function getQuizzes() {
       status: quizzes.status,
       questionCount: quizzes.questionCount,
       createdAt: quizzes.createdAt,
+      sessionCount: count(quizSessions.id),
     })
     .from(quizzes)
+    .leftJoin(quizSessions, eq(quizSessions.quizId, quizzes.id))
     .where(eq(quizzes.teacherId, session.teacherId))
+    .groupBy(
+      quizzes.id,
+      quizzes.title,
+      quizzes.status,
+      quizzes.questionCount,
+      quizzes.createdAt,
+    )
     .orderBy(desc(quizzes.createdAt));
 }
 
@@ -119,7 +128,10 @@ export async function getQuizById(quizId: string) {
   const session = await requireTeacherSession();
 
   const quiz = await db.query.quizzes.findFirst({
-    where: and(eq(quizzes.id, quizId), eq(quizzes.teacherId, session.teacherId)),
+    where: and(
+      eq(quizzes.id, quizId),
+      eq(quizzes.teacherId, session.teacherId),
+    ),
     with: {
       questions: {
         orderBy: (questionsTable, { asc }) => [asc(questionsTable.orderIndex)],
@@ -176,11 +188,19 @@ export async function updateQuiz(
 ): Promise<QuizActionState> {
   const session = await requireTeacherSession();
   const quiz = await getOwnedQuiz(quizId, session.teacherId);
+  const hadSessions = quiz.sessions.length > 0;
 
-  if (quiz.sessions.length > 0) {
-    return {
-      error: "This quiz has been used in a session and can no longer be edited.",
-    };
+  if (hadSessions) {
+    const confirmed = formData.get("confirmWipeHistory") === "1";
+
+    if (!confirmed) {
+      return {
+        error:
+          "Confirm that you want to erase all session history before saving.",
+      };
+    }
+
+    await db.delete(quizSessions).where(eq(quizSessions.quizId, quizId));
   }
 
   const payload = parseSavePayload(formData);
@@ -198,19 +218,22 @@ export async function updateQuiz(
 
   revalidatePath("/teacher/quizzes");
   revalidatePath(`/teacher/quizzes/${quizId}`);
+  if (hadSessions) {
+    revalidatePath("/join");
+    revalidatePath("/teacher/dashboard");
+  }
   redirect(`/teacher/quizzes/${quizId}`);
 }
 
 export async function deleteQuiz(quizId: string) {
   const session = await requireTeacherSession();
-  const quiz = await getOwnedQuiz(quizId, session.teacherId);
-
-  if (quiz.sessions.length > 0) {
-    throw new Error("This quiz has been used in a session and cannot be deleted.");
-  }
+  await getOwnedQuiz(quizId, session.teacherId);
 
   await db.delete(quizzes).where(eq(quizzes.id, quizId));
 
   revalidatePath("/teacher/quizzes");
+  revalidatePath(`/teacher/quizzes/${quizId}`);
+  revalidatePath("/join");
+  revalidatePath("/teacher/dashboard");
   redirect("/teacher/quizzes");
 }

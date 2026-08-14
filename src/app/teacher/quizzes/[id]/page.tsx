@@ -75,26 +75,27 @@ export default async function QuizDetailPage({ params }: QuizDetailPageProps) {
             )}>
             Back to list
           </Link>
-          {!hasSessions ? (
-            <>
-              <Link
-                href={`/teacher/quizzes/${quiz.id}/edit`}
-                className={cn(
-                  buttonSecondaryClassName,
-                  "inline-flex items-center",
-                )}>
-                Edit
-              </Link>
-              <DeleteQuizButton quizId={quiz.id} quizTitle={quiz.title} />
-            </>
-          ) : null}
+          <Link
+            href={`/teacher/quizzes/${quiz.id}/edit`}
+            className={cn(
+              buttonSecondaryClassName,
+              "inline-flex items-center",
+            )}>
+            Edit
+          </Link>
+          <DeleteQuizButton
+            quizId={quiz.id}
+            quizTitle={quiz.title}
+            sessionCount={quiz.sessions.length}
+            isLive={isThisQuizLive}
+          />
         </div>
       </div>
 
       {hasSessions ? (
         <p className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-900">
-          This quiz has been used in a session and can no longer be edited or
-          deleted.
+          This quiz has session history. Editing will erase all sessions,
+          attempts, and results. Deleting removes the quiz entirely.
         </p>
       ) : null}
 

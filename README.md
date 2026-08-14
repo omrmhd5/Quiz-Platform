@@ -141,7 +141,7 @@ This project is built in 8 increments.
 
 - Create MCQ quizzes via **manual builder** (Google Forms style) or **paste import**
 - Paste format: blank line between questions, `A)` options (count auto-detected)
-- Quiz list, detail view, edit, and delete (blocked if quiz has sessions)
+- Quiz list, detail view, edit, and delete (editing or deleting after a session removes all related session data)
 
 **Increment 4** includes:
 

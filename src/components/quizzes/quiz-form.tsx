@@ -1,7 +1,8 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useActionState, useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import { ConfirmDialog } from "@/components/confirm-dialog";
 import { QuizManualBuilder } from "@/components/quizzes/quiz-manual-builder";
 import { QuizPasteBuilder } from "@/components/quizzes/quiz-paste-builder";
 import {
@@ -32,19 +33,39 @@ type QuizFormInitialData = {
 type QuizFormProps = {
   mode: "create" | "edit";
   quizId?: string;
+  sessionCount?: number;
+  isLive?: boolean;
   initialData?: QuizFormInitialData;
 };
+
+function getEditWipeDescription(sessionCount: number, isLive: boolean) {
+  const sessionLabel = `${sessionCount} session${sessionCount === 1 ? "" : "s"}`;
+  const liveNote = isLive
+    ? " This quiz is live right now — students will immediately lose access."
+    : "";
+
+  return `Saving will permanently delete ${sessionLabel}, all student attempts, and results.${liveNote} This cannot be undone.`;
+}
 
 type CreationMethod = "manual" | "paste";
 type FormStep = "method" | "build" | "title";
 
-export function QuizForm({ mode, quizId, initialData }: QuizFormProps) {
+export function QuizForm({
+  mode,
+  quizId,
+  sessionCount = 0,
+  isLive = false,
+  initialData,
+}: QuizFormProps) {
+  const formRef = useRef<HTMLFormElement>(null);
   const action =
     mode === "edit" && quizId ? updateQuiz.bind(null, quizId) : createQuiz;
   const [state, formAction, isPending] = useActionState<
     QuizActionState,
     FormData
   >(action, quizActionInitialState);
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [wipeConfirmed, setWipeConfirmed] = useState(false);
 
   const [step, setStep] = useState<FormStep>(
     mode === "edit" || initialData ? "build" : "method",
@@ -64,6 +85,25 @@ export function QuizForm({ mode, quizId, initialData }: QuizFormProps) {
   const [stepError, setStepError] = useState<string | null>(null);
 
   const displayError = state.error ?? stepError;
+  const requiresHistoryWipe = mode === "edit" && sessionCount > 0;
+
+  useEffect(() => {
+    if (!wipeConfirmed) {
+      return;
+    }
+
+    formRef.current?.requestSubmit();
+    setWipeConfirmed(false);
+  }, [wipeConfirmed]);
+
+  function handleSaveClick() {
+    if (requiresHistoryWipe) {
+      setConfirmOpen(true);
+      return;
+    }
+
+    formRef.current?.requestSubmit();
+  }
 
   const stepLabels =
     mode === "create"
@@ -125,7 +165,14 @@ export function QuizForm({ mode, quizId, initialData }: QuizFormProps) {
   const activeStepIndex = stepIndex(step);
 
   return (
-    <form action={formAction} className="space-y-6">
+    <form ref={formRef} action={formAction} className="space-y-6">
+      {requiresHistoryWipe ? (
+        <input
+          type="hidden"
+          name="confirmWipeHistory"
+          value={wipeConfirmed ? "1" : "0"}
+        />
+      ) : null}
       <input
         type="hidden"
         name="questions"
@@ -239,6 +286,12 @@ export function QuizForm({ mode, quizId, initialData }: QuizFormProps) {
                 className={inputClassName}
               />
             </div>
+            {requiresHistoryWipe ? (
+              <p className="text-sm text-red-700">
+                {getEditWipeDescription(sessionCount, isLive)} You will be asked
+                to confirm when you click Update quiz.
+              </p>
+            ) : null}
             <div className="flex flex-wrap gap-2">
               <button
                 type="button"
@@ -250,8 +303,9 @@ export function QuizForm({ mode, quizId, initialData }: QuizFormProps) {
                 Back
               </button>
               <button
-                type="submit"
+                type="button"
                 disabled={isPending}
+                onClick={handleSaveClick}
                 className={buttonPrimaryClassName}>
                 {isPending
                   ? "Saving..."
@@ -263,6 +317,25 @@ export function QuizForm({ mode, quizId, initialData }: QuizFormProps) {
           </div>
         ) : null}
       </div>
+
+      <ConfirmDialog
+        open={confirmOpen}
+        title="Erase session history and save?"
+        description={getEditWipeDescription(sessionCount, isLive)}
+        confirmLabel={isPending ? "Saving..." : "Save and erase history"}
+        cancelLabel="Keep editing"
+        variant="danger"
+        isPending={isPending}
+        onConfirm={() => {
+          setConfirmOpen(false);
+          setWipeConfirmed(true);
+        }}
+        onCancel={() => {
+          if (!isPending) {
+            setConfirmOpen(false);
+          }
+        }}
+      />
 
       {displayError ? (
         <p role="alert" className={alertErrorClassName}>

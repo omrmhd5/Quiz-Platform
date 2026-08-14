@@ -14,6 +14,7 @@ type QuizRow = {
   status: string;
   questionCount: number;
   createdAt: Date;
+  sessionCount: number;
 };
 
 type QuizzesTableProps = {
