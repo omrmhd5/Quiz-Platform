@@ -7,7 +7,7 @@ import {
 } from "@/components/quizzes/quiz-questions-section";
 import { QuizResultsSection } from "@/components/quizzes/quiz-results-section";
 import { LaunchQuizPanel } from "@/components/sessions/launch-quiz-panel";
-import type { SessionResultsView } from "@/lib/session-results";
+import type { SessionSummaryView } from "@/lib/session-results";
 import type { ActiveSessionInfo } from "@/lib/sessions";
 
 type QuizDetailBodyProps = {
@@ -17,7 +17,7 @@ type QuizDetailBodyProps = {
   activeSession: ActiveSessionInfo | null;
   joinedCount: number;
   questions: QuizQuestionView[];
-  sessions: SessionResultsView[];
+  sessions: SessionSummaryView[];
 };
 
 function getSessionFromHash() {

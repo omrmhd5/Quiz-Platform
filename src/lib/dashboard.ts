@@ -62,6 +62,8 @@ export type DashboardView = {
   totalSkipped: number;
   recentSessions: DashboardRecentSession[];
   scoreTrend: DashboardScoreTrendPoint[];
-  submittedAttempts: DashboardAttemptRow[];
-  sessionResults: DashboardSessionResultRow[];
+  topAttemptsHighest: DashboardAttemptRow[];
+  topAttemptsLowest: DashboardAttemptRow[];
+  topResultsHighest: DashboardSessionResultRow[];
+  topResultsLowest: DashboardSessionResultRow[];
 };

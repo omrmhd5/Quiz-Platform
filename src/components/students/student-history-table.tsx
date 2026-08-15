@@ -1,11 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 import { PaginationControls } from "@/components/pagination-controls";
 import { formatSessionDateTime } from "@/lib/session-format";
 import type { StudentHistoryView } from "@/lib/student-history";
-import { STUDENTS_PAGE_SIZE, paginateSlice } from "@/lib/pagination";
+import { STUDENTS_PAGE_SIZE } from "@/lib/pagination";
 import {
   buttonSecondaryClassName,
   cn,
@@ -33,49 +33,11 @@ function getAttemptStatusLabel(
 }
 
 export function StudentHistoryTable({ history }: StudentHistoryTableProps) {
-  const [page, setPage] = useState(1);
+  const router = useRouter();
 
-  const pagination = useMemo(
-    () => paginateSlice(history.attempts, page, STUDENTS_PAGE_SIZE),
-    [history.attempts, page],
-  );
-
-  const stats = useMemo(() => {
-    const submitted = history.attempts.filter(
-      (attempt) => attempt.status === "submitted",
-    );
-    const didntFinishCount = history.attempts.filter(
-      (attempt) =>
-        attempt.status === "in_progress" && attempt.sessionStatus === "closed",
-    ).length;
-    const scores = submitted
-      .map((attempt) => attempt.scorePercent)
-      .filter((score): score is number => score !== null);
-
-    const totalCorrect = submitted.reduce(
-      (sum, attempt) => sum + (attempt.correctCount ?? 0),
-      0,
-    );
-    const totalWrong = submitted.reduce(
-      (sum, attempt) => sum + (attempt.wrongCount ?? 0),
-      0,
-    );
-    const totalSkipped = submitted.reduce(
-      (sum, attempt) => sum + (attempt.unansweredCount ?? 0),
-      0,
-    );
-
-    return {
-      didntFinishCount,
-      highestScore:
-        scores.length > 0 ? Math.round(Math.max(...scores) * 10) / 10 : null,
-      lowestScore:
-        scores.length > 0 ? Math.round(Math.min(...scores) * 10) / 10 : null,
-      totalCorrect,
-      totalWrong,
-      totalSkipped,
-    };
-  }, [history.attempts]);
+  function handlePageChange(page: number) {
+    router.push(`/teacher/students/${history.studentId}/history?page=${page}`);
+  }
 
   return (
     <div className="space-y-6">
@@ -95,7 +57,7 @@ export function StudentHistoryTable({ history }: StudentHistoryTableProps) {
         <div className={statCardClassName}>
           <p className="text-sm text-zinc-600">Didn&apos;t finish</p>
           <p className="mt-3 text-3xl font-semibold tabular-nums tracking-tight text-zinc-900">
-            {stats.didntFinishCount}
+            {history.didntFinishCount}
           </p>
         </div>
       </div>
@@ -104,7 +66,7 @@ export function StudentHistoryTable({ history }: StudentHistoryTableProps) {
         <div className={statCardClassName}>
           <p className="text-sm text-zinc-600">Highest score</p>
           <p className="mt-3 text-3xl font-semibold tabular-nums tracking-tight text-zinc-900">
-            {stats.highestScore !== null ? `${stats.highestScore}%` : "—"}
+            {history.highestScore !== null ? `${history.highestScore}%` : "—"}
           </p>
         </div>
         <div className={statCardClassName}>
@@ -116,7 +78,7 @@ export function StudentHistoryTable({ history }: StudentHistoryTableProps) {
         <div className={statCardClassName}>
           <p className="text-sm text-zinc-600">Lowest score</p>
           <p className="mt-3 text-3xl font-semibold tabular-nums tracking-tight text-zinc-900">
-            {stats.lowestScore !== null ? `${stats.lowestScore}%` : "—"}
+            {history.lowestScore !== null ? `${history.lowestScore}%` : "—"}
           </p>
         </div>
       </div>
@@ -138,26 +100,26 @@ export function StudentHistoryTable({ history }: StudentHistoryTableProps) {
             <div className={statCardClassName}>
               <p className="text-sm text-zinc-600">Total correct</p>
               <p className="mt-3 text-3xl font-semibold tabular-nums tracking-tight text-zinc-900">
-                {stats.totalCorrect}
+                {history.totalCorrect}
               </p>
             </div>
             <div className={statCardClassName}>
               <p className="text-sm text-zinc-600">Total wrong</p>
               <p className="mt-3 text-3xl font-semibold tabular-nums tracking-tight text-zinc-900">
-                {stats.totalWrong}
+                {history.totalWrong}
               </p>
             </div>
             <div className={statCardClassName}>
               <p className="text-sm text-zinc-600">Total skipped</p>
               <p className="mt-3 text-3xl font-semibold tabular-nums tracking-tight text-zinc-900">
-                {stats.totalSkipped}
+                {history.totalSkipped}
               </p>
             </div>
           </div>
         )}
       </div>
 
-      {history.attempts.length === 0 ? (
+      {history.totalAttempts === 0 ? (
         <div className={`${panelClassName} border-dashed text-center`}>
           <p className="text-sm text-zinc-600">
             No quiz attempts yet. History will appear after this student joins a
@@ -167,11 +129,11 @@ export function StudentHistoryTable({ history }: StudentHistoryTableProps) {
       ) : (
         <div className={`${panelClassName} space-y-4 overflow-x-auto`}>
           <PaginationControls
-            page={pagination.page}
-            pageCount={pagination.pageCount}
-            totalItems={history.attempts.length}
+            page={history.page}
+            pageCount={history.pageCount}
+            totalItems={history.totalAttempts}
             pageSize={STUDENTS_PAGE_SIZE}
-            onPageChange={setPage}
+            onPageChange={handlePageChange}
           />
 
           <table className="min-w-full divide-y divide-zinc-200 text-sm">
@@ -188,7 +150,7 @@ export function StudentHistoryTable({ history }: StudentHistoryTableProps) {
               </tr>
             </thead>
             <tbody className="divide-y divide-zinc-100">
-              {pagination.items.map((attempt) => {
+              {history.attempts.map((attempt) => {
                 const status = getAttemptStatusLabel(
                   attempt.sessionStatus,
                   attempt.status,
@@ -239,11 +201,11 @@ export function StudentHistoryTable({ history }: StudentHistoryTableProps) {
           </table>
 
           <PaginationControls
-            page={pagination.page}
-            pageCount={pagination.pageCount}
-            totalItems={history.attempts.length}
+            page={history.page}
+            pageCount={history.pageCount}
+            totalItems={history.totalAttempts}
             pageSize={STUDENTS_PAGE_SIZE}
-            onPageChange={setPage}
+            onPageChange={handlePageChange}
           />
         </div>
       )}

@@ -19,6 +19,7 @@ import type {
   SubmitAttemptState,
 } from "@/lib/attempts";
 import { shuffleArray } from "@/lib/shuffle";
+import { applyAttemptSubmitted } from "@/server/stats/rollup";
 
 async function getAttemptContext(attemptId: string) {
   const attempt = await db.query.attempts.findFirst({
@@ -288,10 +289,27 @@ export async function submitAttempt(
         submittedAt: new Date(),
       })
       .where(eq(attempts.id, attemptId));
+
+    await applyAttemptSubmitted(tx, {
+      sessionId: attempt.session.id,
+      studentId: attempt.studentId,
+      teacherId: attempt.session.quiz.teacherId,
+      sessionStatus: attempt.session.status,
+      scorePercent,
+      correctCount,
+      wrongCount,
+      unansweredCount,
+      answers: answerRows.map((row) => ({
+        questionId: row.questionId,
+        selectedOptionId: row.selectedOptionId,
+        isCorrect: row.isCorrect,
+      })),
+    });
   });
 
   revalidatePath(`/quiz/${attemptId}`);
   revalidatePath(`/teacher/quizzes/${attempt.session.quiz.id}`);
+  revalidatePath("/teacher/dashboard");
 
   redirect(`/quiz/${attemptId}`);
 }

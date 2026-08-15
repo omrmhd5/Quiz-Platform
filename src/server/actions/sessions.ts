@@ -4,11 +4,22 @@ import { and, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { notFound, redirect } from "next/navigation";
 import { db } from "@/db";
-import { attempts, quizSessions, quizzes, students } from "@/db/schema";
+import {
+  attempts,
+  quizSessions,
+  quizzes,
+  sessionStats,
+  students,
+} from "@/db/schema";
 import { requireTeacherSession } from "@/lib/auth";
 import type { ActiveSessionInfo } from "@/lib/sessions";
 import { validateStudentId } from "@/lib/students";
 import type { JoinActionState } from "@/lib/sessions";
+import {
+  applyAttemptJoined,
+  applySessionClosed,
+  applySessionLaunched,
+} from "@/server/stats/rollup";
 
 export async function getActiveSession(): Promise<ActiveSessionInfo | null> {
   const [row] = await db
@@ -47,14 +58,31 @@ async function assertQuizOwnership(quizId: string, teacherId: string) {
   return quiz;
 }
 
-async function closeActiveSessions() {
-  await db
-    .update(quizSessions)
-    .set({
-      status: "closed",
-      closedAt: new Date(),
+async function closeActiveSessions(teacherId: string) {
+  const activeSessions = await db
+    .select({
+      sessionId: quizSessions.id,
     })
+    .from(quizSessions)
     .where(eq(quizSessions.status, "active"));
+
+  if (activeSessions.length === 0) {
+    return;
+  }
+
+  await db.transaction(async (tx) => {
+    for (const session of activeSessions) {
+      await applySessionClosed(tx, session.sessionId, teacherId);
+    }
+
+    await tx
+      .update(quizSessions)
+      .set({
+        status: "closed",
+        closedAt: new Date(),
+      })
+      .where(eq(quizSessions.status, "active"));
+  });
 }
 
 export async function launchQuizSession(quizId: string, replaceActive = false) {
@@ -75,20 +103,26 @@ export async function launchQuizSession(quizId: string, replaceActive = false) {
       };
     }
 
-    await closeActiveSessions();
+    await closeActiveSessions(teacherSession.teacherId);
   }
 
-  const [session] = await db
-    .insert(quizSessions)
-    .values({
-      quizId,
-      status: "active",
-      launchedAt: new Date(),
-    })
-    .returning({ id: quizSessions.id });
+  const session = await db.transaction(async (tx) => {
+    const [created] = await tx
+      .insert(quizSessions)
+      .values({
+        quizId,
+        status: "active",
+        launchedAt: new Date(),
+      })
+      .returning({ id: quizSessions.id });
+
+    await applySessionLaunched(tx, created.id, teacherSession.teacherId);
+    return created;
+  });
 
   revalidatePath(`/teacher/quizzes/${quizId}`);
   revalidatePath("/teacher/quizzes");
+  revalidatePath("/teacher/dashboard");
   revalidatePath("/join");
 
   const quiz = await db.query.quizzes.findFirst({
@@ -122,16 +156,20 @@ export async function closeQuizSession(sessionId: string) {
     return { error: "This session is not active." };
   }
 
-  await db
-    .update(quizSessions)
-    .set({
-      status: "closed",
-      closedAt: new Date(),
-    })
-    .where(eq(quizSessions.id, sessionId));
+  await db.transaction(async (tx) => {
+    await applySessionClosed(tx, sessionId, teacherSession.teacherId);
+    await tx
+      .update(quizSessions)
+      .set({
+        status: "closed",
+        closedAt: new Date(),
+      })
+      .where(eq(quizSessions.id, sessionId));
+  });
 
   revalidatePath(`/teacher/quizzes/${session.quiz.id}`);
   revalidatePath("/teacher/quizzes");
+  revalidatePath("/teacher/dashboard");
   revalidatePath("/join");
 
   return { success: "Quiz session closed." };
@@ -186,17 +224,38 @@ export async function joinByStudentId(
     redirect(`/quiz/${existingAttempt.id}`);
   }
 
-  const [attempt] = await db
-    .insert(attempts)
-    .values({
-      sessionId: activeSession.sessionId,
-      studentId,
-      status: "in_progress",
-    })
-    .returning({ id: attempts.id });
+  const [attempt] = await db.transaction(async (tx) => {
+    const [created] = await tx
+      .insert(attempts)
+      .values({
+        sessionId: activeSession.sessionId,
+        studentId,
+        status: "in_progress",
+      })
+      .returning({ id: attempts.id });
+
+    const [quizRow] = await tx
+      .select({ teacherId: quizzes.teacherId })
+      .from(quizSessions)
+      .innerJoin(quizzes, eq(quizSessions.quizId, quizzes.id))
+      .where(eq(quizSessions.id, activeSession.sessionId))
+      .limit(1);
+
+    if (quizRow) {
+      await applyAttemptJoined(
+        tx,
+        activeSession.sessionId,
+        studentId,
+        quizRow.teacherId,
+      );
+    }
+
+    return [created];
+  });
 
   revalidatePath("/teacher/quizzes");
   revalidatePath(`/teacher/quizzes/${activeSession.quizId}`);
+  revalidatePath("/teacher/dashboard");
 
   redirect(`/quiz/${attempt.id}`);
 }
@@ -222,6 +281,16 @@ export async function getAttemptById(attemptId: string) {
 }
 
 export async function getActiveSessionAttemptCount(sessionId: string) {
+  const [row] = await db
+    .select({ joinedCount: sessionStats.joinedCount })
+    .from(sessionStats)
+    .where(eq(sessionStats.sessionId, sessionId))
+    .limit(1);
+
+  if (row) {
+    return row.joinedCount;
+  }
+
   const rows = await db
     .select({ id: attempts.id })
     .from(attempts)

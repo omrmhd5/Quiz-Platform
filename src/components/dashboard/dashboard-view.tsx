@@ -221,8 +221,10 @@ export function DashboardView({
       </div>
 
       <DashboardAttemptHighlights
-        submittedAttempts={stats.submittedAttempts}
-        sessionResults={stats.sessionResults}
+        topAttemptsHighest={stats.topAttemptsHighest}
+        topAttemptsLowest={stats.topAttemptsLowest}
+        topResultsHighest={stats.topResultsHighest}
+        topResultsLowest={stats.topResultsLowest}
       />
     </div>
   );

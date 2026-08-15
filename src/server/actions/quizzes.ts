@@ -12,6 +12,10 @@ import {
   type QuizActionState,
   type QuizQuestionPayload,
 } from "@/lib/quizzes";
+import {
+  applyQuizCreated,
+  syncStatsAfterHistoryRemoved,
+} from "@/server/stats/rollup";
 
 async function getOwnedQuiz(quizId: string, teacherId: string) {
   const quiz = await db.query.quizzes.findFirst({
@@ -165,15 +169,20 @@ export async function createQuiz(
     return { error: payload.error };
   }
 
-  const [quiz] = await db
-    .insert(quizzes)
-    .values({
-      teacherId: session.teacherId,
-      title: payload.title,
-      status: "saved",
-      questionCount: payload.questions.length,
-    })
-    .returning({ id: quizzes.id });
+  const quiz = await db.transaction(async (tx) => {
+    const [created] = await tx
+      .insert(quizzes)
+      .values({
+        teacherId: session.teacherId,
+        title: payload.title,
+        status: "saved",
+        questionCount: payload.questions.length,
+      })
+      .returning({ id: quizzes.id });
+
+    await applyQuizCreated(tx, session.teacherId);
+    return created;
+  });
 
   await persistQuizQuestions(quiz.id, payload.questions);
 
@@ -201,6 +210,7 @@ export async function updateQuiz(
     }
 
     await db.delete(quizSessions).where(eq(quizSessions.quizId, quizId));
+    await syncStatsAfterHistoryRemoved(db, session.teacherId);
   }
 
   const payload = parseSavePayload(formData);
@@ -221,6 +231,7 @@ export async function updateQuiz(
   if (hadSessions) {
     revalidatePath("/join");
     revalidatePath("/teacher/dashboard");
+    revalidatePath("/teacher/students");
   }
   redirect(`/teacher/quizzes/${quizId}`);
 }
@@ -230,10 +241,12 @@ export async function deleteQuiz(quizId: string) {
   await getOwnedQuiz(quizId, session.teacherId);
 
   await db.delete(quizzes).where(eq(quizzes.id, quizId));
+  await syncStatsAfterHistoryRemoved(db, session.teacherId);
 
   revalidatePath("/teacher/quizzes");
   revalidatePath(`/teacher/quizzes/${quizId}`);
   revalidatePath("/join");
   revalidatePath("/teacher/dashboard");
+  revalidatePath("/teacher/students");
   redirect("/teacher/quizzes");
 }

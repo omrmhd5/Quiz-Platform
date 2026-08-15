@@ -107,27 +107,6 @@ export function SessionResultsDetail({
   const didntFinishCount =
     results.status === "closed" ? results.inProgressCount : 0;
 
-  const answerTotals = useMemo(() => {
-    const submitted = results.attempts.filter(
-      (attempt) => attempt.status === "submitted",
-    );
-
-    return {
-      totalCorrect: submitted.reduce(
-        (sum, attempt) => sum + (attempt.correctCount ?? 0),
-        0,
-      ),
-      totalWrong: submitted.reduce(
-        (sum, attempt) => sum + (attempt.wrongCount ?? 0),
-        0,
-      ),
-      totalSkipped: submitted.reduce(
-        (sum, attempt) => sum + (attempt.unansweredCount ?? 0),
-        0,
-      ),
-    };
-  }, [results.attempts]);
-
   return (
     <div className="space-y-5">
       {showHeader ? (
@@ -250,9 +229,9 @@ export function SessionResultsDetail({
           <SessionQuizStats
             questionStats={results.questionStats}
             submittedCount={results.submittedCount}
-            totalCorrect={answerTotals.totalCorrect}
-            totalWrong={answerTotals.totalWrong}
-            totalSkipped={answerTotals.totalSkipped}
+            totalCorrect={results.totalCorrect}
+            totalWrong={results.totalWrong}
+            totalSkipped={results.totalSkipped}
           />
         </div>
       ) : (

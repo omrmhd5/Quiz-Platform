@@ -120,6 +120,7 @@ src/
     auth.ts             Session helpers
     session.ts          Iron session config
   server/actions/       Server actions
+  server/stats/         Incremental rollup updates on join/submit/close
 drizzle/                SQL migrations
 ```
 

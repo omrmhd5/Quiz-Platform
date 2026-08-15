@@ -10,7 +10,7 @@ import {
   pageTitleClassName,
 } from "@/lib/utils";
 import { getQuizById } from "@/server/actions/quizzes";
-import { getQuizSessionsResults } from "@/server/actions/session-results";
+import { getQuizSessionSummaries } from "@/server/actions/session-results";
 import {
   getActiveSession,
   getActiveSessionAttemptCount,
@@ -22,11 +22,11 @@ type QuizDetailPageProps = {
 
 export default async function QuizDetailPage({ params }: QuizDetailPageProps) {
   const { id } = await params;
-  const [quiz, activeSession, joinUrl, sessionResults] = await Promise.all([
+  const [quiz, activeSession, joinUrl, sessionSummaries] = await Promise.all([
     getQuizById(id),
     getActiveSession(),
     getJoinUrl(),
-    getQuizSessionsResults(id),
+    getQuizSessionSummaries(id),
   ]);
 
   if (!quiz) {
@@ -106,7 +106,7 @@ export default async function QuizDetailPage({ params }: QuizDetailPageProps) {
         activeSession={activeSession}
         joinedCount={joinedCount}
         questions={questionViews}
-        sessions={sessionResults}
+        sessions={sessionSummaries}
       />
     </div>
   );

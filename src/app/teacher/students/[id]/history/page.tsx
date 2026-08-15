@@ -12,13 +12,20 @@ import { getStudentHistory } from "@/server/actions/student-history";
 
 type StudentHistoryPageProps = {
   params: Promise<{ id: string }>;
+  searchParams: Promise<{ page?: string }>;
 };
 
 export default async function StudentHistoryPage({
   params,
+  searchParams,
 }: StudentHistoryPageProps) {
   const { id } = await params;
-  const history = await getStudentHistory(id);
+  const { page: pageParam } = await searchParams;
+  const page = Number(pageParam ?? "1");
+  const history = await getStudentHistory(
+    id,
+    Number.isFinite(page) && page > 0 ? page : 1,
+  );
 
   if (!history) {
     notFound();

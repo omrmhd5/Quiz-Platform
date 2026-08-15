@@ -1,23 +1,26 @@
 "use server";
 
-import { and, count, desc, eq, sql } from "drizzle-orm";
+import { and, asc, count, desc, eq, sql } from "drizzle-orm";
 import { db } from "@/db";
-import { attempts, quizSessions, quizzes, students } from "@/db/schema";
+import {
+  attempts,
+  quizSessions,
+  quizzes,
+  sessionStats,
+  students,
+  teacherStats,
+} from "@/db/schema";
 import { requireTeacherSession } from "@/lib/auth";
 import {
+  DASHBOARD_ATTEMPT_HIGHLIGHTS,
   DASHBOARD_RECENT_SESSIONS,
   DASHBOARD_TREND_SESSIONS,
   type DashboardAttemptRow,
+  type DashboardSessionResultRow,
   type DashboardView,
 } from "@/lib/dashboard";
-
-function roundScore(value: number | null | undefined) {
-  if (value === null || value === undefined) {
-    return null;
-  }
-
-  return Math.round(value * 10) / 10;
-}
+import { roundScore } from "@/lib/scores";
+import { syncTeacherStatsFromRollups } from "@/server/stats/rollup";
 
 function formatTrendLabel(launchedAt: Date | null, quizTitle: string) {
   const dateLabel = launchedAt
@@ -61,151 +64,219 @@ function mapAttemptRow(row: {
   };
 }
 
-export async function getDashboardStats(): Promise<DashboardView> {
-  const teacherSession = await requireTeacherSession();
-  const teacherId = teacherSession.teacherId;
+function mapSessionResultRow(row: {
+  sessionId: string;
+  quizId: string;
+  quizTitle: string;
+  status: DashboardSessionResultRow["status"];
+  launchedAt: Date | null;
+  joinedCount: number;
+  submittedCount: number;
+  averageScore: number | null;
+  highestScore: number | null;
+  lowestScore: number | null;
+}): DashboardSessionResultRow {
+  return {
+    sessionId: row.sessionId,
+    quizId: row.quizId,
+    quizTitle: row.quizTitle,
+    status: row.status,
+    launchedAt: row.launchedAt,
+    joinedCount: row.joinedCount,
+    submittedCount: row.submittedCount,
+    averageScore: roundScore(row.averageScore),
+    highestScore: roundScore(row.highestScore),
+    lowestScore: roundScore(row.lowestScore),
+  };
+}
 
-  const [studentRow] = await db
-    .select({ studentCount: count(students.id) })
-    .from(students);
+const attemptSelect = {
+  attemptId: attempts.id,
+  studentId: students.id,
+  studentName: students.name,
+  quizId: quizzes.id,
+  quizTitle: quizzes.title,
+  sessionId: quizSessions.id,
+  submittedAt: attempts.submittedAt,
+  scorePercent: attempts.scorePercent,
+  correctCount: attempts.correctCount,
+  wrongCount: attempts.wrongCount,
+  unansweredCount: attempts.unansweredCount,
+};
 
-  const [quizRow] = await db
-    .select({ quizCount: count(quizzes.id) })
-    .from(quizzes)
-    .where(eq(quizzes.teacherId, teacherId));
+const teacherAttemptFilter = (teacherId: string) =>
+  and(eq(quizzes.teacherId, teacherId), eq(attempts.status, "submitted"));
 
-  const [sessionRow] = await db
-    .select({ sessionCount: count(quizSessions.id) })
-    .from(quizSessions)
-    .innerJoin(quizzes, eq(quizSessions.quizId, quizzes.id))
-    .where(eq(quizzes.teacherId, teacherId));
+async function fetchTopAttempts(
+  teacherId: string,
+  direction: "highest" | "lowest",
+) {
+  const order =
+    direction === "highest"
+      ? [desc(attempts.scorePercent), desc(attempts.submittedAt)]
+      : [asc(attempts.scorePercent), desc(attempts.submittedAt)];
 
-  const [attemptRow] = await db
-    .select({
-      totalAttempts: count(attempts.id),
-      submittedCount: sql<number>`count(*) filter (where ${attempts.status} = 'submitted')::int`,
-      liveInProgressCount: sql<number>`count(*) filter (where ${attempts.status} = 'in_progress' and ${quizSessions.status} = 'active')::int`,
-      didntFinishCount: sql<number>`count(*) filter (where ${attempts.status} = 'in_progress' and ${quizSessions.status} = 'closed')::int`,
-      overallAverageScore: sql<
-        number | null
-      >`avg(${attempts.scorePercent}) filter (where ${attempts.status} = 'submitted')`,
-      totalCorrect: sql<number>`coalesce(sum(${attempts.correctCount}) filter (where ${attempts.status} = 'submitted'), 0)::int`,
-      totalWrong: sql<number>`coalesce(sum(${attempts.wrongCount}) filter (where ${attempts.status} = 'submitted'), 0)::int`,
-      totalSkipped: sql<number>`coalesce(sum(${attempts.unansweredCount}) filter (where ${attempts.status} = 'submitted'), 0)::int`,
-    })
+  const rows = await db
+    .select(attemptSelect)
     .from(attempts)
+    .innerJoin(students, eq(attempts.studentId, students.id))
     .innerJoin(quizSessions, eq(attempts.sessionId, quizSessions.id))
     .innerJoin(quizzes, eq(quizSessions.quizId, quizzes.id))
-    .where(eq(quizzes.teacherId, teacherId));
+    .where(teacherAttemptFilter(teacherId))
+    .orderBy(...order)
+    .limit(DASHBOARD_ATTEMPT_HIGHLIGHTS);
 
-  const totalCorrect = attemptRow?.totalCorrect ?? 0;
-  const totalWrong = attemptRow?.totalWrong ?? 0;
-  const totalSkipped = attemptRow?.totalSkipped ?? 0;
+  return rows.map(mapAttemptRow);
+}
 
-  const sessionRows = await db
+async function fetchTopSessionResults(
+  teacherId: string,
+  direction: "highest" | "lowest",
+) {
+  const rows = await db
     .select({
       sessionId: quizSessions.id,
       quizId: quizzes.id,
       quizTitle: quizzes.title,
       status: quizSessions.status,
       launchedAt: quizSessions.launchedAt,
-      joinedCount: count(attempts.id),
-      submittedCount: sql<number>`count(*) filter (where ${attempts.status} = 'submitted')::int`,
-      averageScore: sql<
-        number | null
-      >`avg(${attempts.scorePercent}) filter (where ${attempts.status} = 'submitted')`,
-      highestScore: sql<
-        number | null
-      >`max(${attempts.scorePercent}) filter (where ${attempts.status} = 'submitted')`,
-      lowestScore: sql<
-        number | null
-      >`min(${attempts.scorePercent}) filter (where ${attempts.status} = 'submitted')`,
+      joinedCount: sessionStats.joinedCount,
+      submittedCount: sessionStats.submittedCount,
+      averageScore: sessionStats.averageScore,
+      highestScore: sessionStats.highestScore,
+      lowestScore: sessionStats.lowestScore,
+    })
+    .from(sessionStats)
+    .innerJoin(quizSessions, eq(sessionStats.sessionId, quizSessions.id))
+    .innerJoin(quizzes, eq(quizSessions.quizId, quizzes.id))
+    .where(
+      and(
+        eq(quizzes.teacherId, teacherId),
+        sql`${sessionStats.submittedCount} > 0`,
+      ),
+    )
+    .orderBy(
+      direction === "highest"
+        ? desc(sessionStats.averageScore)
+        : asc(sessionStats.averageScore),
+      desc(quizSessions.launchedAt),
+    )
+    .limit(DASHBOARD_ATTEMPT_HIGHLIGHTS);
+
+  return rows.map((row) =>
+    mapSessionResultRow({
+      ...row,
+      joinedCount: row.joinedCount,
+    }),
+  );
+}
+
+async function fetchLimitedSessions(
+  teacherId: string,
+  limit: number,
+  order: "asc" | "desc",
+) {
+  const rows = await db
+    .select({
+      sessionId: quizSessions.id,
+      quizId: quizzes.id,
+      quizTitle: quizzes.title,
+      status: quizSessions.status,
+      launchedAt: quizSessions.launchedAt,
+      joinedCount: sql<number>`coalesce(${sessionStats.joinedCount}, 0)::int`,
+      submittedCount: sql<number>`coalesce(${sessionStats.submittedCount}, 0)::int`,
+      averageScore: sessionStats.averageScore,
     })
     .from(quizSessions)
     .innerJoin(quizzes, eq(quizSessions.quizId, quizzes.id))
-    .leftJoin(attempts, eq(attempts.sessionId, quizSessions.id))
+    .leftJoin(sessionStats, eq(sessionStats.sessionId, quizSessions.id))
     .where(eq(quizzes.teacherId, teacherId))
-    .groupBy(
-      quizSessions.id,
-      quizzes.id,
-      quizzes.title,
-      quizSessions.status,
-      quizSessions.launchedAt,
+    .orderBy(
+      order === "desc"
+        ? desc(quizSessions.launchedAt)
+        : asc(quizSessions.launchedAt),
     )
-    .orderBy(desc(quizSessions.launchedAt));
+    .limit(limit);
 
-  const trendSessionRows = sessionRows.slice(0, DASHBOARD_TREND_SESSIONS);
-
-  const submittedAttemptRows = await db
-    .select({
-      attemptId: attempts.id,
-      studentId: students.id,
-      studentName: students.name,
-      quizId: quizzes.id,
-      quizTitle: quizzes.title,
-      sessionId: quizSessions.id,
-      submittedAt: attempts.submittedAt,
-      scorePercent: attempts.scorePercent,
-      correctCount: attempts.correctCount,
-      wrongCount: attempts.wrongCount,
-      unansweredCount: attempts.unansweredCount,
-    })
-    .from(attempts)
-    .innerJoin(students, eq(attempts.studentId, students.id))
-    .innerJoin(quizSessions, eq(attempts.sessionId, quizSessions.id))
-    .innerJoin(quizzes, eq(quizSessions.quizId, quizzes.id))
-    .where(
-      and(eq(quizzes.teacherId, teacherId), eq(attempts.status, "submitted")),
-    )
-    .orderBy(desc(attempts.submittedAt));
-
-  const mappedSessions = sessionRows.map((row) => ({
+  return rows.map((row) => ({
     sessionId: row.sessionId,
     quizId: row.quizId,
     quizTitle: row.quizTitle,
     status: row.status,
     launchedAt: row.launchedAt,
-    joinedCount: Number(row.joinedCount),
+    joinedCount: row.joinedCount,
     submittedCount: row.submittedCount,
     averageScore: roundScore(row.averageScore),
-    highestScore: roundScore(row.highestScore),
-    lowestScore: roundScore(row.lowestScore),
   }));
+}
 
-  const mappedTrendSessions = trendSessionRows.map((row) => ({
-    sessionId: row.sessionId,
-    quizId: row.quizId,
-    quizTitle: row.quizTitle,
-    status: row.status,
-    launchedAt: row.launchedAt,
-    joinedCount: Number(row.joinedCount),
-    submittedCount: row.submittedCount,
-    averageScore: roundScore(row.averageScore),
-    highestScore: roundScore(row.highestScore),
-    lowestScore: roundScore(row.lowestScore),
-  }));
+export async function getDashboardStats(): Promise<DashboardView> {
+  const teacherSession = await requireTeacherSession();
+  const teacherId = teacherSession.teacherId;
+
+  let [teacherRow] = await db
+    .select()
+    .from(teacherStats)
+    .where(eq(teacherStats.teacherId, teacherId))
+    .limit(1);
+
+  if (!teacherRow) {
+    await syncTeacherStatsFromRollups(db, teacherId);
+    [teacherRow] = await db
+      .select()
+      .from(teacherStats)
+      .where(eq(teacherStats.teacherId, teacherId))
+      .limit(1);
+  }
+
+  const [studentRow] = await db
+    .select({ studentCount: count(students.id) })
+    .from(students);
+
+  const [
+    recentSessions,
+    trendSessionsDesc,
+    topAttemptsHighest,
+    topAttemptsLowest,
+    topResultsHighest,
+    topResultsLowest,
+  ] = await Promise.all([
+    fetchLimitedSessions(teacherId, DASHBOARD_RECENT_SESSIONS, "desc"),
+    fetchLimitedSessions(teacherId, DASHBOARD_TREND_SESSIONS, "desc"),
+    fetchTopAttempts(teacherId, "highest"),
+    fetchTopAttempts(teacherId, "lowest"),
+    fetchTopSessionResults(teacherId, "highest"),
+    fetchTopSessionResults(teacherId, "lowest"),
+  ]);
+
+  const scoreTrend = [...trendSessionsDesc]
+    .reverse()
+    .filter((session) => session.averageScore !== null)
+    .map((session) => ({
+      sessionId: session.sessionId,
+      quizTitle: session.quizTitle,
+      launchedAt: session.launchedAt,
+      averageScore: session.averageScore,
+      label: formatTrendLabel(session.launchedAt, session.quizTitle),
+    }));
 
   return {
     studentCount: studentRow?.studentCount ?? 0,
-    quizCount: quizRow?.quizCount ?? 0,
-    sessionCount: sessionRow?.sessionCount ?? 0,
-    totalAttempts: Number(attemptRow?.totalAttempts ?? 0),
-    submittedCount: attemptRow?.submittedCount ?? 0,
-    liveInProgressCount: attemptRow?.liveInProgressCount ?? 0,
-    didntFinishCount: attemptRow?.didntFinishCount ?? 0,
-    overallAverageScore: roundScore(attemptRow?.overallAverageScore),
-    totalCorrect,
-    totalWrong,
-    totalSkipped,
-    recentSessions: mappedSessions.slice(0, DASHBOARD_RECENT_SESSIONS),
-    scoreTrend: [...mappedTrendSessions].reverse().map((row) => ({
-      sessionId: row.sessionId,
-      quizTitle: row.quizTitle,
-      launchedAt: row.launchedAt,
-      averageScore: row.averageScore,
-      label: formatTrendLabel(row.launchedAt, row.quizTitle),
-    })),
-    submittedAttempts: submittedAttemptRows.map(mapAttemptRow),
-    sessionResults: mappedSessions.filter((row) => row.submittedCount > 0),
+    quizCount: teacherRow?.quizCount ?? 0,
+    sessionCount: teacherRow?.sessionCount ?? 0,
+    totalAttempts: teacherRow?.totalAttempts ?? 0,
+    submittedCount: teacherRow?.submittedCount ?? 0,
+    liveInProgressCount: teacherRow?.liveInProgressCount ?? 0,
+    didntFinishCount: teacherRow?.didntFinishCount ?? 0,
+    overallAverageScore: roundScore(teacherRow?.overallAverageScore),
+    totalCorrect: teacherRow?.totalCorrect ?? 0,
+    totalWrong: teacherRow?.totalWrong ?? 0,
+    totalSkipped: teacherRow?.totalSkipped ?? 0,
+    recentSessions,
+    scoreTrend,
+    topAttemptsHighest,
+    topAttemptsLowest,
+    topResultsHighest,
+    topResultsLowest,
   };
 }

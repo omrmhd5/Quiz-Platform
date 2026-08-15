@@ -18,20 +18,26 @@ export type SessionQuestionStat = {
   correctPercent: number | null;
 };
 
-export type SessionResultsView = {
+export type SessionSummaryView = {
   sessionId: string;
   quizId: string;
   quizTitle: string;
   status: "waiting" | "active" | "closed";
   launchedAt: Date | null;
   closedAt: Date | null;
-  registeredCount: number;
   joinedCount: number;
   submittedCount: number;
   inProgressCount: number;
   averageScore: number | null;
   highestScore: number | null;
   lowestScore: number | null;
+};
+
+export type SessionResultsView = SessionSummaryView & {
+  registeredCount: number;
+  totalCorrect: number;
+  totalWrong: number;
+  totalSkipped: number;
   questionStats: SessionQuestionStat[];
   attempts: SessionAttemptRow[];
 };

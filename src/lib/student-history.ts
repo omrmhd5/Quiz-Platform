@@ -19,6 +19,15 @@ export type StudentHistoryView = {
   registeredAt: Date;
   attemptCount: number;
   submittedCount: number;
+  didntFinishCount: number;
   averageScore: number | null;
+  highestScore: number | null;
+  lowestScore: number | null;
+  totalCorrect: number;
+  totalWrong: number;
+  totalSkipped: number;
   attempts: StudentHistoryRow[];
+  page: number;
+  pageCount: number;
+  totalAttempts: number;
 };

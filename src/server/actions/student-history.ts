@@ -3,20 +3,21 @@
 import { and, desc, eq, sql } from "drizzle-orm";
 import { notFound } from "next/navigation";
 import { db } from "@/db";
-import { attempts, quizSessions, quizzes, students } from "@/db/schema";
+import {
+  attempts,
+  quizSessions,
+  quizzes,
+  studentStats,
+  students,
+} from "@/db/schema";
 import { requireTeacherSession } from "@/lib/auth";
+import { clampPage, getPageCount, STUDENTS_PAGE_SIZE } from "@/lib/pagination";
 import type { StudentHistoryView } from "@/lib/student-history";
-
-function roundScore(value: number | null | undefined) {
-  if (value === null || value === undefined) {
-    return null;
-  }
-
-  return Math.round(value * 10) / 10;
-}
+import { roundScore } from "@/lib/scores";
 
 export async function getStudentHistory(
   studentId: string,
+  page = 1,
 ): Promise<StudentHistoryView> {
   const teacherSession = await requireTeacherSession();
 
@@ -27,6 +28,40 @@ export async function getStudentHistory(
   if (!student) {
     notFound();
   }
+
+  const [statsRow] = await db
+    .select({
+      attemptCount: studentStats.attemptCount,
+      submittedCount: studentStats.submittedCount,
+      didntFinishCount: studentStats.didntFinishCount,
+      averageScore: studentStats.averageScore,
+      highestScore: studentStats.highestScore,
+      lowestScore: studentStats.lowestScore,
+      totalCorrect: studentStats.totalCorrect,
+      totalWrong: studentStats.totalWrong,
+      totalSkipped: studentStats.totalSkipped,
+    })
+    .from(studentStats)
+    .where(eq(studentStats.studentId, studentId))
+    .limit(1);
+
+  const [{ totalAttempts }] = await db
+    .select({
+      totalAttempts: sql<number>`count(*)::int`,
+    })
+    .from(attempts)
+    .innerJoin(quizSessions, eq(attempts.sessionId, quizSessions.id))
+    .innerJoin(quizzes, eq(quizSessions.quizId, quizzes.id))
+    .where(
+      and(
+        eq(attempts.studentId, studentId),
+        eq(quizzes.teacherId, teacherSession.teacherId),
+      ),
+    );
+
+  const pageCount = getPageCount(totalAttempts, STUDENTS_PAGE_SIZE);
+  const safePage = clampPage(page, pageCount);
+  const offset = (safePage - 1) * STUDENTS_PAGE_SIZE;
 
   const attemptRows = await db
     .select({
@@ -52,25 +87,23 @@ export async function getStudentHistory(
         eq(quizzes.teacherId, teacherSession.teacherId),
       ),
     )
-    .orderBy(desc(quizSessions.launchedAt));
-
-  const submittedAttempts = attemptRows.filter(
-    (row) => row.status === "submitted",
-  );
+    .orderBy(desc(quizSessions.launchedAt))
+    .limit(STUDENTS_PAGE_SIZE)
+    .offset(offset);
 
   return {
     studentId: student.id,
     studentName: student.name,
     registeredAt: student.createdAt,
-    attemptCount: attemptRows.length,
-    submittedCount: submittedAttempts.length,
-    averageScore:
-      submittedAttempts.length > 0
-        ? roundScore(
-            submittedAttempts.reduce((sum, row) => sum + row.scorePercent, 0) /
-              submittedAttempts.length,
-          )
-        : null,
+    attemptCount: totalAttempts,
+    submittedCount: statsRow?.submittedCount ?? 0,
+    didntFinishCount: statsRow?.didntFinishCount ?? 0,
+    averageScore: roundScore(statsRow?.averageScore),
+    highestScore: roundScore(statsRow?.highestScore),
+    lowestScore: roundScore(statsRow?.lowestScore),
+    totalCorrect: statsRow?.totalCorrect ?? 0,
+    totalWrong: statsRow?.totalWrong ?? 0,
+    totalSkipped: statsRow?.totalSkipped ?? 0,
     attempts: attemptRows.map((row) => ({
       attemptId: row.attemptId,
       sessionId: row.sessionId,
@@ -86,5 +119,8 @@ export async function getStudentHistory(
       unansweredCount: row.status === "submitted" ? row.unansweredCount : null,
       submittedAt: row.submittedAt,
     })),
+    page: safePage,
+    pageCount,
+    totalAttempts,
   };
 }

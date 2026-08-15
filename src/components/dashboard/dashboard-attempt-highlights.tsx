@@ -29,8 +29,10 @@ import {
 } from "@/lib/utils";
 
 type DashboardAttemptHighlightsProps = {
-  submittedAttempts: DashboardAttemptRow[];
-  sessionResults: DashboardSessionResultRow[];
+  topAttemptsHighest: DashboardAttemptRow[];
+  topAttemptsLowest: DashboardAttemptRow[];
+  topResultsHighest: DashboardSessionResultRow[];
+  topResultsLowest: DashboardSessionResultRow[];
 };
 
 type ViewTab = "attempts" | "results";
@@ -67,50 +69,18 @@ function formatResultChartLabel(result: DashboardSessionResultRow) {
 }
 
 export function DashboardAttemptHighlights({
-  submittedAttempts,
-  sessionResults,
+  topAttemptsHighest,
+  topAttemptsLowest,
+  topResultsHighest,
+  topResultsLowest,
 }: DashboardAttemptHighlightsProps) {
   const [viewTab, setViewTab] = useState<ViewTab>("attempts");
   const [direction, setDirection] = useState<RankDirection>("highest");
 
-  const rankedAttempts = useMemo(() => {
-    const sorted = [...submittedAttempts].sort((left, right) => {
-      if (left.scorePercent !== right.scorePercent) {
-        return direction === "highest"
-          ? right.scorePercent - left.scorePercent
-          : left.scorePercent - right.scorePercent;
-      }
-
-      const leftTime = left.submittedAt?.getTime() ?? 0;
-      const rightTime = right.submittedAt?.getTime() ?? 0;
-      return rightTime - leftTime;
-    });
-
-    return sorted.slice(0, DASHBOARD_ATTEMPT_HIGHLIGHTS);
-  }, [direction, submittedAttempts]);
-
-  const rankedResults = useMemo(() => {
-    const sortable = sessionResults.filter(
-      (result) => result.averageScore !== null,
-    );
-
-    const sorted = [...sortable].sort((left, right) => {
-      const leftScore = left.averageScore ?? 0;
-      const rightScore = right.averageScore ?? 0;
-
-      if (leftScore !== rightScore) {
-        return direction === "highest"
-          ? rightScore - leftScore
-          : leftScore - rightScore;
-      }
-
-      const leftTime = left.launchedAt?.getTime() ?? 0;
-      const rightTime = right.launchedAt?.getTime() ?? 0;
-      return rightTime - leftTime;
-    });
-
-    return sorted.slice(0, DASHBOARD_ATTEMPT_HIGHLIGHTS);
-  }, [direction, sessionResults]);
+  const rankedAttempts =
+    direction === "highest" ? topAttemptsHighest : topAttemptsLowest;
+  const rankedResults =
+    direction === "highest" ? topResultsHighest : topResultsLowest;
 
   const attemptChartData = useMemo(
     () =>

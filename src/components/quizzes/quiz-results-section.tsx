@@ -8,7 +8,10 @@ import {
   sessionStatusBadgeClass,
 } from "@/lib/session-format";
 import { SessionResultsDetail } from "@/components/sessions/session-results-detail";
-import type { SessionResultsView } from "@/lib/session-results";
+import type {
+  SessionResultsView,
+  SessionSummaryView,
+} from "@/lib/session-results";
 import { SESSIONS_PAGE_SIZE, paginateSlice } from "@/lib/pagination";
 import {
   buttonSecondaryClassName,
@@ -16,13 +19,33 @@ import {
   cn,
   panelClassName,
 } from "@/lib/utils";
-import { getSessionResultsSnapshot } from "@/server/actions/session-results";
+import {
+  getSessionResults,
+  getSessionResultsSnapshot,
+} from "@/server/actions/session-results";
 
 type QuizResultsSectionProps = {
-  sessions: SessionResultsView[];
+  sessions: SessionSummaryView[];
   modalSessionId: string | null;
   onModalSessionIdChange: (sessionId: string | null) => void;
 };
+
+function toSummary(results: SessionResultsView): SessionSummaryView {
+  return {
+    sessionId: results.sessionId,
+    quizId: results.quizId,
+    quizTitle: results.quizTitle,
+    status: results.status,
+    launchedAt: results.launchedAt,
+    closedAt: results.closedAt,
+    joinedCount: results.joinedCount,
+    submittedCount: results.submittedCount,
+    inProgressCount: results.inProgressCount,
+    averageScore: results.averageScore,
+    highestScore: results.highestScore,
+    lowestScore: results.lowestScore,
+  };
+}
 
 export function QuizResultsSection({
   sessions: initialSessions,
@@ -31,14 +54,42 @@ export function QuizResultsSection({
 }: QuizResultsSectionProps) {
   const [sessions, setSessions] = useState(initialSessions);
   const [page, setPage] = useState(1);
-
-  const modalSession = sessions.find(
-    (session) => session.sessionId === modalSessionId,
+  const [modalResults, setModalResults] = useState<SessionResultsView | null>(
+    null,
   );
+  const [modalLoading, setModalLoading] = useState(false);
 
   useEffect(() => {
     setSessions(initialSessions);
   }, [initialSessions]);
+
+  useEffect(() => {
+    if (!modalSessionId) {
+      setModalResults(null);
+      setModalLoading(false);
+      return;
+    }
+
+    let cancelled = false;
+    setModalLoading(true);
+
+    void getSessionResults(modalSessionId)
+      .then((results) => {
+        if (!cancelled) {
+          setModalResults(results);
+          setModalLoading(false);
+        }
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setModalLoading(false);
+        }
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [modalSessionId]);
 
   useEffect(() => {
     if (!modalSessionId) {
@@ -93,9 +144,18 @@ export function QuizResultsSection({
             const updated = updates.find(
               (row) => row.sessionId === session.sessionId,
             );
-            return updated ?? session;
+            return updated ? toSummary(updated) : session;
           }),
         );
+
+        if (modalSessionId) {
+          const modalUpdate = updates.find(
+            (row) => row.sessionId === modalSessionId,
+          );
+          if (modalUpdate) {
+            setModalResults(modalUpdate);
+          }
+        }
       } catch {
         // Retry on next interval.
       }
@@ -111,11 +171,15 @@ export function QuizResultsSection({
       cancelled = true;
       window.clearInterval(intervalId);
     };
-  }, [activeSessionKey]);
+  }, [activeSessionKey, modalSessionId]);
 
   if (sessions.length === 0) {
     return null;
   }
+
+  const modalSummary = modalSessionId
+    ? sessions.find((session) => session.sessionId === modalSessionId)
+    : undefined;
 
   return (
     <>
@@ -207,19 +271,23 @@ export function QuizResultsSection({
       <ContentModal
         open={modalSessionId !== null}
         title={
-          modalSession
-            ? `Results · ${formatSessionDateTime(modalSession.launchedAt)}`
+          modalSummary
+            ? `Results · ${formatSessionDateTime(modalSummary.launchedAt)}`
             : "Session results"
         }
         description={
-          modalSession
-            ? `${modalSession.joinedCount} joined · ${modalSession.submittedCount} submitted`
+          modalSummary
+            ? `${modalSummary.joinedCount} joined · ${modalSummary.submittedCount} submitted`
             : undefined
         }
         size="lg"
         onClose={() => onModalSessionIdChange(null)}>
-        {modalSession ? (
-          <SessionResultsDetail results={modalSession} showHeader />
+        {modalLoading ? (
+          <p className="py-8 text-center text-sm text-zinc-600">
+            Loading session results…
+          </p>
+        ) : modalResults ? (
+          <SessionResultsDetail results={modalResults} showHeader />
         ) : null}
       </ContentModal>
     </>
