@@ -7,6 +7,7 @@ Local-network quiz platform for classroom use. One teacher runs the app on their
 - Next.js 16 (App Router)
 - PostgreSQL 18
 - Drizzle ORM
+- Recharts
 - Docker Compose
 
 ## Quick start (development)
@@ -104,7 +105,13 @@ docker/
 src/
   app/
     login/              Teacher login
+    join/               Student join flow
+    quiz/               Student quiz taking and results
     teacher/            Protected teacher console
+      dashboard/        All-time stats and charts
+      students/         Roster and per-student history
+      quizzes/          Quiz list, detail, create, edit
+  proxy.ts              Teacher route protection (Next.js 16)
   db/
     schema.ts           Drizzle table definitions
     relations.ts        Drizzle relations
@@ -127,7 +134,7 @@ This project is built in 8 increments.
 - **Increment 5** — Shuffled MCQ quiz taking, submit, auto-grading, student score screen
 - **Increment 6** — Session results on each quiz detail page with live updates
 - **Increment 7** — Quiz stats per session and student quiz history
-- **Increment 8** — General dashboard at `/teacher/dashboard`
+- **Increment 8** — Teacher dashboard at `/teacher/dashboard` (stats, charts, rankings, recent sessions)
 
 **Increment 2** includes:
 
@@ -162,14 +169,22 @@ This project is built in 8 increments.
 
 **Increment 7** includes:
 
-- Quiz stats in session results: highest/lowest score, participation, most missed / easiest question, per-question correct %
-- Student quiz history at `/teacher/students/[id]/history`
+- Quiz stats in session results: highest/average/lowest score, participation, most missed / easiest question, per-question correct %
+- Quiz stats totals: correct, wrong, and skipped (across submitted attempts in that session)
+- Student quiz history at `/teacher/students/[id]/history` with the same summary stats and an attempts table
 - History links from the student roster and session results table
 
 **Increment 8** includes:
 
-- Real dashboard at `/teacher/dashboard` — totals, recent sessions, score trend, most missed questions globally
-- Live session banner on dashboard when a quiz is running
+- Dashboard at `/teacher/dashboard` with all-time platform stats: registered students, total quizzes, total sessions, submitted, in progress, didn't finish, and average score
+- Aggregate quiz stats across all submissions: total correct, wrong, and skipped
+- Charts (Recharts): answer breakdown, participation mix, and average score trend for the **last 10** quiz runs
+- Recent sessions table for the **most recent 5** runs, with links to each session's results
+- **Top attempts** (student submissions) and **Top results** (session averages), each with highest/lowest tabs (**top 10**)
+- Live session banner on the dashboard when a quiz is running
+- Quick actions: **Manage students** and **Manage quizzes**
+
+Lists across the app use pagination on large tables (students, quizzes, session results, answer key, quiz taker, student history).
 
 ## Environment variables
 
