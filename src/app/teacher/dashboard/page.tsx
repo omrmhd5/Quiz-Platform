@@ -1,34 +1,29 @@
+import { DashboardView } from "@/components/dashboard/dashboard-view";
+import { getJoinUrl } from "@/lib/join-url";
+import { getDashboardStats } from "@/server/actions/dashboard";
 import {
-  pageDescriptionClassName,
-  pageTitleClassName,
-  statCardClassName,
-} from "@/lib/utils";
+  getActiveSession,
+  getActiveSessionAttemptCount,
+} from "@/server/actions/sessions";
 
-export default function DashboardPage() {
+export default async function DashboardPage() {
+  const [stats, activeSession, joinUrl] = await Promise.all([
+    getDashboardStats(),
+    getActiveSession(),
+    getJoinUrl(),
+  ]);
+
+  const joinedCount =
+    activeSession !== null
+      ? await getActiveSessionAttemptCount(activeSession.sessionId)
+      : 0;
+
   return (
-    <div className="space-y-8">
-      <div>
-        <h1 className={pageTitleClassName}>Dashboard</h1>
-        <p className={pageDescriptionClassName}>
-          General stats and recent activity will appear here.
-        </p>
-      </div>
-
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {[
-          "Registered students",
-          "Quizzes created",
-          "Sessions run",
-          "Overall average score",
-        ].map((label) => (
-          <div key={label} className={statCardClassName}>
-            <p className="text-sm text-zinc-600">{label}</p>
-            <p className="mt-3 text-3xl font-semibold tabular-nums tracking-tight text-zinc-300">
-              0
-            </p>
-          </div>
-        ))}
-      </div>
-    </div>
+    <DashboardView
+      stats={stats}
+      activeSession={activeSession}
+      joinUrl={joinUrl}
+      joinedCount={joinedCount}
+    />
   );
 }

@@ -5,6 +5,10 @@ import { useEffect, useMemo, useState } from "react";
 import { PaginationControls } from "@/components/pagination-controls";
 import { SessionQuizStats } from "@/components/sessions/session-quiz-stats";
 import type { SessionResultsView } from "@/lib/session-results";
+import {
+  formatSessionDateTime,
+  sessionStatusBadgeClass,
+} from "@/lib/session-format";
 import { SESSION_RESULTS_PAGE_SIZE, paginateSlice } from "@/lib/pagination";
 import {
   cn,
@@ -26,34 +30,6 @@ function parseStudentIdFilter(query: string) {
     .split(",")
     .map((part) => part.trim())
     .filter(Boolean);
-}
-
-export function formatSessionDateTime(value: Date | string | null) {
-  if (!value) {
-    return "—";
-  }
-
-  const date = typeof value === "string" ? new Date(value) : value;
-
-  return date.toLocaleString("en-US", {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-    hour: "numeric",
-    minute: "2-digit",
-  });
-}
-
-export function sessionStatusBadgeClass(status: SessionResultsView["status"]) {
-  if (status === "active") {
-    return "bg-green-100 text-green-800";
-  }
-
-  if (status === "closed") {
-    return "bg-zinc-100 text-zinc-700";
-  }
-
-  return "bg-amber-100 text-amber-800";
 }
 
 function getAttemptStatusDisplay(

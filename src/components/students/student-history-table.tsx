@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { PaginationControls } from "@/components/pagination-controls";
-import { formatSessionDateTime } from "@/components/sessions/session-results-detail";
+import { formatSessionDateTime } from "@/lib/session-format";
 import type { StudentHistoryView } from "@/lib/student-history";
 import { STUDENTS_PAGE_SIZE, paginateSlice } from "@/lib/pagination";
 import {
@@ -64,7 +64,6 @@ export function StudentHistoryTable({ history }: StudentHistoryTableProps) {
       (sum, attempt) => sum + (attempt.unansweredCount ?? 0),
       0,
     );
-    const totalQuestions = totalCorrect + totalWrong + totalSkipped;
 
     return {
       didntFinishCount,
@@ -75,10 +74,6 @@ export function StudentHistoryTable({ history }: StudentHistoryTableProps) {
       totalCorrect,
       totalWrong,
       totalSkipped,
-      overallAccuracy:
-        totalQuestions > 0
-          ? Math.round((totalCorrect / totalQuestions) * 1000) / 10
-          : null,
     };
   }, [history.attempts]);
 
@@ -139,7 +134,7 @@ export function StudentHistoryTable({ history }: StudentHistoryTableProps) {
             No submitted quizzes yet.
           </p>
         ) : (
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="grid gap-4 sm:grid-cols-3">
             <div className={statCardClassName}>
               <p className="text-sm text-zinc-600">Total correct</p>
               <p className="mt-3 text-3xl font-semibold tabular-nums tracking-tight text-zinc-900">
@@ -156,14 +151,6 @@ export function StudentHistoryTable({ history }: StudentHistoryTableProps) {
               <p className="text-sm text-zinc-600">Total skipped</p>
               <p className="mt-3 text-3xl font-semibold tabular-nums tracking-tight text-zinc-900">
                 {stats.totalSkipped}
-              </p>
-            </div>
-            <div className={statCardClassName}>
-              <p className="text-sm text-zinc-600">Overall accuracy</p>
-              <p className="mt-3 text-3xl font-semibold tabular-nums tracking-tight text-zinc-900">
-                {stats.overallAccuracy !== null
-                  ? `${stats.overallAccuracy}%`
-                  : "—"}
               </p>
             </div>
           </div>

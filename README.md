@@ -13,11 +13,7 @@ Local-network quiz platform for classroom use. One teacher runs the app on their
 
 1. Install [Docker Desktop](https://www.docker.com/products/docker-desktop/) and Node.js.
 
-2. Copy environment variables:
-
-```bash
-cp .env.example .env
-```
+2. Create a `.env` file in the project root (see [Environment variables](#environment-variables) below).
 
 3. Start PostgreSQL (Docker, background):
 
@@ -51,7 +47,7 @@ Stop the database when done:
 npm run docker:down
 ```
 
-> **Production Docker** (web + postgres in containers) will be added later. For now, Docker runs **Postgres only**; use `npm run dev` for the app.
+> Docker runs **Postgres only**. Use `npm run dev` for the app with hot reload.
 
 ## LAN access for students
 
@@ -105,8 +101,6 @@ If it still fails: confirm the phone is on Wi‑Fi (not cellular), disable VPN o
 ```
 docker/
   docker-compose.yml    Postgres only (dev)
-  Dockerfile            Production app image (later)
-  entrypoint.sh         Production startup (later)
 src/
   app/
     login/              Teacher login
@@ -133,6 +127,7 @@ This project is built in 8 increments.
 - **Increment 5** — Shuffled MCQ quiz taking, submit, auto-grading, student score screen
 - **Increment 6** — Session results on each quiz detail page with live updates
 - **Increment 7** — Quiz stats per session and student quiz history
+- **Increment 8** — General dashboard at `/teacher/dashboard`
 
 **Increment 2** includes:
 
@@ -171,19 +166,22 @@ This project is built in 8 increments.
 - Student quiz history at `/teacher/students/[id]/history`
 - History links from the student roster and session results table
 
-See `docs/PROJECT_PLAN.md` for the full roadmap (added in Increment 8).
+**Increment 8** includes:
+
+- Real dashboard at `/teacher/dashboard` — totals, recent sessions, score trend, most missed questions globally
+- Live session banner on dashboard when a quiz is running
 
 ## Environment variables
 
-| Variable            | Description                                                                 |
-| ------------------- | --------------------------------------------------------------------------- |
-| `POSTGRES_USER`     | PostgreSQL username                                                         |
-| `POSTGRES_PASSWORD` | PostgreSQL password                                                         |
-| `POSTGRES_DB`       | Database name                                                               |
-| `POSTGRES_PORT`     | Host port for Postgres (use `5433` if local Postgres already uses `5432`)   |
-| `APP_PORT`          | Host port for the web app (default `3000`)                                  |
-| `LAN_HOST`          | Optional LAN IP or host for student join links (auto-detected if omitted)   |
-| `TEACHER_USERNAME`  | Seed teacher username                                                       |
-| `TEACHER_PASSWORD`  | Seed teacher password                                                       |
-| `SESSION_SECRET`    | Cookie encryption secret (32+ characters)                                   |
-| `DATABASE_URL`      | Local dev only — use `localhost` as host (Docker builds this automatically) |
+| Variable            | Description                                                               |
+| ------------------- | ------------------------------------------------------------------------- |
+| `POSTGRES_USER`     | PostgreSQL username                                                       |
+| `POSTGRES_PASSWORD` | PostgreSQL password                                                       |
+| `POSTGRES_DB`       | Database name                                                             |
+| `POSTGRES_PORT`     | Host port for Postgres (use `5433` if local Postgres already uses `5432`) |
+| `APP_PORT`          | Host port for the web app (default `3000`)                                |
+| `LAN_HOST`          | Optional LAN IP or host for student join links (auto-detected if omitted) |
+| `TEACHER_USERNAME`  | Seed teacher username                                                     |
+| `TEACHER_PASSWORD`  | Seed teacher password                                                     |
+| `SESSION_SECRET`    | Cookie encryption secret (32+ characters)                                 |
+| `DATABASE_URL`      | Local dev — use `localhost` as host                                       |

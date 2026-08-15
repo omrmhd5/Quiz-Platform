@@ -42,11 +42,6 @@ export function SessionQuizStats({
   totalSkipped,
 }: SessionQuizStatsProps) {
   const { mostMissed, easiest } = getHighlightedQuestions(questionStats);
-  const totalQuestions = totalCorrect + totalWrong + totalSkipped;
-  const overallAccuracy =
-    totalQuestions > 0
-      ? Math.round((totalCorrect / totalQuestions) * 1000) / 10
-      : null;
 
   if (questionStats.length === 0) {
     return null;
@@ -68,7 +63,7 @@ export function SessionQuizStats({
         </p>
       ) : (
         <>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="grid gap-4 sm:grid-cols-3">
             <div className={statCardClassName}>
               <p className="text-sm text-zinc-600">Total correct</p>
               <p className="mt-3 text-3xl font-semibold tabular-nums tracking-tight text-zinc-900">
@@ -85,12 +80,6 @@ export function SessionQuizStats({
               <p className="text-sm text-zinc-600">Total skipped</p>
               <p className="mt-3 text-3xl font-semibold tabular-nums tracking-tight text-zinc-900">
                 {totalSkipped}
-              </p>
-            </div>
-            <div className={statCardClassName}>
-              <p className="text-sm text-zinc-600">Overall accuracy</p>
-              <p className="mt-3 text-3xl font-semibold tabular-nums tracking-tight text-zinc-900">
-                {overallAccuracy !== null ? `${overallAccuracy}%` : "—"}
               </p>
             </div>
           </div>

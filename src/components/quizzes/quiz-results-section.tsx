@@ -5,9 +5,9 @@ import { ContentModal } from "@/components/content-modal";
 import { PaginationControls } from "@/components/pagination-controls";
 import {
   formatSessionDateTime,
-  SessionResultsDetail,
   sessionStatusBadgeClass,
-} from "@/components/sessions/session-results-detail";
+} from "@/lib/session-format";
+import { SessionResultsDetail } from "@/components/sessions/session-results-detail";
 import type { SessionResultsView } from "@/lib/session-results";
 import { SESSIONS_PAGE_SIZE, paginateSlice } from "@/lib/pagination";
 import {
