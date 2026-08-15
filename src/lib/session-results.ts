@@ -10,6 +10,14 @@ export type SessionAttemptRow = {
   submittedAt: Date | null;
 };
 
+export type SessionQuestionStat = {
+  questionId: string;
+  orderIndex: number;
+  prompt: string;
+  answeredCount: number;
+  correctPercent: number | null;
+};
+
 export type SessionResultsView = {
   sessionId: string;
   quizId: string;
@@ -17,9 +25,13 @@ export type SessionResultsView = {
   status: "waiting" | "active" | "closed";
   launchedAt: Date | null;
   closedAt: Date | null;
+  registeredCount: number;
   joinedCount: number;
   submittedCount: number;
   inProgressCount: number;
   averageScore: number | null;
+  highestScore: number | null;
+  lowestScore: number | null;
+  questionStats: SessionQuestionStat[];
   attempts: SessionAttemptRow[];
 };

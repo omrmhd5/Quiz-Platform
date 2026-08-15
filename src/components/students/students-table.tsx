@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useActionState, useEffect, useMemo, useState } from "react";
 import type { StudentActionState } from "@/lib/students";
 import {
@@ -101,38 +102,51 @@ export function StudentsTable({ students }: StudentsTableProps) {
               </thead>
               <tbody className="divide-y divide-zinc-100">
                 {pagination.items.map((student) =>
-                editingId === student.id ? (
-                  <EditStudentRow
-                    key={student.id}
-                    student={student}
-                    onCancel={() => setEditingId(null)}
-                    onSaved={() => setEditingId(null)}
-                  />
-                ) : (
-                  <tr key={student.id} className="ui-table-row">
-                    <td className="px-3 py-3 font-mono text-zinc-900">
-                      {student.id}
-                    </td>
-                    <td className="px-3 py-3 text-zinc-900">{student.name}</td>
-                    <td className="px-3 py-3">
-                      <div className="flex flex-wrap gap-2">
-                        <button
-                          type="button"
-                          onClick={() => setEditingId(student.id)}
-                          className={cn(buttonSecondaryClassName, "ui-btn-sm")}>
-                          Edit
-                        </button>
-                        <DeleteStudentButton
-                          studentId={student.id}
-                          studentName={student.name}
-                        />
-                      </div>
-                    </td>
-                  </tr>
-                ),
-              )}
-            </tbody>
-          </table>
+                  editingId === student.id ? (
+                    <EditStudentRow
+                      key={student.id}
+                      student={student}
+                      onCancel={() => setEditingId(null)}
+                      onSaved={() => setEditingId(null)}
+                    />
+                  ) : (
+                    <tr key={student.id} className="ui-table-row">
+                      <td className="px-3 py-3 font-mono text-zinc-900">
+                        {student.id}
+                      </td>
+                      <td className="px-3 py-3 text-zinc-900">
+                        {student.name}
+                      </td>
+                      <td className="px-3 py-3">
+                        <div className="flex flex-wrap gap-2">
+                          <Link
+                            href={`/teacher/students/${student.id}/history`}
+                            className={cn(
+                              buttonSecondaryClassName,
+                              "ui-btn-sm",
+                            )}>
+                            History
+                          </Link>
+                          <button
+                            type="button"
+                            onClick={() => setEditingId(student.id)}
+                            className={cn(
+                              buttonSecondaryClassName,
+                              "ui-btn-sm",
+                            )}>
+                            Edit
+                          </button>
+                          <DeleteStudentButton
+                            studentId={student.id}
+                            studentName={student.name}
+                          />
+                        </div>
+                      </td>
+                    </tr>
+                  ),
+                )}
+              </tbody>
+            </table>
           </div>
 
           <PaginationControls

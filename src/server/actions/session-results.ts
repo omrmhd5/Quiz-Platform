@@ -1,9 +1,16 @@
 "use server";
 
-import { and, desc, eq, sql } from "drizzle-orm";
+import { and, asc, count, desc, eq, sql } from "drizzle-orm";
 import { notFound } from "next/navigation";
 import { db } from "@/db";
-import { attempts, quizSessions, quizzes, students } from "@/db/schema";
+import {
+  attemptAnswers,
+  attempts,
+  questions,
+  quizSessions,
+  quizzes,
+  students,
+} from "@/db/schema";
 import { requireTeacherSession } from "@/lib/auth";
 import type { SessionResultsView } from "@/lib/session-results";
 
@@ -30,6 +37,41 @@ function roundScore(value: number | null | undefined) {
   }
 
   return Math.round(value * 10) / 10;
+}
+
+async function getSessionQuestionStats(sessionId: string, quizId: string) {
+  const rows = await db
+    .select({
+      questionId: questions.id,
+      orderIndex: questions.orderIndex,
+      prompt: questions.prompt,
+      answeredCount: sql<number>`count(${attemptAnswers.id})::int`,
+      correctCount: sql<number>`coalesce(sum(case when ${attemptAnswers.isCorrect} then 1 else 0 end), 0)::int`,
+    })
+    .from(questions)
+    .leftJoin(attemptAnswers, eq(attemptAnswers.questionId, questions.id))
+    .leftJoin(
+      attempts,
+      and(
+        eq(attempts.id, attemptAnswers.attemptId),
+        eq(attempts.sessionId, sessionId),
+        eq(attempts.status, "submitted"),
+      ),
+    )
+    .where(eq(questions.quizId, quizId))
+    .groupBy(questions.id, questions.orderIndex, questions.prompt)
+    .orderBy(asc(questions.orderIndex));
+
+  return rows.map((row) => ({
+    questionId: row.questionId,
+    orderIndex: row.orderIndex,
+    prompt: row.prompt,
+    answeredCount: row.answeredCount,
+    correctPercent:
+      row.answeredCount > 0
+        ? roundScore((row.correctCount / row.answeredCount) * 100)
+        : null,
+  }));
 }
 
 export async function getSessionResults(
@@ -76,6 +118,25 @@ export async function getSessionResults(
         )
       : null;
 
+  const submittedScores = submittedAttempts.map((row) => row.scorePercent);
+  const highestScore =
+    submittedScores.length > 0
+      ? roundScore(Math.max(...submittedScores))
+      : null;
+  const lowestScore =
+    submittedScores.length > 0
+      ? roundScore(Math.min(...submittedScores))
+      : null;
+
+  const [registeredRow] = await db
+    .select({ registeredCount: count(students.id) })
+    .from(students);
+
+  const questionStats = await getSessionQuestionStats(
+    sessionId,
+    session.quiz.id,
+  );
+
   return {
     sessionId: session.id,
     quizId: session.quiz.id,
@@ -83,10 +144,14 @@ export async function getSessionResults(
     status: session.status,
     launchedAt: session.launchedAt,
     closedAt: session.closedAt,
+    registeredCount: registeredRow?.registeredCount ?? 0,
     joinedCount,
     submittedCount,
     inProgressCount,
     averageScore,
+    highestScore,
+    lowestScore,
+    questionStats,
     attempts: attemptRows.map((row) => ({
       attemptId: row.attemptId,
       studentId: row.studentId,

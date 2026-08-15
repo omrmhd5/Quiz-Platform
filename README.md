@@ -132,6 +132,7 @@ This project is built in 8 increments.
 - **Increment 4** — Launch live sessions, student join at `/join`, attempt placeholder at `/quiz/[attemptId]`
 - **Increment 5** — Shuffled MCQ quiz taking, submit, auto-grading, student score screen
 - **Increment 6** — Session results on each quiz detail page with live updates
+- **Increment 7** — Quiz stats per session and student quiz history
 
 **Increment 2** includes:
 
@@ -163,6 +164,12 @@ This project is built in 8 increments.
 - Student scores, status, and summary stats per session
 - Live refresh while a session is active
 - Jump links from the launch panel and live banner
+
+**Increment 7** includes:
+
+- Quiz stats in session results: highest/lowest score, participation, most missed / easiest question, per-question correct %
+- Student quiz history at `/teacher/students/[id]/history`
+- History links from the student roster and session results table
 
 See `docs/PROJECT_PLAN.md` for the full roadmap (added in Increment 8).
 
