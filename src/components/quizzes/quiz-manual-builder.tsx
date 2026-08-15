@@ -1,14 +1,8 @@
 "use client";
 
 import { createEmptyQuestion, type QuizQuestionDraft } from "@/lib/quizzes";
-import {
-  buttonDangerClassName,
-  buttonPrimaryClassName,
-  buttonSecondaryClassName,
-  cn,
-  inputClassName,
-  panelClassName,
-} from "@/lib/utils";
+import { ActionButton } from "@/components/ui/action-control";
+import { cn, inputClassName, panelClassName } from "@/lib/utils";
 
 type QuizManualBuilderProps = {
   questions: QuizQuestionDraft[];
@@ -68,16 +62,13 @@ export function QuizManualBuilder({
                 Question {questionIndex + 1}
               </h3>
               {questions.length > 1 ? (
-                <button
-                  type="button"
+                <ActionButton
+                  action="delete"
+                  label="Remove"
                   onClick={() =>
-                    onChange(
-                      questions.filter((item) => item.id !== question.id),
-                    )
+                    onChange(questions.filter((item) => item.id !== question.id))
                   }
-                  className={cn(buttonDangerClassName, "ui-btn-sm")}>
-                  Remove
-                </button>
+                />
               ) : null}
             </div>
 
@@ -160,8 +151,9 @@ export function QuizManualBuilder({
                           {isCorrect ? "Correct ✓" : "Mark correct"}
                         </button>
                         {question.options.length > 2 ? (
-                          <button
-                            type="button"
+                          <ActionButton
+                            action="delete"
+                            label="Remove"
                             onClick={() =>
                               updateQuestion(question.id, (current) => {
                                 const nextOptions = current.options.filter(
@@ -179,9 +171,7 @@ export function QuizManualBuilder({
                                 };
                               })
                             }
-                            className={cn(buttonDangerClassName, "ui-btn-sm")}>
-                            Remove
-                          </button>
+                          />
                         ) : null}
                       </div>
                     </div>
@@ -190,8 +180,8 @@ export function QuizManualBuilder({
               </div>
 
               {question.options.length < 6 ? (
-                <button
-                  type="button"
+                <ActionButton
+                  action="addOption"
                   onClick={() =>
                     updateQuestion(question.id, (current) => {
                       const nextOption = {
@@ -205,37 +195,27 @@ export function QuizManualBuilder({
                       };
                     })
                   }
-                  className={cn(buttonSecondaryClassName, "ui-btn-sm")}>
-                  Add option
-                </button>
+                />
               ) : null}
             </div>
           </article>
         ))}
       </div>
 
-      <button
-        type="button"
+      <ActionButton
+        action="addQuestion"
         onClick={addQuestion}
-        className={cn(buttonSecondaryClassName, "w-full sm:w-auto")}>
-        + Add question
-      </button>
+        className="w-full sm:w-auto"
+      />
 
       <div className="flex flex-wrap gap-2">
-        {onBack ? (
-          <button
-            type="button"
-            onClick={onBack}
-            className={buttonSecondaryClassName}>
-            Back
-          </button>
-        ) : null}
-        <button
-          type="button"
+        {onBack ? <ActionButton action="back" onClick={onBack} size="md" /> : null}
+        <ActionButton
+          action="continue"
           onClick={onContinue}
-          className={buttonPrimaryClassName}>
-          {continueLabel}
-        </button>
+          size="md"
+          label={continueLabel}
+        />
       </div>
     </div>
   );

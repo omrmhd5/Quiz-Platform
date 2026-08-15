@@ -1,12 +1,11 @@
 "use client";
 
 import { useState } from "react";
+import { ActionButton } from "@/components/ui/action-control";
 import { parseQuizPaste, type ParsedQuestion } from "@/lib/quiz-parser";
 import { type QuizQuestionPayload } from "@/lib/quizzes";
 import {
   alertErrorClassName,
-  buttonPrimaryClassName,
-  buttonSecondaryClassName,
   cn,
   inputClassName,
   panelClassName,
@@ -152,18 +151,8 @@ export function QuizPasteBuilder({
         ) : null}
 
         <div className="flex flex-wrap gap-2">
-          <button
-            type="button"
-            onClick={onBack}
-            className={buttonSecondaryClassName}>
-            Back
-          </button>
-          <button
-            type="button"
-            onClick={handleParse}
-            className={buttonPrimaryClassName}>
-            Parse &amp; continue
-          </button>
+          <ActionButton action="back" onClick={onBack} size="md" />
+          <ActionButton action="parse" onClick={handleParse} size="md" />
         </div>
       </div>
     );
@@ -241,21 +230,15 @@ export function QuizPasteBuilder({
       ) : null}
 
       <div className="flex flex-wrap gap-2">
-        <button
-          type="button"
+        <ActionButton
+          action="back"
           onClick={() => {
             setError(null);
             setSubStep("paste");
           }}
-          className={buttonSecondaryClassName}>
-          Back
-        </button>
-        <button
-          type="button"
-          onClick={handleComplete}
-          className={buttonPrimaryClassName}>
-          Continue
-        </button>
+          size="md"
+        />
+        <ActionButton action="continue" onClick={handleComplete} size="md" />
       </div>
     </div>
   );

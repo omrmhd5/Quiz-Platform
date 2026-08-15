@@ -1,10 +1,8 @@
-import Link from "next/link";
 import { ActiveSessionBanner } from "@/components/sessions/active-session-banner";
 import { QuizzesTable } from "@/components/quizzes/quizzes-table";
+import { ActionLink } from "@/components/ui/action-control";
 import { getJoinUrl } from "@/lib/join-url";
 import {
-  buttonPrimaryClassName,
-  cn,
   emptyStateClassName,
   pageDescriptionClassName,
   pageTitleClassName,
@@ -37,11 +35,7 @@ export default async function QuizzesPage() {
             Create, save, and manage multiple-choice quizzes.
           </p>
         </div>
-        <Link
-          href="/teacher/quizzes/new"
-          className={cn(buttonPrimaryClassName, "inline-flex items-center")}>
-          Create quiz
-        </Link>
+        <ActionLink action="createQuiz" href="/teacher/quizzes/new" size="md" />
       </div>
 
       {activeSession ? (
@@ -57,14 +51,12 @@ export default async function QuizzesPage() {
           <p className={emptyStateClassName}>
             No quizzes yet. Create your first MCQ quiz to get started.
           </p>
-          <Link
+          <ActionLink
+            action="createQuiz"
             href="/teacher/quizzes/new"
-            className={cn(
-              buttonPrimaryClassName,
-              "inline-flex w-full justify-center sm:w-auto",
-            )}>
-            Create quiz
-          </Link>
+            size="md"
+            className="w-full justify-center sm:w-auto"
+          />
         </div>
       ) : (
         <QuizzesTable quizzes={quizRows} activeSession={activeSession} />

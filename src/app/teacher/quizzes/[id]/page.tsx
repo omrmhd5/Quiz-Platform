@@ -1,11 +1,9 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { DeleteQuizButton } from "@/components/quizzes/delete-quiz-button";
 import { QuizDetailBody } from "@/components/quizzes/quiz-detail-body";
+import { ActionLink } from "@/components/ui/action-control";
 import { getJoinUrl } from "@/lib/join-url";
 import {
-  buttonSecondaryClassName,
-  cn,
   pageDescriptionClassName,
   pageTitleClassName,
 } from "@/lib/utils";
@@ -67,22 +65,17 @@ export default async function QuizDetailPage({ params }: QuizDetailPageProps) {
         </div>
 
         <div className="flex flex-wrap gap-2">
-          <Link
+          <ActionLink
+            action="back"
+            label="Back to list"
             href="/teacher/quizzes"
-            className={cn(
-              buttonSecondaryClassName,
-              "inline-flex items-center",
-            )}>
-            Back to list
-          </Link>
-          <Link
+            size="md"
+          />
+          <ActionLink
+            action="edit"
             href={`/teacher/quizzes/${quiz.id}/edit`}
-            className={cn(
-              buttonSecondaryClassName,
-              "inline-flex items-center",
-            )}>
-            Edit
-          </Link>
+            size="md"
+          />
           <DeleteQuizButton
             quizId={quiz.id}
             quizTitle={quiz.title}

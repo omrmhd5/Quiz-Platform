@@ -4,6 +4,11 @@ import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { PaginationControls } from "@/components/pagination-controls";
 import { SessionQuizStats } from "@/components/sessions/session-quiz-stats";
+import { StatCard } from "@/components/stat-display";
+import {
+  AttemptStatusBadge,
+  resolveAttemptStatus,
+} from "@/components/ui/attempt-status-badge";
 import type { SessionResultsView } from "@/lib/session-results";
 import {
   formatSessionDateTime,
@@ -17,7 +22,6 @@ import {
   linkClassName,
   navLinkClassName,
   segmentClassName,
-  statCardClassName,
   tableShellClassName,
 } from "@/lib/utils";
 
@@ -39,23 +43,12 @@ function getAttemptStatusDisplay(
   sessionStatus: SessionResultsView["status"],
   attemptStatus: SessionResultsView["attempts"][number]["status"],
 ) {
-  if (attemptStatus === "submitted") {
-    return {
-      label: "Submitted",
-      className: "ui-badge ui-badge-success",
-    };
-  }
-
-  if (sessionStatus === "closed") {
-    return {
-      label: "Didn't finish",
-      className: "ui-badge ui-badge-danger",
-    };
-  }
+  const status = resolveAttemptStatus(sessionStatus, attemptStatus);
 
   return {
-    label: "In progress",
-    className: "ui-badge ui-badge-progress",
+    kind: status.kind,
+    label: status.label,
+    className: status.className,
   };
 }
 
@@ -171,59 +164,62 @@ export function SessionResultsDetail({
       {activeTab === "stats" ? (
         <div className="space-y-5">
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            <div className={statCardClassName}>
-              <p className="text-sm text-zinc-600">Joined / registered</p>
-              <p className="mt-3 text-3xl font-semibold tabular-nums tracking-tight text-zinc-900">
-                {results.joinedCount}
-                <span className="text-lg font-normal text-zinc-500">
-                  {" "}
-                  / {results.registeredCount}
-                </span>
-              </p>
-            </div>
-            <div className={statCardClassName}>
-              <p className="text-sm text-zinc-600">Submitted</p>
-              <p className="mt-3 text-3xl font-semibold tabular-nums tracking-tight text-zinc-900">
-                {results.submittedCount}
-              </p>
-            </div>
-            <div className={statCardClassName}>
-              <p className="text-sm text-zinc-600">In progress</p>
-              <p className="mt-3 text-3xl font-semibold tabular-nums tracking-tight text-zinc-900">
-                {liveInProgress}
-              </p>
-            </div>
-            <div className={statCardClassName}>
-              <p className="text-sm text-zinc-600">Didn&apos;t finish</p>
-              <p className="mt-3 text-3xl font-semibold tabular-nums tracking-tight text-zinc-900">
-                {didntFinishCount}
-              </p>
-            </div>
+            <StatCard
+              label="Joined / registered"
+              preset="joined"
+              value={
+                <>
+                  {results.joinedCount}
+                  <span className="text-lg font-normal text-zinc-500">
+                    {" "}
+                    / {results.registeredCount}
+                  </span>
+                </>
+              }
+            />
+            <StatCard
+              label="Submitted"
+              value={results.submittedCount}
+              preset="submitted"
+            />
+            <StatCard
+              label="In progress"
+              value={liveInProgress}
+              preset="inProgress"
+            />
+            <StatCard
+              label="Didn't finish"
+              value={didntFinishCount}
+              preset="didntFinish"
+            />
           </div>
 
           <div className="grid gap-4 sm:grid-cols-3">
-            <div className={statCardClassName}>
-              <p className="text-sm text-zinc-600">Highest score</p>
-              <p className="mt-3 text-3xl font-semibold tabular-nums tracking-tight text-zinc-900">
-                {results.highestScore !== null
+            <StatCard
+              label="Highest score"
+              value={
+                results.highestScore !== null
                   ? `${results.highestScore}%`
-                  : "—"}
-              </p>
-            </div>
-            <div className={statCardClassName}>
-              <p className="text-sm text-zinc-600">Average score</p>
-              <p className="mt-3 text-3xl font-semibold tabular-nums tracking-tight text-zinc-900">
-                {results.averageScore !== null
+                  : "—"
+              }
+              preset="highestScore"
+            />
+            <StatCard
+              label="Average score"
+              value={
+                results.averageScore !== null
                   ? `${results.averageScore}%`
-                  : "—"}
-              </p>
-            </div>
-            <div className={statCardClassName}>
-              <p className="text-sm text-zinc-600">Lowest score</p>
-              <p className="mt-3 text-3xl font-semibold tabular-nums tracking-tight text-zinc-900">
-                {results.lowestScore !== null ? `${results.lowestScore}%` : "—"}
-              </p>
-            </div>
+                  : "—"
+              }
+              preset="averageScore"
+            />
+            <StatCard
+              label="Lowest score"
+              value={
+                results.lowestScore !== null ? `${results.lowestScore}%` : "—"
+              }
+              preset="lowestScore"
+            />
           </div>
 
           <SessionQuizStats
@@ -325,9 +321,11 @@ export function SessionResultsDetail({
                           </Link>
                         </td>
                         <td className="px-3 py-3">
-                          <span className={cn(attemptStatus.className)}>
-                            {attemptStatus.label}
-                          </span>
+                          <AttemptStatusBadge
+                            kind={attemptStatus.kind}
+                            label={attemptStatus.label}
+                            className={attemptStatus.className}
+                          />
                         </td>
                         <td className="px-3 py-3 tabular-nums text-zinc-900">
                           {attempt.scorePercent !== null

@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { ContentModal } from "@/components/content-modal";
 import { PaginationControls } from "@/components/pagination-controls";
+import { ActionButton } from "@/components/ui/action-control";
 import {
   formatSessionDateTime,
   sessionStatusBadgeClass,
@@ -14,8 +15,6 @@ import type {
 } from "@/lib/session-results";
 import { SESSIONS_PAGE_SIZE, paginateSlice } from "@/lib/pagination";
 import {
-  buttonSecondaryClassName,
-  buttonSuccessClassName,
   cn,
   panelClassName,
 } from "@/lib/utils";
@@ -241,17 +240,10 @@ export function QuizResultsSection({
                       : "—"}
                   </td>
                   <td className="px-3 py-3">
-                    <button
-                      type="button"
+                    <ActionButton
+                      action={session.status === "active" ? "live" : "open"}
                       onClick={() => onModalSessionIdChange(session.sessionId)}
-                      className={cn(
-                        session.status === "active"
-                          ? buttonSuccessClassName
-                          : buttonSecondaryClassName,
-                        "ui-btn-sm",
-                      )}>
-                      Open
-                    </button>
+                    />
                   </td>
                 </tr>
               ))}

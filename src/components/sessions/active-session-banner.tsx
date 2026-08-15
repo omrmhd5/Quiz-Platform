@@ -4,9 +4,9 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { LiveJoinedCount } from "@/components/sessions/live-joined-count";
+import { ActionButton, ActionLink } from "@/components/ui/action-control";
 import type { ActiveSessionInfo } from "@/lib/sessions";
 import {
-  buttonSecondaryClassName,
   cn,
   inputClassName,
   linkClassName,
@@ -77,18 +77,17 @@ export function ActiveSessionBanner({
         </div>
 
         <div className="flex flex-wrap gap-2">
-          <Link
+          <ActionLink
+            action="view"
+            label="View live results"
             href={`/teacher/quizzes/${activeSession.quizId}#session-${activeSession.sessionId}`}
-            className={cn(buttonSecondaryClassName, "ui-btn-sm")}>
-            View live results
-          </Link>
-          <button
-            type="button"
+          />
+          <ActionButton
+            action="close"
             onClick={handleClose}
             disabled={isClosing}
-            className={cn(buttonSecondaryClassName, "ui-btn-sm")}>
-            {isClosing ? "Closing..." : "Close session"}
-          </button>
+            label={isClosing ? "Closing..." : "Close session"}
+          />
         </div>
       </div>
 
@@ -99,12 +98,12 @@ export function ActiveSessionBanner({
           aria-label="Student join link"
           className={cn(inputClassName, "font-mono text-xs")}
         />
-        <button
-          type="button"
+        <ActionButton
+          action="copy"
           onClick={handleCopy}
-          className={cn(buttonSecondaryClassName, "ui-btn-sm shrink-0")}>
-          <span aria-live="polite">{copyLabel}</span>
-        </button>
+          className="ui-btn-sm shrink-0"
+          label={copyLabel}
+        />
       </div>
     </div>
   );

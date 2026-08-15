@@ -1,15 +1,10 @@
 "use client";
 
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { ConfirmDialog } from "@/components/confirm-dialog";
+import { ActionButton, ActionLink } from "@/components/ui/action-control";
 import type { ActiveSessionInfo } from "@/lib/sessions";
-import {
-  buttonPrimaryClassName,
-  buttonSuccessClassName,
-  cn,
-} from "@/lib/utils";
 import { launchQuizSession } from "@/server/actions/sessions";
 
 type LaunchQuizButtonProps = {
@@ -53,18 +48,14 @@ export function LaunchQuizButton({
 
   if (isThisQuizLive) {
     return (
-      <Link
-        href={`/teacher/quizzes/${quizId}`}
-        className={cn(buttonSuccessClassName, "ui-btn-sm")}>
-        Live
-      </Link>
+      <ActionLink action="live" href={`/teacher/quizzes/${quizId}`} />
     );
   }
 
   return (
     <>
-      <button
-        type="button"
+      <ActionButton
+        action="launch"
         disabled={!canLaunch || isLaunching}
         title={canLaunch ? undefined : "Add at least one question first"}
         onClick={() => {
@@ -75,9 +66,8 @@ export function LaunchQuizButton({
 
           void handleLaunch(false);
         }}
-        className={cn(buttonPrimaryClassName, "ui-btn-sm")}>
-        {isLaunching ? "Launching..." : "Launch"}
-      </button>
+        label={isLaunching ? "Launching..." : "Launch"}
+      />
 
       <ConfirmDialog
         open={replaceDialogOpen}

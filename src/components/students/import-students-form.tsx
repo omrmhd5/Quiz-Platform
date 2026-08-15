@@ -8,10 +8,10 @@ import {
 import {
   alertErrorClassName,
   alertSuccessClassName,
-  buttonSecondaryClassName,
   inputClassName,
   panelClassName,
 } from "@/lib/utils";
+import { ActionButton } from "@/components/ui/action-control";
 import { importStudents } from "@/server/actions/students";
 
 export function ImportStudentsForm() {
@@ -60,12 +60,12 @@ export function ImportStudentsForm() {
         <p className={alertSuccessClassName}>{state.success}</p>
       ) : null}
 
-      <button
+      <ActionButton
+        action="import"
         type="submit"
         disabled={isPending}
-        className={buttonSecondaryClassName}>
-        {isPending ? "Importing..." : "Import students"}
-      </button>
+        label={isPending ? "Importing..." : "Import students"}
+      />
     </form>
   );
 }

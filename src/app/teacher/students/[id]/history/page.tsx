@@ -1,9 +1,8 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { StudentHistoryTable } from "@/components/students/student-history-table";
+import { ActionLink } from "@/components/ui/action-control";
 import {
-  buttonSecondaryClassName,
-  cn,
   linkClassName,
   pageDescriptionClassName,
   pageTitleClassName,
@@ -51,11 +50,12 @@ export default async function StudentHistoryPage({
             · quiz history across all sessions
           </p>
         </div>
-        <Link
+        <ActionLink
+          action="back"
+          label="Back to roster"
           href="/teacher/students"
-          className={cn(buttonSecondaryClassName, "inline-flex items-center")}>
-          Back to roster
-        </Link>
+          size="md"
+        />
       </div>
 
       <StudentHistoryTable history={history} />

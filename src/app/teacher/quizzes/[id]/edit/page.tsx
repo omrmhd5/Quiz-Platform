@@ -1,10 +1,8 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { QuizForm } from "@/components/quizzes/quiz-form";
+import { ActionLink } from "@/components/ui/action-control";
 import { quizQuestionsToPayload } from "@/lib/quizzes";
 import {
-  buttonSecondaryClassName,
-  cn,
   pageDescriptionClassName,
   pageTitleClassName,
 } from "@/lib/utils";
@@ -38,11 +36,11 @@ export default async function EditQuizPage({ params }: EditQuizPageProps) {
             Update questions or correct answers for &ldquo;{quiz.title}&rdquo;.
           </p>
         </div>
-        <Link
+        <ActionLink
+          action="cancel"
           href={`/teacher/quizzes/${quiz.id}`}
-          className={cn(buttonSecondaryClassName, "inline-flex items-center")}>
-          Cancel
-        </Link>
+          size="md"
+        />
       </div>
 
       {sessionCount > 0 ? (

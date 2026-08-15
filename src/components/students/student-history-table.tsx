@@ -4,17 +4,19 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { PaginationControls } from "@/components/pagination-controls";
 import { SectionIntro } from "@/components/section-intro";
-import { StatDisplay } from "@/components/stat-display";
-import { StatusBadge, TableCell, TableRow } from "@/components/data-table";
+import { StatCard } from "@/components/stat-display";
+import { ActionLink } from "@/components/ui/action-control";
+import {
+  AttemptStatusBadge,
+  resolveAttemptStatus,
+} from "@/components/ui/attempt-status-badge";
+import { TableCell, TableRow } from "@/components/data-table";
 import { formatSessionDateTime } from "@/lib/session-format";
 import type { StudentHistoryView } from "@/lib/student-history";
 import { STUDENTS_PAGE_SIZE } from "@/lib/pagination";
 import {
-  buttonSecondaryClassName,
-  cn,
   emptyStateClassName,
   panelClassName,
-  statCardClassName,
   tableBodyClassName,
   tableCellClassName,
   tableClassName,
@@ -32,15 +34,7 @@ function getAttemptStatusLabel(
   sessionStatus: StudentHistoryView["attempts"][number]["sessionStatus"],
   attemptStatus: StudentHistoryView["attempts"][number]["status"],
 ) {
-  if (attemptStatus === "submitted") {
-    return { label: "Submitted", className: "ui-badge ui-badge-success" };
-  }
-
-  if (sessionStatus === "closed") {
-    return { label: "Didn't finish", className: "ui-badge ui-badge-danger" };
-  }
-
-  return { label: "In progress", className: "ui-badge ui-badge-progress" };
+  return resolveAttemptStatus(sessionStatus, attemptStatus);
 }
 
 export function StudentHistoryTable({ history }: StudentHistoryTableProps) {
@@ -53,42 +47,45 @@ export function StudentHistoryTable({ history }: StudentHistoryTableProps) {
   return (
     <div className="space-y-6">
       <div className="grid gap-4 sm:grid-cols-3">
-        <div className={statCardClassName}>
-          <StatDisplay label="Sessions joined" value={history.attemptCount} />
-        </div>
-        <div className={statCardClassName}>
-          <StatDisplay label="Submitted" value={history.submittedCount} />
-        </div>
-        <div className={statCardClassName}>
-          <StatDisplay label="Didn't finish" value={history.didntFinishCount} />
-        </div>
+        <StatCard
+          label="Sessions joined"
+          value={history.attemptCount}
+          preset="joined"
+        />
+        <StatCard
+          label="Submitted"
+          value={history.submittedCount}
+          preset="submitted"
+        />
+        <StatCard
+          label="Didn't finish"
+          value={history.didntFinishCount}
+          preset="didntFinish"
+        />
       </div>
 
       <div className="grid gap-4 sm:grid-cols-3">
-        <div className={statCardClassName}>
-          <StatDisplay
-            label="Highest score"
-            value={
-              history.highestScore !== null ? `${history.highestScore}%` : "—"
-            }
-          />
-        </div>
-        <div className={statCardClassName}>
-          <StatDisplay
-            label="Average score"
-            value={
-              history.averageScore !== null ? `${history.averageScore}%` : "—"
-            }
-          />
-        </div>
-        <div className={statCardClassName}>
-          <StatDisplay
-            label="Lowest score"
-            value={
-              history.lowestScore !== null ? `${history.lowestScore}%` : "—"
-            }
-          />
-        </div>
+        <StatCard
+          label="Highest score"
+          value={
+            history.highestScore !== null ? `${history.highestScore}%` : "—"
+          }
+          preset="highestScore"
+        />
+        <StatCard
+          label="Average score"
+          value={
+            history.averageScore !== null ? `${history.averageScore}%` : "—"
+          }
+          preset="averageScore"
+        />
+        <StatCard
+          label="Lowest score"
+          value={
+            history.lowestScore !== null ? `${history.lowestScore}%` : "—"
+          }
+          preset="lowestScore"
+        />
       </div>
 
       <div className={`${panelClassName} space-y-4`}>
@@ -100,15 +97,21 @@ export function StudentHistoryTable({ history }: StudentHistoryTableProps) {
           <p className={emptyStateClassName}>No submitted quizzes yet.</p>
         ) : (
           <div className="grid gap-4 sm:grid-cols-3">
-            <div className={statCardClassName}>
-              <StatDisplay label="Total correct" value={history.totalCorrect} />
-            </div>
-            <div className={statCardClassName}>
-              <StatDisplay label="Total wrong" value={history.totalWrong} />
-            </div>
-            <div className={statCardClassName}>
-              <StatDisplay label="Total skipped" value={history.totalSkipped} />
-            </div>
+            <StatCard
+              label="Total correct"
+              value={history.totalCorrect}
+              preset="correct"
+            />
+            <StatCard
+              label="Total wrong"
+              value={history.totalWrong}
+              preset="wrong"
+            />
+            <StatCard
+              label="Total skipped"
+              value={history.totalSkipped}
+              preset="skipped"
+            />
           </div>
         )}
       </div>
@@ -174,10 +177,11 @@ export function StudentHistoryTable({ history }: StudentHistoryTableProps) {
                         {formatSessionDateTime(attempt.launchedAt)}
                       </TableCell>
                       <TableCell>
-                        <StatusBadge
-                          className={cn("capitalize", status.className)}>
-                          {status.label}
-                        </StatusBadge>
+                        <AttemptStatusBadge
+                          kind={status.kind}
+                          label={status.label}
+                          className={status.className}
+                        />
                       </TableCell>
                       <TableCell className="tabular-nums text-zinc-900">
                         {attempt.scorePercent !== null
@@ -194,11 +198,11 @@ export function StudentHistoryTable({ history }: StudentHistoryTableProps) {
                         {attempt.unansweredCount ?? "—"}
                       </TableCell>
                       <TableCell>
-                        <Link
+                        <ActionLink
+                          action="view"
+                          label="View session"
                           href={`/teacher/quizzes/${attempt.quizId}#session-${attempt.sessionId}`}
-                          className={cn(buttonSecondaryClassName, "ui-btn-sm")}>
-                          View session
-                        </Link>
+                        />
                       </TableCell>
                     </TableRow>
                   );

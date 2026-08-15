@@ -3,8 +3,9 @@
 import { useEffect, useMemo, useState } from "react";
 import { ContentModal } from "@/components/content-modal";
 import { PaginationControls } from "@/components/pagination-controls";
+import { ActionButton } from "@/components/ui/action-control";
 import { QUESTIONS_PAGE_SIZE, paginateSlice } from "@/lib/pagination";
-import { buttonSecondaryClassName, cn, panelClassName } from "@/lib/utils";
+import { cn, panelClassName } from "@/lib/utils";
 
 export type QuizQuestionView = {
   id: string;
@@ -49,12 +50,7 @@ export function QuizQuestionsSection({ questions }: QuizQuestionsSectionProps) {
             answer key for this quiz
           </p>
         </div>
-        <button
-          type="button"
-          onClick={() => setOpen(true)}
-          className={cn(buttonSecondaryClassName, "shrink-0")}>
-          View answer key
-        </button>
+        <ActionButton action="answerKey" onClick={() => setOpen(true)} />
       </div>
 
       <ContentModal

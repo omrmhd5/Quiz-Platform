@@ -1,13 +1,12 @@
-import Link from "next/link";
+import { StatCard } from "@/components/stat-display";
+import { ActionLink } from "@/components/ui/action-control";
 import {
-  buttonPrimaryClassName,
   cn,
   enterClassName,
   pageDescriptionClassName,
   pageTitleClassName,
   panelClassName,
   scoreHeroClassName,
-  statCardClassName,
 } from "@/lib/utils";
 import type { AttemptResultsView } from "@/lib/attempts";
 
@@ -33,35 +32,34 @@ export function QuizResults({ results }: QuizResultsProps) {
           </p>
         </div>
 
-        <div className="grid grid-cols-3 gap-3">
-          <div className={cn(statCardClassName, "px-3 py-4")}>
-            <p className="text-2xl font-semibold tabular-nums text-green-700">
-              {results.correctCount}
-            </p>
-            <p className="mt-1 text-xs text-zinc-600">Correct</p>
-          </div>
-          <div className={cn(statCardClassName, "px-3 py-4")}>
-            <p className="text-2xl font-semibold tabular-nums text-red-700">
-              {results.wrongCount}
-            </p>
-            <p className="mt-1 text-xs text-zinc-600">Wrong</p>
-          </div>
-          <div className={cn(statCardClassName, "px-3 py-4")}>
-            <p className="text-2xl font-semibold tabular-nums text-zinc-700">
-              {results.unansweredCount}
-            </p>
-            <p className="mt-1 text-xs text-zinc-600">Skipped</p>
-          </div>
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+          <StatCard
+            label="Correct"
+            value={results.correctCount}
+            preset="correct"
+            className="px-3 py-4 text-center [&_.ui-stat-card__icon]:mx-auto"
+          />
+          <StatCard
+            label="Wrong"
+            value={results.wrongCount}
+            preset="wrong"
+            className="px-3 py-4 text-center [&_.ui-stat-card__icon]:mx-auto"
+          />
+          <StatCard
+            label="Skipped"
+            value={results.unansweredCount}
+            preset="skipped"
+            className="px-3 py-4 text-center [&_.ui-stat-card__icon]:mx-auto"
+          />
         </div>
 
-        <Link
+        <ActionLink
+          action="join"
+          label="Back to join"
           href="/join"
-          className={cn(
-            buttonPrimaryClassName,
-            "inline-flex w-full justify-center",
-          )}>
-          Back to join
-        </Link>
+          size="md"
+          className="w-full justify-center"
+        />
       </div>
     </div>
   );

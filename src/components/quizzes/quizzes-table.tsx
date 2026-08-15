@@ -4,10 +4,10 @@ import Link from "next/link";
 import { useMemo, useState } from "react";
 import { PaginationControls } from "@/components/pagination-controls";
 import { LaunchQuizButton } from "@/components/sessions/launch-quiz-button";
+import { ActionLink } from "@/components/ui/action-control";
 import type { ActiveSessionInfo } from "@/lib/sessions";
 import { QUIZZES_PAGE_SIZE, paginateSlice } from "@/lib/pagination";
 import {
-  buttonSecondaryClassName,
   cn,
   linkClassName,
   panelClassName,
@@ -99,11 +99,10 @@ export function QuizzesTable({ quizzes, activeSession }: QuizzesTableProps) {
                       questionCount={quiz.questionCount}
                       activeSession={activeSession}
                     />
-                    <Link
+                    <ActionLink
+                      action="view"
                       href={`/teacher/quizzes/${quiz.id}`}
-                      className={cn(buttonSecondaryClassName, "ui-btn-sm")}>
-                      View
-                    </Link>
+                    />
                   </div>
                 </td>
               </tr>

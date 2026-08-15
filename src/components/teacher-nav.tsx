@@ -2,9 +2,9 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { ActionButton } from "@/components/ui/action-control";
 import {
   brandLinkClassName,
-  buttonGhostClassName,
   cn,
   navLinkClassName,
   segmentClassName,
@@ -58,9 +58,7 @@ export function TeacherNav({ username, logoutAction }: TeacherNavProps) {
             {username}
           </span>
           <form action={logoutAction}>
-            <button type="submit" className={buttonGhostClassName}>
-              Sign out
-            </button>
+            <ActionButton action="signOut" type="submit" size="md" />
           </form>
         </div>
       </div>

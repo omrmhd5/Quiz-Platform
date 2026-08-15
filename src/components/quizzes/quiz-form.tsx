@@ -1,10 +1,10 @@
 "use client";
 
 import { useActionState, useEffect, useRef, useState } from "react";
-import Link from "next/link";
 import { ConfirmDialog } from "@/components/confirm-dialog";
 import { QuizManualBuilder } from "@/components/quizzes/quiz-manual-builder";
 import { QuizPasteBuilder } from "@/components/quizzes/quiz-paste-builder";
+import { ActionButton, ActionLink } from "@/components/ui/action-control";
 import {
   createEmptyQuestion,
   draftsToPayload,
@@ -16,8 +16,6 @@ import {
 } from "@/lib/quizzes";
 import {
   alertErrorClassName,
-  buttonPrimaryClassName,
-  buttonSecondaryClassName,
   cn,
   inputClassName,
   methodCardClassName,
@@ -293,26 +291,25 @@ export function QuizForm({
               </p>
             ) : null}
             <div className="flex flex-wrap gap-2">
-              <button
-                type="button"
+              <ActionButton
+                action="back"
                 onClick={() => {
                   setStepError(null);
                   setStep("build");
                 }}
-                className={buttonSecondaryClassName}>
-                Back
-              </button>
-              <button
-                type="button"
+              />
+              <ActionButton
+                action="save"
                 disabled={isPending}
                 onClick={handleSaveClick}
-                className={buttonPrimaryClassName}>
-                {isPending
-                  ? "Saving..."
-                  : mode === "edit"
-                    ? "Update quiz"
-                    : "Save quiz"}
-              </button>
+                label={
+                  isPending
+                    ? "Saving..."
+                    : mode === "edit"
+                      ? "Update quiz"
+                      : "Save quiz"
+                }
+              />
             </div>
           </div>
         ) : null}
@@ -343,15 +340,15 @@ export function QuizForm({
         </p>
       ) : null}
 
-      <Link
+      <ActionLink
+        action="cancel"
         href={
           mode === "edit" && quizId
             ? `/teacher/quizzes/${quizId}`
             : "/teacher/quizzes"
         }
-        className={cn(buttonSecondaryClassName, "inline-flex items-center")}>
-        Cancel
-      </Link>
+        size="md"
+      />
     </form>
   );
 }

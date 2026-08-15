@@ -436,6 +436,58 @@ button.ui-press {
   }
 }
 
+.ui-stat-card__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  margin-bottom: 0.75rem;
+  border-radius: 0.625rem;
+}
+
+.ui-stat-card--neutral .ui-stat-card__icon {
+  background-color: #f4f4f5;
+  color: #52525b;
+}
+
+.ui-stat-card--info .ui-stat-card__icon {
+  background-color: #dbeafe;
+  color: #1d4ed8;
+}
+
+.ui-stat-card--info .ui-stat-value {
+  color: #1e3a8a;
+}
+
+.ui-stat-card--success .ui-stat-card__icon {
+  background-color: #dcfce7;
+  color: #166534;
+}
+
+.ui-stat-card--success .ui-stat-value {
+  color: #14532d;
+}
+
+.ui-stat-card--warning .ui-stat-card__icon,
+.ui-stat-card--progress .ui-stat-card__icon {
+  background-color: #fef3c7;
+  color: #b45309;
+}
+
+.ui-stat-card--progress .ui-stat-value {
+  color: #92400e;
+}
+
+.ui-stat-card--danger .ui-stat-card__icon {
+  background-color: #fee2e2;
+  color: #b91c1c;
+}
+
+.ui-stat-card--danger .ui-stat-value {
+  color: #991b1b;
+}
+
 .ui-live-banner {
   border-color: #bbf7d0;
   background: linear-gradient(

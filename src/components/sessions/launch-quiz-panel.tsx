@@ -5,13 +5,12 @@ import { useState } from "react";
 import { ConfirmDialog } from "@/components/confirm-dialog";
 import { SectionIntro } from "@/components/section-intro";
 import { LiveJoinedCount } from "@/components/sessions/live-joined-count";
+import { ActionButton } from "@/components/ui/action-control";
 import type { ActiveSessionInfo } from "@/lib/sessions";
 import {
   alertErrorClassName,
   alertSuccessClassName,
   alertWarningClassName,
-  buttonPrimaryClassName,
-  buttonSecondaryClassName,
   cn,
   inputClassName,
   labelClassName,
@@ -160,12 +159,12 @@ export function LaunchQuizPanel({
               value={joinUrl}
               className={cn(inputClassName, "font-mono text-xs")}
             />
-            <button
-              type="button"
+            <ActionButton
+              action="copy"
               onClick={handleCopy}
-              className={cn(buttonSecondaryClassName, "shrink-0")}>
-              {copyLabel}
-            </button>
+              className="shrink-0"
+              label={copyLabel}
+            />
           </div>
           <p className="text-xs text-zinc-500">
             Share this URL on your classroom network. Students open it on their
@@ -173,24 +172,22 @@ export function LaunchQuizPanel({
           </p>
 
           <div className="flex flex-wrap gap-2">
-            <button
-              type="button"
+            <ActionButton
+              action="view"
+              label="View live results"
               onClick={onViewLiveResults}
-              className={cn(buttonSecondaryClassName, "ui-btn-sm")}>
-              View live results
-            </button>
-            <button
-              type="button"
+            />
+            <ActionButton
+              action="close"
               onClick={handleClose}
               disabled={isClosing}
-              className={buttonSecondaryClassName}>
-              {isClosing ? "Closing..." : "Close session"}
-            </button>
+              label={isClosing ? "Closing..." : "Close session"}
+            />
           </div>
         </div>
       ) : (
-        <button
-          type="button"
+        <ActionButton
+          action="launch"
           disabled={isLaunching}
           onClick={() => {
             if (otherQuizLive) {
@@ -200,9 +197,8 @@ export function LaunchQuizPanel({
 
             void handleLaunch(false);
           }}
-          className={buttonPrimaryClassName}>
-          {isLaunching ? "Launching..." : "Launch quiz"}
-        </button>
+          label={isLaunching ? "Launching..." : "Launch quiz"}
+        />
       )}
 
       {error ? (

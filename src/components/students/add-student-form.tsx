@@ -8,10 +8,10 @@ import {
 import {
   alertErrorClassName,
   alertSuccessClassName,
-  buttonPrimaryClassName,
   inputClassName,
   panelClassName,
 } from "@/lib/utils";
+import { ActionButton } from "@/components/ui/action-control";
 import { createStudent } from "@/server/actions/students";
 
 export function AddStudentForm() {
@@ -83,12 +83,12 @@ export function AddStudentForm() {
         <p className={alertSuccessClassName}>{state.success}</p>
       ) : null}
 
-      <button
+      <ActionButton
+        action="add"
         type="submit"
         disabled={isPending}
-        className={buttonPrimaryClassName}>
-        {isPending ? "Adding..." : "Add student"}
-      </button>
+        label={isPending ? "Adding..." : "Add student"}
+      />
     </form>
   );
 }

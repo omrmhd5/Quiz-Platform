@@ -1,8 +1,7 @@
-import Link from "next/link";
 import { QuizResults } from "@/components/quiz/quiz-results";
 import { QuizTaker } from "@/components/quiz/quiz-taker";
+import { ActionLink } from "@/components/ui/action-control";
 import {
-  buttonPrimaryClassName,
   cn,
   enterClassName,
   pageDescriptionClassName,
@@ -49,9 +48,13 @@ export default async function QuizAttemptPage({
               This quiz session has ended. Contact your teacher if you still
               need to participate.
             </p>
-            <Link href="/join" className={buttonPrimaryClassName}>
-              Back to join
-            </Link>
+            <ActionLink
+              action="join"
+              label="Back to join"
+              href="/join"
+              size="md"
+              className="inline-flex w-full justify-center"
+            />
           </div>
         </div>
       </div>

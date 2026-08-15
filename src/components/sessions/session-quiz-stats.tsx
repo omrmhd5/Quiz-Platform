@@ -1,11 +1,10 @@
 import type { SessionQuestionStat } from "@/lib/session-results";
 import { SectionIntro } from "@/components/section-intro";
-import { StatDisplay } from "@/components/stat-display";
+import { StatCard } from "@/components/stat-display";
 import {
   cn,
   emptyStateClassName,
   panelClassName,
-  statCardClassName,
 } from "@/lib/utils";
 
 type SessionQuizStatsProps = {
@@ -69,15 +68,17 @@ export function SessionQuizStats({
       ) : (
         <>
           <div className="grid gap-4 sm:grid-cols-3">
-            <div className={statCardClassName}>
-              <StatDisplay label="Total correct" value={totalCorrect} />
-            </div>
-            <div className={statCardClassName}>
-              <StatDisplay label="Total wrong" value={totalWrong} />
-            </div>
-            <div className={statCardClassName}>
-              <StatDisplay label="Total skipped" value={totalSkipped} />
-            </div>
+            <StatCard
+              label="Total correct"
+              value={totalCorrect}
+              preset="correct"
+            />
+            <StatCard label="Total wrong" value={totalWrong} preset="wrong" />
+            <StatCard
+              label="Total skipped"
+              value={totalSkipped}
+              preset="skipped"
+            />
           </div>
 
           {(mostMissed || easiest) &&

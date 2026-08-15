@@ -2,7 +2,8 @@ import Link from "next/link";
 import { DashboardAttemptHighlights } from "@/components/dashboard/dashboard-attempt-highlights";
 import { DashboardCharts } from "@/components/dashboard/dashboard-charts";
 import { SectionIntro } from "@/components/section-intro";
-import { StatDisplay } from "@/components/stat-display";
+import { StatCard } from "@/components/stat-display";
+import { ActionLink } from "@/components/ui/action-control";
 import { StatusBadge, TableCell, TableRow } from "@/components/data-table";
 import { ActiveSessionBanner } from "@/components/sessions/active-session-banner";
 import {
@@ -12,14 +13,12 @@ import {
 import { DASHBOARD_RECENT_SESSIONS, type DashboardView } from "@/lib/dashboard";
 import type { ActiveSessionInfo } from "@/lib/sessions";
 import {
-  buttonSecondaryClassName,
   cn,
   emptyStateClassName,
   linkClassName,
   pageDescriptionClassName,
   pageTitleClassName,
   panelClassName,
-  statCardClassName,
   tableBodyClassName,
   tableCellClassName,
   tableClassName,
@@ -52,12 +51,8 @@ export function DashboardView({
           </p>
         </div>
         <div className="flex flex-wrap gap-3">
-          <Link href="/teacher/students" className={buttonSecondaryClassName}>
-            Manage students
-          </Link>
-          <Link href="/teacher/quizzes" className={buttonSecondaryClassName}>
-            Manage quizzes
-          </Link>
+          <ActionLink action="manageStudents" href="/teacher/students" />
+          <ActionLink action="manageQuizzes" href="/teacher/quizzes" />
         </div>
       </div>
 
@@ -71,42 +66,47 @@ export function DashboardView({
 
       <div className="space-y-4">
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          <div className={statCardClassName}>
-            <StatDisplay
-              label="Registered students"
-              value={stats.studentCount}
-            />
-          </div>
-          <div className={statCardClassName}>
-            <StatDisplay label="Total quizzes" value={stats.quizCount} />
-          </div>
-          <div className={statCardClassName}>
-            <StatDisplay label="Total sessions" value={stats.sessionCount} />
-          </div>
+          <StatCard
+            label="Registered students"
+            value={stats.studentCount}
+            preset="students"
+          />
+          <StatCard
+            label="Total quizzes"
+            value={stats.quizCount}
+            preset="quizzes"
+          />
+          <StatCard
+            label="Total sessions"
+            value={stats.sessionCount}
+            preset="sessions"
+          />
         </div>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <div className={statCardClassName}>
-            <StatDisplay label="Submitted" value={stats.submittedCount} />
-          </div>
-          <div className={statCardClassName}>
-            <StatDisplay
-              label="In progress"
-              value={stats.liveInProgressCount}
-            />
-          </div>
-          <div className={statCardClassName}>
-            <StatDisplay label="Didn't finish" value={stats.didntFinishCount} />
-          </div>
-          <div className={statCardClassName}>
-            <StatDisplay
-              label="Average score"
-              value={
-                stats.overallAverageScore !== null
-                  ? `${stats.overallAverageScore}%`
-                  : "—"
-              }
-            />
-          </div>
+          <StatCard
+            label="Submitted"
+            value={stats.submittedCount}
+            preset="submitted"
+          />
+          <StatCard
+            label="In progress"
+            value={stats.liveInProgressCount}
+            preset="inProgress"
+          />
+          <StatCard
+            label="Didn't finish"
+            value={stats.didntFinishCount}
+            preset="didntFinish"
+          />
+          <StatCard
+            label="Average score"
+            value={
+              stats.overallAverageScore !== null
+                ? `${stats.overallAverageScore}%`
+                : "—"
+            }
+            preset="averageScore"
+          />
         </div>
       </div>
 
@@ -119,15 +119,21 @@ export function DashboardView({
           <p className={emptyStateClassName}>No submitted quizzes yet.</p>
         ) : (
           <div className="grid gap-4 sm:grid-cols-3">
-            <div className={statCardClassName}>
-              <StatDisplay label="Total correct" value={stats.totalCorrect} />
-            </div>
-            <div className={statCardClassName}>
-              <StatDisplay label="Total wrong" value={stats.totalWrong} />
-            </div>
-            <div className={statCardClassName}>
-              <StatDisplay label="Total skipped" value={stats.totalSkipped} />
-            </div>
+            <StatCard
+              label="Total correct"
+              value={stats.totalCorrect}
+              preset="correct"
+            />
+            <StatCard
+              label="Total wrong"
+              value={stats.totalWrong}
+              preset="wrong"
+            />
+            <StatCard
+              label="Total skipped"
+              value={stats.totalSkipped}
+              preset="skipped"
+            />
           </div>
         )}
       </div>

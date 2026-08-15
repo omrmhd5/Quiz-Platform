@@ -2,8 +2,9 @@
 
 import { useEffect, useId, useRef, type ReactNode } from "react";
 import { createPortal } from "react-dom";
+import { ActionButton } from "@/components/ui/action-control";
 import { useModalMotion } from "@/lib/use-modal-motion";
-import { buttonSecondaryClassName, cn } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 
 type ContentModalProps = {
   open: boolean;
@@ -90,13 +91,13 @@ export function ContentModal({
               </p>
             ) : null}
           </div>
-          <button
+          <ActionButton
             ref={closeRef}
-            type="button"
+            action="cancel"
+            label="Close"
             onClick={onClose}
-            className={cn(buttonSecondaryClassName, "ui-btn-sm shrink-0")}>
-            Close
-          </button>
+            className="shrink-0"
+          />
         </div>
 
         <div className="min-h-0 flex-1 overflow-y-auto pt-4">{children}</div>

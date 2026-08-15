@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { ConfirmDialog } from "@/components/confirm-dialog";
-import { buttonDangerClassName, cn } from "@/lib/utils";
+import { ActionButton } from "@/components/ui/action-control";
 import { deleteQuiz } from "@/server/actions/quizzes";
 
 type DeleteQuizButtonProps = {
@@ -56,13 +56,11 @@ export function DeleteQuizButton({
 
   return (
     <>
-      <button
-        type="button"
+      <ActionButton
+        action="delete"
         onClick={() => setOpen(true)}
         disabled={isDeleting}
-        className={cn(buttonDangerClassName, "ui-btn-sm")}>
-        Delete
-      </button>
+      />
 
       <ConfirmDialog
         open={open}

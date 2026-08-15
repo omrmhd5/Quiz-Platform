@@ -3,13 +3,12 @@
 import { useActionState, useMemo, useRef, useState } from "react";
 import { ConfirmDialog } from "@/components/confirm-dialog";
 import { PaginationControls } from "@/components/pagination-controls";
+import { ActionButton } from "@/components/ui/action-control";
 import type { AttemptQuizView } from "@/lib/attempts";
 import { submitAttemptInitialState } from "@/lib/attempts";
 import { QUESTIONS_PAGE_SIZE, paginateSlice } from "@/lib/pagination";
 import {
   alertErrorClassName,
-  buttonPrimaryClassName,
-  buttonSecondaryClassName,
   cn,
   enterClassName,
   optionLabelClassName,
@@ -87,9 +86,7 @@ export function QuizTaker({ quiz }: QuizTakerProps) {
             <fieldset className="space-y-2">
               <legend className="sr-only">Choose an answer</legend>
               {question.options.map((option) => (
-                <label
-                  key={option.id}
-                  className={optionLabelClassName}>
+                <label key={option.id} className={optionLabelClassName}>
                   <input
                     type="radio"
                     value={option.id}
@@ -125,28 +122,28 @@ export function QuizTaker({ quiz }: QuizTakerProps) {
 
         <div className="flex flex-wrap gap-2">
           {pagination.page > 1 ? (
-            <button
-              type="button"
+            <ActionButton
+              action="previous"
               onClick={() => setPage((current) => current - 1)}
-              className={cn(buttonSecondaryClassName, "sm:w-auto")}>
-              Previous questions
-            </button>
+              className="sm:w-auto"
+              aria-label="Previous questions"
+            />
           ) : null}
           {pagination.page < pagination.pageCount ? (
-            <button
-              type="button"
+            <ActionButton
+              action="next"
               onClick={() => setPage((current) => current + 1)}
-              className={cn(buttonSecondaryClassName, "sm:w-auto")}>
-              Next questions
-            </button>
+              className="sm:w-auto"
+              aria-label="Next questions"
+            />
           ) : null}
-          <button
-            type="button"
+          <ActionButton
+            action="submit"
             disabled={isPending}
             onClick={() => setConfirmOpen(true)}
-            className={cn(buttonPrimaryClassName, "w-full sm:ml-auto sm:w-auto")}>
-            {isPending ? "Submitting..." : "Submit quiz"}
-          </button>
+            className="w-full sm:ml-auto sm:w-auto"
+            label={isPending ? "Submitting..." : "Submit quiz"}
+          />
         </div>
 
         <ConfirmDialog
