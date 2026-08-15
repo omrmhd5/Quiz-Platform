@@ -1,6 +1,6 @@
 "use server";
 
-import { and, count, desc, eq } from "drizzle-orm";
+import { and, countDistinct, desc, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { notFound, redirect } from "next/navigation";
 import { db } from "@/db";
@@ -109,7 +109,7 @@ export async function getQuizzes() {
       status: quizzes.status,
       questionCount: quizzes.questionCount,
       createdAt: quizzes.createdAt,
-      sessionCount: count(quizSessions.id),
+      sessionCount: countDistinct(quizSessions.id),
     })
     .from(quizzes)
     .leftJoin(quizSessions, eq(quizSessions.quizId, quizzes.id))

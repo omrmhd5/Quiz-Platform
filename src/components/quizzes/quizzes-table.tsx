@@ -45,6 +45,7 @@ export function QuizzesTable({ quizzes, activeSession }: QuizzesTableProps) {
           <tr className="text-left text-zinc-500">
             <th className="px-3 py-2 font-medium">Title</th>
             <th className="px-3 py-2 font-medium">Questions</th>
+            <th className="px-3 py-2 font-medium">Results</th>
             <th className="px-3 py-2 font-medium">Status</th>
             <th className="px-3 py-2 font-medium">Created</th>
             <th className="px-3 py-2 font-medium">Actions</th>
@@ -65,6 +66,9 @@ export function QuizzesTable({ quizzes, activeSession }: QuizzesTableProps) {
                 </td>
                 <td className="px-3 py-3 tabular-nums text-zinc-700">
                   {quiz.questionCount}
+                </td>
+                <td className="px-3 py-3 tabular-nums text-zinc-700">
+                  {quiz.sessionCount}
                 </td>
                 <td className="px-3 py-3">
                   {isLive ? (
@@ -96,11 +100,6 @@ export function QuizzesTable({ quizzes, activeSession }: QuizzesTableProps) {
                       href={`/teacher/quizzes/${quiz.id}`}
                       className={cn(buttonSecondaryClassName, "ui-btn-sm")}>
                       View
-                    </Link>
-                    <Link
-                      href={`/teacher/quizzes/${quiz.id}/edit`}
-                      className={cn(buttonSecondaryClassName, "ui-btn-sm")}>
-                      Edit
                     </Link>
                   </div>
                 </td>
