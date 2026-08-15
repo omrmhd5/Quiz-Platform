@@ -5,6 +5,7 @@ import { getJoinUrl } from "@/lib/join-url";
 import {
   buttonPrimaryClassName,
   cn,
+  emptyStateClassName,
   pageDescriptionClassName,
   pageTitleClassName,
   panelClassName,
@@ -52,15 +53,15 @@ export default async function QuizzesPage() {
       ) : null}
 
       {quizRows.length === 0 ? (
-        <div className={`${panelClassName} border-dashed text-center`}>
-          <p className="text-sm text-zinc-600">
+        <div className={`${panelClassName} space-y-4`}>
+          <p className={emptyStateClassName}>
             No quizzes yet. Create your first MCQ quiz to get started.
           </p>
           <Link
             href="/teacher/quizzes/new"
             className={cn(
               buttonPrimaryClassName,
-              "mt-4 inline-flex items-center",
+              "inline-flex w-full justify-center sm:w-auto",
             )}>
             Create quiz
           </Link>

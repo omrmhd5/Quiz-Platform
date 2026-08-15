@@ -18,12 +18,12 @@ export function formatSessionDateTime(value: Date | string | null) {
 
 export function sessionStatusBadgeClass(status: SessionStatus) {
   if (status === "active") {
-    return "bg-green-100 text-green-800";
+    return "ui-badge ui-badge-active";
   }
 
   if (status === "closed") {
-    return "bg-zinc-100 text-zinc-700";
+    return "ui-badge ui-badge-closed";
   }
 
-  return "bg-amber-100 text-amber-800";
+  return "ui-badge ui-badge-waiting";
 }

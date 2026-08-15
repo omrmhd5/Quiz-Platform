@@ -6,9 +6,11 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export const inputClassName = cn(
-  "ui-input w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 placeholder:text-zinc-400",
+  "ui-input w-full rounded-lg border border-zinc-300 bg-white px-3 py-2.5 text-sm text-zinc-900 placeholder:text-zinc-400",
   "focus:border-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-900/10",
 );
+
+export const labelClassName = "ui-label";
 
 export const buttonPrimaryClassName = cn("ui-btn ui-btn-primary ui-press");
 
@@ -35,15 +37,61 @@ export const methodCardClassName = cn(
 
 export const statCardClassName = cn("ui-panel ui-stat");
 
+export const segmentClassName = "ui-segment";
+
+export const emptyStateClassName = "ui-empty";
+
+export const tableShellClassName = "ui-table-shell";
+
+export const liveBannerClassName = cn(panelClassName, "ui-live-banner");
+
+export const optionLabelClassName = "ui-option";
+
+export const pageEnterClassName = "ui-page";
+
+export const enterClassName = "ui-enter";
+
+export const scoreHeroClassName = "ui-score-hero";
+
+export const badgeClassName = "ui-badge";
+
+export const sectionHeaderClassName = "ui-section-header";
+
+export const sectionTitleClassName = "ui-section-title";
+
+export const sectionDescriptionClassName = "ui-section-description";
+
+export const statLabelClassName = "ui-stat-label";
+
+export const statValueClassName = "ui-stat-value";
+
+export const tableClassName = "ui-table";
+
+export const tableHeadClassName = "ui-table-head";
+
+export const tableHeadRowClassName = "ui-table-head-row";
+
+export const tableHeadCellClassName = "ui-table-head-cell";
+
+export const tableBodyClassName = "ui-table-body";
+
+export const tableCellClassName = "ui-table-cell";
+
+export const tableEmptyCellClassName = "ui-table-empty-cell";
+
 export const pageTitleClassName =
   "text-2xl font-semibold tracking-tight text-zinc-900";
 
 export const pageDescriptionClassName = "mt-1 text-sm text-zinc-600";
 
-export const alertErrorClassName =
-  "ui-alert-enter rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800";
+export const alertErrorClassName = cn("ui-alert ui-alert-error ui-alert-enter");
 
-export const alertSuccessClassName =
-  "ui-alert-enter rounded-lg border border-green-200 bg-green-50 px-3 py-2 text-sm text-green-800";
+export const alertSuccessClassName = cn(
+  "ui-alert ui-alert-success ui-alert-enter",
+);
 
-export const enterClassName = "ui-enter";
+export const alertInfoClassName = cn("ui-alert ui-alert-info ui-alert-enter");
+
+export const alertWarningClassName = cn(
+  "ui-alert ui-alert-warning ui-alert-enter",
+);

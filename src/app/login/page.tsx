@@ -1,6 +1,12 @@
 import { LoginForm } from "@/components/login-form";
 import { getSession } from "@/lib/auth";
-import { cn, enterClassName, panelClassName } from "@/lib/utils";
+import {
+  cn,
+  enterClassName,
+  pageDescriptionClassName,
+  pageTitleClassName,
+  panelClassName,
+} from "@/lib/utils";
 import { redirect } from "next/navigation";
 
 export default async function LoginPage() {
@@ -14,11 +20,9 @@ export default async function LoginPage() {
     <div className="flex min-h-dvh items-center justify-center px-4 py-12">
       <div
         className={cn(panelClassName, enterClassName, "w-full max-w-md p-8")}>
-        <div className="mb-8 space-y-2">
-          <h1 className="text-2xl font-semibold tracking-tight text-zinc-900">
-            Teacher login
-          </h1>
-          <p className="text-sm text-zinc-600">
+        <div className="mb-8">
+          <h1 className={pageTitleClassName}>Teacher login</h1>
+          <p className={pageDescriptionClassName}>
             Sign in to manage students, quizzes, and results.
           </p>
         </div>

@@ -3,8 +3,11 @@
 import { useActionState } from "react";
 import {
   alertErrorClassName,
+  alertInfoClassName,
+  alertSuccessClassName,
   buttonPrimaryClassName,
   inputClassName,
+  labelClassName,
   panelClassName,
 } from "@/lib/utils";
 import { joinActionInitialState } from "@/lib/sessions";
@@ -24,22 +27,19 @@ export function JoinForm({ quizTitle, quizRunning }: JoinFormProps) {
   return (
     <form action={formAction} className={`${panelClassName} space-y-5`}>
       {quizRunning && quizTitle ? (
-        <p className="rounded-lg border border-green-200 bg-green-50 px-3 py-2 text-sm text-green-900">
+        <p className={alertSuccessClassName}>
           Live quiz: <strong>{quizTitle}</strong>
         </p>
       ) : null}
 
       {!quizRunning ? (
-        <p className="rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-2 text-sm text-zinc-700">
+        <p className={alertInfoClassName}>
           No quiz is running right now. Wait for your teacher to launch one.
         </p>
       ) : (
         <>
           <div className="space-y-2">
-            <label
-              htmlFor="studentId"
-              className="block text-sm font-medium text-zinc-700"
-            >
+            <label htmlFor="studentId" className={labelClassName}>
               Student ID
             </label>
             <input

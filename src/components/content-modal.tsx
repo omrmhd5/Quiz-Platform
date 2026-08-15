@@ -2,6 +2,7 @@
 
 import { useEffect, useId, useRef, type ReactNode } from "react";
 import { createPortal } from "react-dom";
+import { useModalMotion } from "@/lib/use-modal-motion";
 import { buttonSecondaryClassName, cn } from "@/lib/utils";
 
 type ContentModalProps = {
@@ -30,6 +31,7 @@ export function ContentModal({
   const titleId = useId();
   const descriptionId = useId();
   const closeRef = useRef<HTMLButtonElement>(null);
+  const visible = useModalMotion(open);
 
   useEffect(() => {
     if (!open) {
@@ -59,7 +61,7 @@ export function ContentModal({
   }
 
   return createPortal(
-    <div className="ui-modal-root">
+    <div className="ui-modal-root" data-open={visible ? "true" : "false"}>
       <button
         type="button"
         className="ui-modal-backdrop"
@@ -72,7 +74,7 @@ export function ContentModal({
         aria-labelledby={titleId}
         aria-describedby={description ? descriptionId : undefined}
         className={cn(
-          "ui-modal-panel ui-enter flex max-h-[90vh] flex-col",
+          "ui-modal-panel flex max-h-[90vh] flex-col",
           sizeClassName[size],
         )}>
         <div className="flex shrink-0 items-start justify-between gap-4 border-b border-zinc-200 pb-4">

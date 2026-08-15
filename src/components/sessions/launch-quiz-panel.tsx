@@ -3,15 +3,18 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { ConfirmDialog } from "@/components/confirm-dialog";
+import { SectionIntro } from "@/components/section-intro";
 import { LiveJoinedCount } from "@/components/sessions/live-joined-count";
 import type { ActiveSessionInfo } from "@/lib/sessions";
 import {
   alertErrorClassName,
   alertSuccessClassName,
+  alertWarningClassName,
   buttonPrimaryClassName,
   buttonSecondaryClassName,
   cn,
   inputClassName,
+  labelClassName,
   panelClassName,
 } from "@/lib/utils";
 import { closeQuizSession, launchQuizSession } from "@/server/actions/sessions";
@@ -117,17 +120,17 @@ export function LaunchQuizPanel({
 
   return (
     <div className={`${panelClassName} space-y-4`}>
-      <div>
-        <h2 className="text-base font-semibold text-zinc-900">Launch quiz</h2>
-        <p className="mt-1 text-sm text-zinc-600">
-          {isThisQuizLive
+      <SectionIntro
+        title="Launch quiz"
+        description={
+          isThisQuizLive
             ? "Students can join using the link below."
-            : "Start a live session so students can join from their devices."}
-        </p>
-      </div>
+            : "Start a live session so students can join from their devices."
+        }
+      />
 
       {otherQuizLive ? (
-        <p className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-900">
+        <p className={alertWarningClassName}>
           Another quiz is live: <strong>{otherQuizLive.quizTitle}</strong>.
           Launching this quiz will close that session.
         </p>
@@ -136,10 +139,7 @@ export function LaunchQuizPanel({
       {isThisQuizLive ? (
         <div className="space-y-3">
           <div className="flex items-center gap-2">
-            <span className="relative flex h-2.5 w-2.5">
-              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-75" />
-              <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-green-500" />
-            </span>
+            <span className="ui-live-dot" aria-hidden="true" />
             <span className="text-sm font-medium text-green-800">Live now</span>
             <LiveJoinedCount
               key={activeSession!.sessionId}
@@ -150,9 +150,7 @@ export function LaunchQuizPanel({
             />
           </div>
 
-          <label
-            htmlFor="join-url"
-            className="block text-sm font-medium text-zinc-700">
+          <label htmlFor="join-url" className={labelClassName}>
             Student join link
           </label>
           <div className="flex flex-col gap-2 sm:flex-row">

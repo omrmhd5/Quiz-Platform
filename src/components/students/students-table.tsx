@@ -4,15 +4,27 @@ import Link from "next/link";
 import { useActionState, useEffect, useMemo, useState } from "react";
 import type { StudentActionState } from "@/lib/students";
 import {
+  alertErrorClassName,
   buttonDangerClassName,
   buttonPrimaryClassName,
   buttonSecondaryClassName,
   cn,
+  emptyStateClassName,
   inputClassName,
+  labelClassName,
   panelClassName,
+  tableBodyClassName,
+  tableCellClassName,
+  tableClassName,
+  tableHeadCellClassName,
+  tableHeadClassName,
+  tableHeadRowClassName,
+  tableShellClassName,
 } from "@/lib/utils";
 import { ConfirmDialog } from "@/components/confirm-dialog";
 import { PaginationControls } from "@/components/pagination-controls";
+import { SectionIntro } from "@/components/section-intro";
+import { TableCell, TableRow } from "@/components/data-table";
 import { STUDENTS_PAGE_SIZE, paginateSlice } from "@/lib/pagination";
 import { deleteStudent, updateStudent } from "@/server/actions/students";
 
@@ -56,27 +68,30 @@ export function StudentsTable({ students }: StudentsTableProps) {
 
   return (
     <div className={`${panelClassName} space-y-4`}>
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h2 className="text-base font-semibold text-zinc-900">
-            Student roster
-          </h2>
-          <p className="mt-1 text-sm text-zinc-600">
-            {students.length} registered · {filteredStudents.length} shown
-          </p>
-        </div>
-
-        <input
-          type="search"
-          value={query}
-          onChange={(event) => setQuery(event.target.value)}
-          placeholder="Search by ID or name"
-          className={`${inputClassName} sm:max-w-xs`}
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+        <SectionIntro
+          title="Student roster"
+          description={`${students.length} registered · ${filteredStudents.length} shown`}
+          className="mb-0"
         />
+
+        <div className="w-full sm:max-w-xs">
+          <label htmlFor="student-search" className={labelClassName}>
+            Search students
+          </label>
+          <input
+            id="student-search"
+            type="search"
+            value={query}
+            onChange={(event) => setQuery(event.target.value)}
+            placeholder="ID or name"
+            className={cn(inputClassName, "mt-2")}
+          />
+        </div>
       </div>
 
       {filteredStudents.length === 0 ? (
-        <p className="rounded-lg border border-dashed border-zinc-300 px-4 py-8 text-center text-sm text-zinc-600">
+        <p className={emptyStateClassName}>
           {students.length === 0
             ? "No students yet. Add one above or import a list."
             : "No students match your search."}
@@ -91,16 +106,22 @@ export function StudentsTable({ students }: StudentsTableProps) {
             onPageChange={setPage}
           />
 
-          <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-zinc-200 text-sm">
-              <thead>
-                <tr className="text-left text-zinc-500">
-                  <th className="px-3 py-2 font-medium">ID</th>
-                  <th className="px-3 py-2 font-medium">Name</th>
-                  <th className="px-3 py-2 font-medium">Actions</th>
+          <div className={tableShellClassName}>
+            <table className={tableClassName}>
+              <thead className={tableHeadClassName}>
+                <tr className={tableHeadRowClassName}>
+                  <th scope="col" className={tableHeadCellClassName}>
+                    ID
+                  </th>
+                  <th scope="col" className={tableHeadCellClassName}>
+                    Name
+                  </th>
+                  <th scope="col" className={tableHeadCellClassName}>
+                    Actions
+                  </th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-zinc-100">
+              <tbody className={tableBodyClassName}>
                 {pagination.items.map((student) =>
                   editingId === student.id ? (
                     <EditStudentRow
@@ -110,14 +131,14 @@ export function StudentsTable({ students }: StudentsTableProps) {
                       onSaved={() => setEditingId(null)}
                     />
                   ) : (
-                    <tr key={student.id} className="ui-table-row">
-                      <td className="px-3 py-3 font-mono text-zinc-900">
+                    <TableRow key={student.id}>
+                      <TableCell className="font-mono text-zinc-900">
                         {student.id}
-                      </td>
-                      <td className="px-3 py-3 text-zinc-900">
+                      </TableCell>
+                      <TableCell className="text-zinc-900">
                         {student.name}
-                      </td>
-                      <td className="px-3 py-3">
+                      </TableCell>
+                      <TableCell>
                         <div className="flex flex-wrap gap-2">
                           <Link
                             href={`/teacher/students/${student.id}/history`}
@@ -141,8 +162,8 @@ export function StudentsTable({ students }: StudentsTableProps) {
                             studentName={student.name}
                           />
                         </div>
-                      </td>
-                    </tr>
+                      </TableCell>
+                    </TableRow>
                   ),
                 )}
               </tbody>
@@ -184,9 +205,9 @@ function EditStudentRow({
   }, [state.success, onSaved]);
 
   return (
-    <tr className="ui-table-row">
-      <td className="px-3 py-3 font-mono text-zinc-900">{student.id}</td>
-      <td className="px-3 py-3" colSpan={2}>
+    <TableRow>
+      <TableCell className="font-mono text-zinc-900">{student.id}</TableCell>
+      <TableCell colSpan={2}>
         <form action={formAction} className="flex flex-col gap-2 sm:flex-row">
           <input
             name="name"
@@ -210,11 +231,13 @@ function EditStudentRow({
             </button>
           </div>
           {state.error ? (
-            <p className="text-xs text-red-600 sm:basis-full">{state.error}</p>
+            <p className={cn(alertErrorClassName, "text-xs sm:basis-full")}>
+              {state.error}
+            </p>
           ) : null}
         </form>
-      </td>
-    </tr>
+      </TableCell>
+    </TableRow>
   );
 }
 

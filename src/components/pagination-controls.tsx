@@ -9,6 +9,7 @@ type PaginationControlsProps = {
   pageSize: number;
   onPageChange: (page: number) => void;
   className?: string;
+  label?: string;
 };
 
 export function PaginationControls({
@@ -18,6 +19,7 @@ export function PaginationControls({
   pageSize,
   onPageChange,
   className,
+  label = "Pagination",
 }: PaginationControlsProps) {
   if (totalItems <= pageSize) {
     return null;
@@ -27,7 +29,8 @@ export function PaginationControls({
   const end = Math.min(page * pageSize, totalItems);
 
   return (
-    <div
+    <nav
+      aria-label={label}
       className={cn(
         "flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between",
         className,
@@ -40,20 +43,30 @@ export function PaginationControls({
           type="button"
           disabled={page <= 1}
           onClick={() => onPageChange(page - 1)}
-          className={cn(buttonSecondaryClassName, "ui-btn-sm")}>
+          aria-label="Previous page"
+          className={cn(
+            buttonSecondaryClassName,
+            "ui-btn-sm min-h-11 min-w-11",
+          )}>
           Previous
         </button>
-        <span className="text-sm tabular-nums text-zinc-600">
+        <span
+          className="text-sm tabular-nums text-zinc-600"
+          aria-current="page">
           Page {page} of {pageCount}
         </span>
         <button
           type="button"
           disabled={page >= pageCount}
           onClick={() => onPageChange(page + 1)}
-          className={cn(buttonSecondaryClassName, "ui-btn-sm")}>
+          aria-label="Next page"
+          className={cn(
+            buttonSecondaryClassName,
+            "ui-btn-sm min-h-11 min-w-11",
+          )}>
           Next
         </button>
       </div>
-    </div>
+    </nav>
   );
 }

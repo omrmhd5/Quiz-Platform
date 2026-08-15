@@ -6,7 +6,13 @@ import { PaginationControls } from "@/components/pagination-controls";
 import { LaunchQuizButton } from "@/components/sessions/launch-quiz-button";
 import type { ActiveSessionInfo } from "@/lib/sessions";
 import { QUIZZES_PAGE_SIZE, paginateSlice } from "@/lib/pagination";
-import { buttonSecondaryClassName, cn, panelClassName } from "@/lib/utils";
+import {
+  buttonSecondaryClassName,
+  cn,
+  linkClassName,
+  panelClassName,
+  tableShellClassName,
+} from "@/lib/utils";
 
 type QuizRow = {
   id: string;
@@ -31,7 +37,7 @@ export function QuizzesTable({ quizzes, activeSession }: QuizzesTableProps) {
   );
 
   return (
-    <div className={`${panelClassName} space-y-4 overflow-x-auto`}>
+    <div className={`${panelClassName} space-y-4`}>
       <PaginationControls
         page={pagination.page}
         pageCount={pagination.pageCount}
@@ -40,6 +46,7 @@ export function QuizzesTable({ quizzes, activeSession }: QuizzesTableProps) {
         onPageChange={setPage}
       />
 
+      <div className={tableShellClassName}>
       <table className="min-w-full divide-y divide-zinc-200 text-sm">
         <thead>
           <tr className="text-left text-zinc-500">
@@ -58,9 +65,7 @@ export function QuizzesTable({ quizzes, activeSession }: QuizzesTableProps) {
             return (
               <tr key={quiz.id} className="ui-table-row">
                 <td className="px-3 py-3 font-medium text-zinc-900">
-                  <Link
-                    href={`/teacher/quizzes/${quiz.id}`}
-                    className="rounded-sm underline decoration-zinc-300 underline-offset-2 transition-colors hover:text-zinc-600 hover:decoration-zinc-500">
+                  <Link href={`/teacher/quizzes/${quiz.id}`} className={linkClassName}>
                     {quiz.title}
                   </Link>
                 </td>
@@ -72,11 +77,9 @@ export function QuizzesTable({ quizzes, activeSession }: QuizzesTableProps) {
                 </td>
                 <td className="px-3 py-3">
                   {isLive ? (
-                    <span className="rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800">
-                      Live
-                    </span>
+                    <span className="ui-badge ui-badge-active">Live</span>
                   ) : (
-                    <span className="rounded-full bg-zinc-100 px-2.5 py-0.5 text-xs font-medium capitalize text-zinc-700">
+                    <span className="ui-badge ui-badge-closed capitalize">
                       {quiz.status}
                     </span>
                   )}
@@ -108,6 +111,7 @@ export function QuizzesTable({ quizzes, activeSession }: QuizzesTableProps) {
           })}
         </tbody>
       </table>
+      </div>
 
       <PaginationControls
         page={pagination.page}

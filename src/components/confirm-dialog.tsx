@@ -2,6 +2,7 @@
 
 import { useEffect, useId, useRef } from "react";
 import { createPortal } from "react-dom";
+import { useModalMotion } from "@/lib/use-modal-motion";
 import {
   buttonPrimaryClassName,
   buttonSecondaryClassName,
@@ -34,6 +35,7 @@ export function ConfirmDialog({
   const titleId = useId();
   const descriptionId = useId();
   const cancelRef = useRef<HTMLButtonElement>(null);
+  const visible = useModalMotion(open);
 
   useEffect(() => {
     if (!open) {
@@ -63,7 +65,7 @@ export function ConfirmDialog({
   }
 
   return createPortal(
-    <div className="ui-modal-root">
+    <div className="ui-modal-root" data-open={visible ? "true" : "false"}>
       <button
         type="button"
         className="ui-modal-backdrop"
@@ -76,7 +78,7 @@ export function ConfirmDialog({
         aria-modal="true"
         aria-labelledby={titleId}
         aria-describedby={descriptionId}
-        className="ui-modal-panel ui-enter max-w-md">
+        className="ui-modal-panel max-w-md">
         <h2
           id={titleId}
           className="text-lg font-semibold tracking-tight text-zinc-900">

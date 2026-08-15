@@ -12,6 +12,7 @@ import {
   buttonSecondaryClassName,
   cn,
   enterClassName,
+  optionLabelClassName,
   pageDescriptionClassName,
   pageTitleClassName,
   panelClassName,
@@ -88,10 +89,7 @@ export function QuizTaker({ quiz }: QuizTakerProps) {
               {question.options.map((option) => (
                 <label
                   key={option.id}
-                  className={cn(
-                    "flex cursor-pointer items-start gap-3 rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-3 text-sm text-zinc-800",
-                    "transition-colors has-checked:border-zinc-900 has-checked:bg-white",
-                  )}>
+                  className={optionLabelClassName}>
                   <input
                     type="radio"
                     value={option.id}

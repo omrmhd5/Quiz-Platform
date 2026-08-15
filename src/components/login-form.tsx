@@ -6,6 +6,7 @@ import {
   alertErrorClassName,
   buttonPrimaryClassName,
   inputClassName,
+  labelClassName,
 } from "@/lib/utils";
 
 const initialState: LoginState = {};
@@ -19,9 +20,7 @@ export function LoginForm() {
   return (
     <form action={formAction} className="space-y-5">
       <div className="space-y-2">
-        <label
-          htmlFor="username"
-          className="block text-sm font-medium text-zinc-700">
+        <label htmlFor="username" className={labelClassName}>
           Username
         </label>
         <input
@@ -36,9 +35,7 @@ export function LoginForm() {
       </div>
 
       <div className="space-y-2">
-        <label
-          htmlFor="password"
-          className="block text-sm font-medium text-zinc-700">
+        <label htmlFor="password" className={labelClassName}>
           Password
         </label>
         <input

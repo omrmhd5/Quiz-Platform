@@ -13,9 +13,12 @@ import { SESSION_RESULTS_PAGE_SIZE, paginateSlice } from "@/lib/pagination";
 import {
   cn,
   inputClassName,
+  labelClassName,
   linkClassName,
   navLinkClassName,
+  segmentClassName,
   statCardClassName,
+  tableShellClassName,
 } from "@/lib/utils";
 
 type SessionResultsDetailProps = {
@@ -39,20 +42,20 @@ function getAttemptStatusDisplay(
   if (attemptStatus === "submitted") {
     return {
       label: "Submitted",
-      className: "bg-green-100 text-green-800",
+      className: "ui-badge ui-badge-success",
     };
   }
 
   if (sessionStatus === "closed") {
     return {
       label: "Didn't finish",
-      className: "bg-red-100 text-red-800",
+      className: "ui-badge ui-badge-danger",
     };
   }
 
   return {
     label: "In progress",
-    className: "bg-amber-100 text-amber-800",
+    className: "ui-badge ui-badge-progress",
   };
 }
 
@@ -121,11 +124,8 @@ export function SessionResultsDetail({
             </span>
             {isLive ? (
               <span className="flex items-center gap-2 text-sm text-green-800">
-                <span className="relative flex h-2 w-2">
-                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-75" />
-                  <span className="relative inline-flex h-2 w-2 rounded-full bg-green-500" />
-                </span>
-                Updating live
+                <span className="ui-live-dot" aria-hidden="true" />
+                <span aria-live="polite">Updating live</span>
               </span>
             ) : null}
           </div>
@@ -140,7 +140,7 @@ export function SessionResultsDetail({
 
       <nav
         aria-label="Session results sections"
-        className="grid w-full grid-cols-2 gap-1 rounded-lg bg-zinc-100/90 p-1">
+        className={cn(segmentClassName, "grid-cols-2")}>
         <button
           type="button"
           aria-current={activeTab === "stats" ? "page" : undefined}
@@ -239,7 +239,7 @@ export function SessionResultsDetail({
           <div className="space-y-2">
             <label
               htmlFor={`student-id-filter-${results.sessionId}`}
-              className="text-sm font-medium text-zinc-700">
+              className={labelClassName}>
               Search by student ID
             </label>
             <input
@@ -271,7 +271,7 @@ export function SessionResultsDetail({
             onPageChange={setPage}
           />
 
-          <div className="overflow-x-auto rounded-lg border border-zinc-200">
+          <div className={tableShellClassName}>
             <table className="min-w-full divide-y divide-zinc-200 text-sm">
               <thead className="bg-zinc-50">
                 <tr className="text-left text-zinc-500">
@@ -325,11 +325,7 @@ export function SessionResultsDetail({
                           </Link>
                         </td>
                         <td className="px-3 py-3">
-                          <span
-                            className={cn(
-                              "rounded-full px-2.5 py-0.5 text-xs font-medium",
-                              attemptStatus.className,
-                            )}>
+                          <span className={cn(attemptStatus.className)}>
                             {attemptStatus.label}
                           </span>
                         </td>

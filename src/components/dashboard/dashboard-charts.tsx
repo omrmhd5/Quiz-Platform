@@ -14,7 +14,13 @@ import {
   CartesianGrid,
 } from "recharts";
 import { DASHBOARD_TREND_SESSIONS, type DashboardView } from "@/lib/dashboard";
-import { cn, panelClassName } from "@/lib/utils";
+import {
+  cn,
+  emptyStateClassName,
+  panelClassName,
+  sectionDescriptionClassName,
+  sectionTitleClassName,
+} from "@/lib/utils";
 
 type DashboardChartsProps = {
   stats: DashboardView;
@@ -44,8 +50,8 @@ function ChartPanel({
   return (
     <div className={cn(panelClassName, "space-y-4", className)}>
       <div>
-        <h2 className="text-base font-semibold text-zinc-900">{title}</h2>
-        <p className="mt-1 text-sm text-zinc-600">{description}</p>
+        <h2 className={sectionTitleClassName}>{title}</h2>
+        <p className={sectionDescriptionClassName}>{description}</p>
       </div>
       {children}
     </div>
@@ -54,7 +60,11 @@ function ChartPanel({
 
 function EmptyChart({ message }: { message: string }) {
   return (
-    <p className="flex h-64 items-center justify-center rounded-lg border border-dashed border-zinc-300 px-4 text-center text-sm text-zinc-600">
+    <p
+      className={cn(
+        emptyStateClassName,
+        "flex h-64 items-center justify-center",
+      )}>
       {message}
     </p>
   );

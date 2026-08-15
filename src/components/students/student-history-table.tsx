@@ -3,14 +3,25 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { PaginationControls } from "@/components/pagination-controls";
+import { SectionIntro } from "@/components/section-intro";
+import { StatDisplay } from "@/components/stat-display";
+import { StatusBadge, TableCell, TableRow } from "@/components/data-table";
 import { formatSessionDateTime } from "@/lib/session-format";
 import type { StudentHistoryView } from "@/lib/student-history";
 import { STUDENTS_PAGE_SIZE } from "@/lib/pagination";
 import {
   buttonSecondaryClassName,
   cn,
+  emptyStateClassName,
   panelClassName,
   statCardClassName,
+  tableBodyClassName,
+  tableCellClassName,
+  tableClassName,
+  tableHeadCellClassName,
+  tableHeadClassName,
+  tableHeadRowClassName,
+  tableShellClassName,
 } from "@/lib/utils";
 
 type StudentHistoryTableProps = {
@@ -22,14 +33,14 @@ function getAttemptStatusLabel(
   attemptStatus: StudentHistoryView["attempts"][number]["status"],
 ) {
   if (attemptStatus === "submitted") {
-    return { label: "Submitted", className: "bg-green-100 text-green-800" };
+    return { label: "Submitted", className: "ui-badge ui-badge-success" };
   }
 
   if (sessionStatus === "closed") {
-    return { label: "Didn't finish", className: "bg-red-100 text-red-800" };
+    return { label: "Didn't finish", className: "ui-badge ui-badge-danger" };
   }
 
-  return { label: "In progress", className: "bg-amber-100 text-amber-800" };
+  return { label: "In progress", className: "ui-badge ui-badge-progress" };
 }
 
 export function StudentHistoryTable({ history }: StudentHistoryTableProps) {
@@ -43,91 +54,72 @@ export function StudentHistoryTable({ history }: StudentHistoryTableProps) {
     <div className="space-y-6">
       <div className="grid gap-4 sm:grid-cols-3">
         <div className={statCardClassName}>
-          <p className="text-sm text-zinc-600">Sessions joined</p>
-          <p className="mt-3 text-3xl font-semibold tabular-nums tracking-tight text-zinc-900">
-            {history.attemptCount}
-          </p>
+          <StatDisplay label="Sessions joined" value={history.attemptCount} />
         </div>
         <div className={statCardClassName}>
-          <p className="text-sm text-zinc-600">Submitted</p>
-          <p className="mt-3 text-3xl font-semibold tabular-nums tracking-tight text-zinc-900">
-            {history.submittedCount}
-          </p>
+          <StatDisplay label="Submitted" value={history.submittedCount} />
         </div>
         <div className={statCardClassName}>
-          <p className="text-sm text-zinc-600">Didn&apos;t finish</p>
-          <p className="mt-3 text-3xl font-semibold tabular-nums tracking-tight text-zinc-900">
-            {history.didntFinishCount}
-          </p>
+          <StatDisplay label="Didn't finish" value={history.didntFinishCount} />
         </div>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-3">
         <div className={statCardClassName}>
-          <p className="text-sm text-zinc-600">Highest score</p>
-          <p className="mt-3 text-3xl font-semibold tabular-nums tracking-tight text-zinc-900">
-            {history.highestScore !== null ? `${history.highestScore}%` : "—"}
-          </p>
+          <StatDisplay
+            label="Highest score"
+            value={
+              history.highestScore !== null ? `${history.highestScore}%` : "—"
+            }
+          />
         </div>
         <div className={statCardClassName}>
-          <p className="text-sm text-zinc-600">Average score</p>
-          <p className="mt-3 text-3xl font-semibold tabular-nums tracking-tight text-zinc-900">
-            {history.averageScore !== null ? `${history.averageScore}%` : "—"}
-          </p>
+          <StatDisplay
+            label="Average score"
+            value={
+              history.averageScore !== null ? `${history.averageScore}%` : "—"
+            }
+          />
         </div>
         <div className={statCardClassName}>
-          <p className="text-sm text-zinc-600">Lowest score</p>
-          <p className="mt-3 text-3xl font-semibold tabular-nums tracking-tight text-zinc-900">
-            {history.lowestScore !== null ? `${history.lowestScore}%` : "—"}
-          </p>
+          <StatDisplay
+            label="Lowest score"
+            value={
+              history.lowestScore !== null ? `${history.lowestScore}%` : "—"
+            }
+          />
         </div>
       </div>
 
       <div className={`${panelClassName} space-y-4`}>
-        <div>
-          <h2 className="text-base font-semibold text-zinc-900">Quiz stats</h2>
-          <p className="mt-1 text-sm text-zinc-600">
-            Totals across {history.submittedCount} submitted attempt
-            {history.submittedCount === 1 ? "" : "s"}.
-          </p>
-        </div>
+        <SectionIntro
+          title="Quiz stats"
+          description={`Totals across ${history.submittedCount} submitted attempt${history.submittedCount === 1 ? "" : "s"}.`}
+        />
         {history.submittedCount === 0 ? (
-          <p className="rounded-lg border border-dashed border-zinc-300 px-4 py-6 text-center text-sm text-zinc-600">
-            No submitted quizzes yet.
-          </p>
+          <p className={emptyStateClassName}>No submitted quizzes yet.</p>
         ) : (
           <div className="grid gap-4 sm:grid-cols-3">
             <div className={statCardClassName}>
-              <p className="text-sm text-zinc-600">Total correct</p>
-              <p className="mt-3 text-3xl font-semibold tabular-nums tracking-tight text-zinc-900">
-                {history.totalCorrect}
-              </p>
+              <StatDisplay label="Total correct" value={history.totalCorrect} />
             </div>
             <div className={statCardClassName}>
-              <p className="text-sm text-zinc-600">Total wrong</p>
-              <p className="mt-3 text-3xl font-semibold tabular-nums tracking-tight text-zinc-900">
-                {history.totalWrong}
-              </p>
+              <StatDisplay label="Total wrong" value={history.totalWrong} />
             </div>
             <div className={statCardClassName}>
-              <p className="text-sm text-zinc-600">Total skipped</p>
-              <p className="mt-3 text-3xl font-semibold tabular-nums tracking-tight text-zinc-900">
-                {history.totalSkipped}
-              </p>
+              <StatDisplay label="Total skipped" value={history.totalSkipped} />
             </div>
           </div>
         )}
       </div>
 
       {history.totalAttempts === 0 ? (
-        <div className={`${panelClassName} border-dashed text-center`}>
-          <p className="text-sm text-zinc-600">
-            No quiz attempts yet. History will appear after this student joins a
-            session.
-          </p>
-        </div>
+        <p className={emptyStateClassName}>
+          No quiz attempts yet. History will appear after this student joins a
+          session.
+        </p>
       ) : (
-        <div className={`${panelClassName} space-y-4 overflow-x-auto`}>
+        <div className={`${panelClassName} space-y-4`}>
           <PaginationControls
             page={history.page}
             pageCount={history.pageCount}
@@ -136,69 +128,84 @@ export function StudentHistoryTable({ history }: StudentHistoryTableProps) {
             onPageChange={handlePageChange}
           />
 
-          <table className="min-w-full divide-y divide-zinc-200 text-sm">
-            <thead>
-              <tr className="text-left text-zinc-500">
-                <th className="px-3 py-2 font-medium">Quiz</th>
-                <th className="px-3 py-2 font-medium">Session</th>
-                <th className="px-3 py-2 font-medium">Status</th>
-                <th className="px-3 py-2 font-medium">Score</th>
-                <th className="px-3 py-2 font-medium">Correct</th>
-                <th className="px-3 py-2 font-medium">Wrong</th>
-                <th className="px-3 py-2 font-medium">Skipped</th>
-                <th className="px-3 py-2 font-medium">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-zinc-100">
-              {history.attempts.map((attempt) => {
-                const status = getAttemptStatusLabel(
-                  attempt.sessionStatus,
-                  attempt.status,
-                );
+          <div className={tableShellClassName}>
+            <table className={tableClassName}>
+              <thead className={tableHeadClassName}>
+                <tr className={tableHeadRowClassName}>
+                  <th scope="col" className={tableHeadCellClassName}>
+                    Quiz
+                  </th>
+                  <th scope="col" className={tableHeadCellClassName}>
+                    Session
+                  </th>
+                  <th scope="col" className={tableHeadCellClassName}>
+                    Status
+                  </th>
+                  <th scope="col" className={tableHeadCellClassName}>
+                    Score
+                  </th>
+                  <th scope="col" className={tableHeadCellClassName}>
+                    Correct
+                  </th>
+                  <th scope="col" className={tableHeadCellClassName}>
+                    Wrong
+                  </th>
+                  <th scope="col" className={tableHeadCellClassName}>
+                    Skipped
+                  </th>
+                  <th scope="col" className={tableHeadCellClassName}>
+                    Actions
+                  </th>
+                </tr>
+              </thead>
+              <tbody className={tableBodyClassName}>
+                {history.attempts.map((attempt) => {
+                  const status = getAttemptStatusLabel(
+                    attempt.sessionStatus,
+                    attempt.status,
+                  );
 
-                return (
-                  <tr key={attempt.attemptId} className="ui-table-row">
-                    <td className="px-3 py-3 font-medium text-zinc-900">
-                      {attempt.quizTitle}
-                    </td>
-                    <td className="px-3 py-3 text-zinc-600">
-                      {formatSessionDateTime(attempt.launchedAt)}
-                    </td>
-                    <td className="px-3 py-3">
-                      <span
-                        className={cn(
-                          "rounded-full px-2.5 py-0.5 text-xs font-medium capitalize",
-                          status.className,
-                        )}>
-                        {status.label}
-                      </span>
-                    </td>
-                    <td className="px-3 py-3 tabular-nums text-zinc-900">
-                      {attempt.scorePercent !== null
-                        ? `${attempt.scorePercent}%`
-                        : "—"}
-                    </td>
-                    <td className="px-3 py-3 tabular-nums text-zinc-700">
-                      {attempt.correctCount ?? "—"}
-                    </td>
-                    <td className="px-3 py-3 tabular-nums text-zinc-700">
-                      {attempt.wrongCount ?? "—"}
-                    </td>
-                    <td className="px-3 py-3 tabular-nums text-zinc-700">
-                      {attempt.unansweredCount ?? "—"}
-                    </td>
-                    <td className="px-3 py-3">
-                      <Link
-                        href={`/teacher/quizzes/${attempt.quizId}#session-${attempt.sessionId}`}
-                        className={cn(buttonSecondaryClassName, "ui-btn-sm")}>
-                        View session
-                      </Link>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+                  return (
+                    <TableRow key={attempt.attemptId}>
+                      <TableCell className="font-medium text-zinc-900">
+                        {attempt.quizTitle}
+                      </TableCell>
+                      <TableCell className="text-zinc-600">
+                        {formatSessionDateTime(attempt.launchedAt)}
+                      </TableCell>
+                      <TableCell>
+                        <StatusBadge
+                          className={cn("capitalize", status.className)}>
+                          {status.label}
+                        </StatusBadge>
+                      </TableCell>
+                      <TableCell className="tabular-nums text-zinc-900">
+                        {attempt.scorePercent !== null
+                          ? `${attempt.scorePercent}%`
+                          : "—"}
+                      </TableCell>
+                      <TableCell className="tabular-nums text-zinc-700">
+                        {attempt.correctCount ?? "—"}
+                      </TableCell>
+                      <TableCell className="tabular-nums text-zinc-700">
+                        {attempt.wrongCount ?? "—"}
+                      </TableCell>
+                      <TableCell className="tabular-nums text-zinc-700">
+                        {attempt.unansweredCount ?? "—"}
+                      </TableCell>
+                      <TableCell>
+                        <Link
+                          href={`/teacher/quizzes/${attempt.quizId}#session-${attempt.sessionId}`}
+                          className={cn(buttonSecondaryClassName, "ui-btn-sm")}>
+                          View session
+                        </Link>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
 
           <PaginationControls
             page={history.page}

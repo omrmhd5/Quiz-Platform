@@ -7,6 +7,7 @@ import {
   buttonGhostClassName,
   cn,
   navLinkClassName,
+  segmentClassName,
 } from "@/lib/utils";
 
 const links = [
@@ -24,7 +25,7 @@ export function TeacherNav({ username, logoutAction }: TeacherNavProps) {
   const pathname = usePathname();
 
   return (
-    <header className="border-b border-zinc-200/80 bg-white/95 backdrop-blur-sm">
+    <header className="ui-site-header">
       <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 px-4 py-3 sm:px-6">
         <Link href="/teacher/dashboard" className={brandLinkClassName}>
           <p className="ui-brand-title truncate text-lg font-semibold tracking-tight text-zinc-900">
@@ -35,7 +36,7 @@ export function TeacherNav({ username, logoutAction }: TeacherNavProps) {
 
         <nav
           aria-label="Teacher sections"
-          className="flex flex-wrap items-center gap-1 rounded-lg bg-zinc-100/90 p-1">
+          className={cn(segmentClassName, "w-auto grid-cols-3 sm:grid-flow-col")}>
           {links.map((link) => {
             const isActive =
               pathname === link.href || pathname.startsWith(`${link.href}/`);

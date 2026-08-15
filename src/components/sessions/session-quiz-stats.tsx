@@ -1,5 +1,12 @@
 import type { SessionQuestionStat } from "@/lib/session-results";
-import { cn, panelClassName, statCardClassName } from "@/lib/utils";
+import { SectionIntro } from "@/components/section-intro";
+import { StatDisplay } from "@/components/stat-display";
+import {
+  cn,
+  emptyStateClassName,
+  panelClassName,
+  statCardClassName,
+} from "@/lib/utils";
 
 type SessionQuizStatsProps = {
   questionStats: SessionQuestionStat[];
@@ -49,38 +56,27 @@ export function SessionQuizStats({
 
   return (
     <div className="space-y-4">
-      <div>
-        <h3 className="text-base font-semibold text-zinc-900">Quiz stats</h3>
-        <p className="mt-1 text-sm text-zinc-600">
-          Based on {submittedCount} submitted attempt
-          {submittedCount === 1 ? "" : "s"}.
-        </p>
-      </div>
+      <SectionIntro
+        title="Quiz stats"
+        titleAs="h3"
+        description={`Based on ${submittedCount} submitted attempt${submittedCount === 1 ? "" : "s"}.`}
+      />
 
       {submittedCount === 0 ? (
-        <p className="rounded-lg border border-dashed border-zinc-300 px-4 py-6 text-center text-sm text-zinc-600">
+        <p className={emptyStateClassName}>
           No submissions yet — question stats will appear after students submit.
         </p>
       ) : (
         <>
           <div className="grid gap-4 sm:grid-cols-3">
             <div className={statCardClassName}>
-              <p className="text-sm text-zinc-600">Total correct</p>
-              <p className="mt-3 text-3xl font-semibold tabular-nums tracking-tight text-zinc-900">
-                {totalCorrect}
-              </p>
+              <StatDisplay label="Total correct" value={totalCorrect} />
             </div>
             <div className={statCardClassName}>
-              <p className="text-sm text-zinc-600">Total wrong</p>
-              <p className="mt-3 text-3xl font-semibold tabular-nums tracking-tight text-zinc-900">
-                {totalWrong}
-              </p>
+              <StatDisplay label="Total wrong" value={totalWrong} />
             </div>
             <div className={statCardClassName}>
-              <p className="text-sm text-zinc-600">Total skipped</p>
-              <p className="mt-3 text-3xl font-semibold tabular-nums tracking-tight text-zinc-900">
-                {totalSkipped}
-              </p>
+              <StatDisplay label="Total skipped" value={totalSkipped} />
             </div>
           </div>
 
@@ -136,17 +132,17 @@ export function SessionQuizStats({
                         : "—"}
                     </span>
                   </div>
-                  <div className="h-2 overflow-hidden rounded-full bg-zinc-100">
+                  <div className="ui-progress-track">
                     <div
                       className={cn(
-                        "h-full rounded-full",
+                        "ui-progress-fill",
                         question.correctPercent === null
                           ? "w-0"
                           : question.correctPercent >= 70
-                            ? "bg-green-500"
+                            ? "ui-progress-fill-good"
                             : question.correctPercent >= 40
-                              ? "bg-amber-500"
-                              : "bg-red-500",
+                              ? "ui-progress-fill-warn"
+                              : "ui-progress-fill-bad",
                       )}
                       style={{
                         width:

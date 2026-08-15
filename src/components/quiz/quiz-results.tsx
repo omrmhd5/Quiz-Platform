@@ -6,6 +6,7 @@ import {
   pageDescriptionClassName,
   pageTitleClassName,
   panelClassName,
+  scoreHeroClassName,
   statCardClassName,
 } from "@/lib/utils";
 import type { AttemptResultsView } from "@/lib/attempts";
@@ -27,7 +28,7 @@ export function QuizResults({ results }: QuizResultsProps) {
       <div className={`${panelClassName} space-y-6 text-center`}>
         <div>
           <p className="text-sm font-medium text-zinc-600">Your score</p>
-          <p className="mt-2 text-5xl font-semibold tabular-nums tracking-tight text-zinc-900">
+          <p className={cn(scoreHeroClassName, "mt-2")}>
             {results.scorePercent}%
           </p>
         </div>

@@ -23,9 +23,12 @@ import {
 } from "@/lib/session-format";
 import {
   cn,
+  emptyStateClassName,
   linkClassName,
   navLinkClassName,
   panelClassName,
+  segmentClassName,
+  tableShellClassName,
 } from "@/lib/utils";
 
 type DashboardAttemptHighlightsProps = {
@@ -127,7 +130,7 @@ export function DashboardAttemptHighlights({
 
       <nav
         aria-label="Ranking view"
-        className="grid w-full grid-cols-2 gap-1 rounded-lg bg-zinc-100/90 p-1">
+        className={cn(segmentClassName, "grid-cols-2")}>
         <button
           type="button"
           aria-current={viewTab === "attempts" ? "page" : undefined}
@@ -154,7 +157,7 @@ export function DashboardAttemptHighlights({
 
       <nav
         aria-label="Rank direction"
-        className="grid w-full grid-cols-2 gap-1 rounded-lg bg-zinc-100/90 p-1">
+        className={cn(segmentClassName, "grid-cols-2")}>
         <button
           type="button"
           aria-current={direction === "highest" ? "page" : undefined}
@@ -180,7 +183,7 @@ export function DashboardAttemptHighlights({
       </nav>
 
       {isEmpty ? (
-        <p className="rounded-lg border border-dashed border-zinc-300 px-4 py-6 text-center text-sm text-zinc-600">
+        <p className={emptyStateClassName}>
           {viewTab === "attempts"
             ? "Attempt rankings appear after students submit quizzes."
             : "Session result rankings appear after students submit quizzes."}
@@ -227,7 +230,7 @@ export function DashboardAttemptHighlights({
           </div>
 
           {viewTab === "attempts" ? (
-            <div className="overflow-x-auto rounded-lg border border-zinc-200">
+            <div className={tableShellClassName}>
               <table className="min-w-full divide-y divide-zinc-200 text-sm">
                 <thead className="bg-zinc-50">
                   <tr className="text-left text-zinc-500">
@@ -281,7 +284,7 @@ export function DashboardAttemptHighlights({
               </table>
             </div>
           ) : (
-            <div className="overflow-x-auto rounded-lg border border-zinc-200">
+            <div className={tableShellClassName}>
               <table className="min-w-full divide-y divide-zinc-200 text-sm">
                 <thead className="bg-zinc-50">
                   <tr className="text-left text-zinc-500">

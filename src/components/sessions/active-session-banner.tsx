@@ -9,7 +9,8 @@ import {
   buttonSecondaryClassName,
   cn,
   inputClassName,
-  panelClassName,
+  linkClassName,
+  liveBannerClassName,
 } from "@/lib/utils";
 import { closeQuizSession } from "@/server/actions/sessions";
 
@@ -51,18 +52,11 @@ export function ActiveSessionBanner({
   }
 
   return (
-    <div
-      className={cn(
-        panelClassName,
-        "border-green-200 bg-green-50/80 space-y-4",
-      )}>
+    <div className={cn(liveBannerClassName, "space-y-4")}>
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div className="space-y-1">
           <div className="flex items-center gap-2">
-            <span className="relative flex h-2.5 w-2.5">
-              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-75" />
-              <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-green-500" />
-            </span>
+            <span className="ui-live-dot" aria-hidden="true" />
             <span className="text-sm font-medium text-green-900">
               Live quiz running
             </span>
@@ -70,7 +64,7 @@ export function ActiveSessionBanner({
           <p className="text-base font-semibold text-zinc-900">
             <Link
               href={`/teacher/quizzes/${activeSession.quizId}`}
-              className="underline decoration-green-300 underline-offset-2 hover:decoration-green-500">
+              className={linkClassName}>
               {activeSession.quizTitle}
             </Link>
           </p>
@@ -109,7 +103,7 @@ export function ActiveSessionBanner({
           type="button"
           onClick={handleCopy}
           className={cn(buttonSecondaryClassName, "ui-btn-sm shrink-0")}>
-          {copyLabel}
+          <span aria-live="polite">{copyLabel}</span>
         </button>
       </div>
     </div>
