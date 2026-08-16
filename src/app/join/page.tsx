@@ -7,6 +7,8 @@ import {
 } from "@/lib/utils";
 import { getActiveSession } from "@/server/actions/sessions";
 
+export const dynamic = "force-dynamic";
+
 export default async function JoinPage() {
   const activeSession = await getActiveSession();
 

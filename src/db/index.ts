@@ -15,8 +15,14 @@ declare global {
 
 function createDb() {
   const connectionString = getDatabaseUrl();
+  const needsSsl =
+    process.env.NODE_ENV === "production" ||
+    /render\.com|sslmode=require/i.test(connectionString);
 
-  const client = postgres(connectionString, { max: 10 });
+  const client = postgres(connectionString, {
+    max: 10,
+    ...(needsSsl ? { ssl: "require" } : {}),
+  });
   const database = drizzle(client, { schema: fullSchema });
 
   if (process.env.NODE_ENV !== "production") {

@@ -1,0 +1,13 @@
+# Render Blueprint — PostgreSQL only (app runs on Vercel)
+# Free tier: one Postgres instance per workspace.
+# Apply: https://dashboard.render.com/select-repo?type=blueprint
+#
+# If you already have a free DB, either delete it first or create a logical
+# database on the existing instance (see README deployment section).
+
+databases:
+  - name: quiz-platform-db
+    plan: free
+    region: frankfurt
+    databaseName: quiz_platform
+    postgresMajorVersion: "16"
