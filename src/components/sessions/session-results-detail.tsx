@@ -23,6 +23,12 @@ import {
   navLinkClassName,
   segmentClassName,
   tableShellClassName,
+  tableBodyClassName,
+  tableCellClassName,
+  tableClassName,
+  tableHeadCellClassName,
+  tableHeadClassName,
+  tableHeadRowClassName,
 } from "@/lib/utils";
 
 type SessionResultsDetailProps = {
@@ -268,19 +274,19 @@ export function SessionResultsDetail({
           />
 
           <div className={tableShellClassName}>
-            <table className="min-w-full divide-y divide-zinc-200 text-sm">
-              <thead className="bg-zinc-50">
-                <tr className="text-left text-zinc-500">
-                  <th className="px-3 py-2 font-medium">Student</th>
-                  <th className="px-3 py-2 font-medium">ID</th>
-                  <th className="px-3 py-2 font-medium">Status</th>
-                  <th className="px-3 py-2 font-medium">Score</th>
-                  <th className="px-3 py-2 font-medium">Correct</th>
-                  <th className="px-3 py-2 font-medium">Wrong</th>
-                  <th className="px-3 py-2 font-medium">Skipped</th>
+            <table className={tableClassName}>
+              <thead className={tableHeadClassName}>
+                <tr className={tableHeadRowClassName}>
+                  <th scope="col" className={tableHeadCellClassName}>Student</th>
+                  <th scope="col" className={cn(tableHeadCellClassName, "hidden sm:table-cell")}>ID</th>
+                  <th scope="col" className={tableHeadCellClassName}>Status</th>
+                  <th scope="col" className={tableHeadCellClassName}>Score</th>
+                  <th scope="col" className={cn(tableHeadCellClassName, "hidden md:table-cell")}>Correct</th>
+                  <th scope="col" className={cn(tableHeadCellClassName, "hidden md:table-cell")}>Wrong</th>
+                  <th scope="col" className={cn(tableHeadCellClassName, "hidden lg:table-cell")}>Skipped</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-zinc-100 bg-white">
+              <tbody className={tableBodyClassName}>
                 {results.attempts.length === 0 ? (
                   <tr>
                     <td
@@ -306,39 +312,42 @@ export function SessionResultsDetail({
 
                     return (
                       <tr key={attempt.attemptId} className="ui-table-row">
-                        <td className="px-3 py-3 font-medium text-zinc-900">
+                        <td className={cn(tableCellClassName, "font-medium text-zinc-900")}>
                           <Link
                             href={`/teacher/students/${attempt.studentId}/history`}
                             className={linkClassName}>
                             {attempt.studentName}
                           </Link>
+                          <p className="font-mono text-xs text-zinc-500 sm:hidden">
+                            {attempt.studentId}
+                          </p>
                         </td>
-                        <td className="px-3 py-3 font-mono text-zinc-700">
+                        <td className={cn(tableCellClassName, "hidden font-mono text-zinc-700 sm:table-cell")}>
                           <Link
                             href={`/teacher/students/${attempt.studentId}/history`}
                             className={linkClassName}>
                             {attempt.studentId}
                           </Link>
                         </td>
-                        <td className="px-3 py-3">
+                        <td className={tableCellClassName}>
                           <AttemptStatusBadge
                             kind={attemptStatus.kind}
                             label={attemptStatus.label}
                             className={attemptStatus.className}
                           />
                         </td>
-                        <td className="px-3 py-3 tabular-nums text-zinc-900">
+                        <td className={cn(tableCellClassName, "tabular-nums text-zinc-900")}>
                           {attempt.scorePercent !== null
                             ? `${attempt.scorePercent}%`
                             : "—"}
                         </td>
-                        <td className="px-3 py-3 tabular-nums text-zinc-700">
+                        <td className={cn(tableCellClassName, "hidden tabular-nums text-zinc-700 md:table-cell")}>
                           {attempt.correctCount ?? "—"}
                         </td>
-                        <td className="px-3 py-3 tabular-nums text-zinc-700">
+                        <td className={cn(tableCellClassName, "hidden tabular-nums text-zinc-700 md:table-cell")}>
                           {attempt.wrongCount ?? "—"}
                         </td>
-                        <td className="px-3 py-3 tabular-nums text-zinc-700">
+                        <td className={cn(tableCellClassName, "hidden tabular-nums text-zinc-700 lg:table-cell")}>
                           {attempt.unansweredCount ?? "—"}
                         </td>
                       </tr>

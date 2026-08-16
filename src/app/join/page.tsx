@@ -13,7 +13,7 @@ export default async function JoinPage() {
   const activeSession = await getActiveSession();
 
   return (
-    <div className="flex min-h-dvh items-center justify-center px-4 py-12">
+    <div className="flex min-h-dvh items-center justify-center px-4 py-8 sm:py-12">
       <div className={cn("w-full max-w-md space-y-8", enterClassName)}>
         <div className="text-center">
           <h1 className={pageTitleClassName}>Join quiz</h1>

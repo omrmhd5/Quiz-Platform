@@ -23,6 +23,7 @@ type ActionLinkProps = {
   size?: ActionSize;
   className?: string;
   hideLabel?: boolean;
+  compact?: boolean;
 };
 
 export function ActionLink({
@@ -32,18 +33,22 @@ export function ActionLink({
   size = "sm",
   className,
   hideLabel,
+  compact,
 }: ActionLinkProps) {
   const preset = actionPresets[action];
   const text = label ?? preset.label;
   const showLabel = !hideLabel && !preset.hideLabel;
+  const labelHidden = compact && showLabel;
 
   return (
     <Link
       href={href}
       className={getActionClasses(action, size, className)}
-      aria-label={showLabel ? undefined : text}>
+      aria-label={!showLabel || labelHidden ? text : undefined}>
       <UiIcon icon={preset.icon} />
-      {showLabel ? <span>{text}</span> : null}
+      {showLabel ? (
+        <span className={cn(compact && "hidden sm:inline")}>{text}</span>
+      ) : null}
     </Link>
   );
 }
@@ -54,6 +59,7 @@ type ActionButtonProps = {
   size?: ActionSize;
   className?: string;
   hideLabel?: boolean;
+  compact?: boolean;
 } & ComponentPropsWithoutRef<"button">;
 
 export const ActionButton = forwardRef<HTMLButtonElement, ActionButtonProps>(
@@ -64,6 +70,7 @@ export const ActionButton = forwardRef<HTMLButtonElement, ActionButtonProps>(
       size = "sm",
       className,
       hideLabel,
+      compact,
       children,
       type = "button",
       ...props
@@ -73,16 +80,20 @@ export const ActionButton = forwardRef<HTMLButtonElement, ActionButtonProps>(
     const preset = actionPresets[action];
     const text = label ?? preset.label;
     const showLabel = !hideLabel && !preset.hideLabel;
+    const labelHidden = compact && showLabel;
 
     return (
       <button
         ref={ref}
         type={type}
         className={getActionClasses(action, size, className)}
-        aria-label={showLabel ? undefined : text}
+        aria-label={!showLabel || labelHidden ? text : undefined}
         {...props}>
         <UiIcon icon={preset.icon} />
-        {children ?? (showLabel ? <span>{text}</span> : null)}
+        {children ??
+          (showLabel ? (
+            <span className={cn(compact && "hidden sm:inline")}>{text}</span>
+          ) : null)}
       </button>
     );
   },

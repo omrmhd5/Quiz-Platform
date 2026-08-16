@@ -63,7 +63,7 @@ function EmptyChart({ message }: { message: string }) {
     <p
       className={cn(
         emptyStateClassName,
-        "flex h-64 items-center justify-center",
+        "flex h-52 items-center justify-center sm:h-64",
       )}>
       {message}
     </p>
@@ -110,7 +110,7 @@ export function DashboardCharts({ stats }: DashboardChartsProps) {
         {answerBreakdown.length === 0 ? (
           <EmptyChart message="Answer chart appears after students submit quizzes." />
         ) : (
-          <div className="h-72">
+          <div className="h-56 sm:h-72">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
                 <Pie
@@ -147,7 +147,7 @@ export function DashboardCharts({ stats }: DashboardChartsProps) {
         {participationBreakdown.length === 0 ? (
           <EmptyChart message="Participation chart appears after students join sessions." />
         ) : (
-          <div className="h-72">
+          <div className="h-56 sm:h-72">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
                 <Pie
@@ -184,7 +184,7 @@ export function DashboardCharts({ stats }: DashboardChartsProps) {
         {scoreTrendData.length === 0 ? (
           <EmptyChart message="Score trend appears after sessions with submissions." />
         ) : (
-          <div className="h-72">
+          <div className="h-56 sm:h-72">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart
                 data={scoreTrendData}

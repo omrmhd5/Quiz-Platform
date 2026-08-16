@@ -47,7 +47,7 @@ export function QuizTaker({ quiz }: QuizTakerProps) {
   return (
     <div
       className={cn(
-        "mx-auto w-full max-w-2xl space-y-6 px-4 py-8",
+        "mx-auto w-full max-w-2xl space-y-6 px-4 py-6 sm:py-8",
         enterClassName,
       )}>
       <div className="space-y-1 text-center sm:text-left">
@@ -69,13 +69,15 @@ export function QuizTaker({ quiz }: QuizTakerProps) {
           />
         ))}
 
-        <PaginationControls
-          page={pagination.page}
-          pageCount={pagination.pageCount}
-          totalItems={quiz.questions.length}
-          pageSize={QUESTIONS_PAGE_SIZE}
-          onPageChange={setPage}
-        />
+        <div className="hidden sm:block">
+          <PaginationControls
+            page={pagination.page}
+            pageCount={pagination.pageCount}
+            totalItems={quiz.questions.length}
+            pageSize={QUESTIONS_PAGE_SIZE}
+            onPageChange={setPage}
+          />
+        </div>
 
         {pagination.items.map((question) => (
           <article key={question.id} className={`${panelClassName} space-y-4`}>
@@ -120,12 +122,12 @@ export function QuizTaker({ quiz }: QuizTakerProps) {
           </p>
         ) : null}
 
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
           {pagination.page > 1 ? (
             <ActionButton
               action="previous"
               onClick={() => setPage((current) => current - 1)}
-              className="sm:w-auto"
+              className="w-full sm:w-auto"
               aria-label="Previous questions"
             />
           ) : null}
@@ -133,7 +135,7 @@ export function QuizTaker({ quiz }: QuizTakerProps) {
             <ActionButton
               action="next"
               onClick={() => setPage((current) => current + 1)}
-              className="sm:w-auto"
+              className="w-full sm:w-auto"
               aria-label="Next questions"
             />
           ) : null}

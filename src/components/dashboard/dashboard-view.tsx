@@ -42,7 +42,7 @@ export function DashboardView({
   joinedCount,
 }: DashboardViewProps) {
   return (
-    <div className="space-y-8">
+    <div className="space-y-6 sm:space-y-8">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <h1 className={pageTitleClassName}>Dashboard</h1>
@@ -50,9 +50,17 @@ export function DashboardView({
             All-time overview of classroom activity.
           </p>
         </div>
-        <div className="flex flex-wrap gap-3">
-          <ActionLink action="manageStudents" href="/teacher/students" />
-          <ActionLink action="manageQuizzes" href="/teacher/quizzes" />
+        <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:gap-3">
+          <ActionLink
+            action="manageStudents"
+            href="/teacher/students"
+            className="w-full justify-center sm:w-auto"
+          />
+          <ActionLink
+            action="manageQuizzes"
+            href="/teacher/quizzes"
+            className="w-full justify-center sm:w-auto"
+          />
         </div>
       </div>
 
@@ -141,7 +149,7 @@ export function DashboardView({
       <DashboardCharts stats={stats} />
 
       <div className={`${panelClassName} space-y-4`}>
-        <div className="flex items-start justify-between gap-3">
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between sm:gap-3">
           <SectionIntro
             title="Recent sessions"
             description={`Most recent ${DASHBOARD_RECENT_SESSIONS} quiz runs.`}
@@ -149,7 +157,7 @@ export function DashboardView({
           />
           <Link
             href="/teacher/quizzes"
-            className={cn(linkClassName, "shrink-0")}>
+            className={cn(linkClassName, "shrink-0 self-start")}>
             All quizzes
           </Link>
         </div>
@@ -183,14 +191,14 @@ export function DashboardView({
               <tbody className={tableBodyClassName}>
                 {stats.recentSessions.map((session) => (
                   <TableRow key={session.sessionId}>
-                    <TableCell className="font-medium text-zinc-900">
+                    <TableCell className="max-w-[10rem] font-medium text-zinc-900 sm:max-w-none">
                       <Link
                         href={`/teacher/quizzes/${session.quizId}#session-${session.sessionId}`}
-                        className={linkClassName}>
+                        className={cn(linkClassName, "line-clamp-2 sm:line-clamp-none")}>
                         {session.quizTitle}
                       </Link>
                     </TableCell>
-                    <TableCell className="text-zinc-600">
+                    <TableCell className="whitespace-nowrap text-zinc-600">
                       {formatSessionDateTime(session.launchedAt)}
                     </TableCell>
                     <TableCell>
@@ -204,9 +212,9 @@ export function DashboardView({
                     </TableCell>
                     <TableCell className="tabular-nums text-zinc-700">
                       {session.joinedCount}
-                      <span className="text-zinc-400">
-                        {" "}
-                        / {session.submittedCount} submitted
+                      <span className="block text-xs text-zinc-400 sm:inline sm:text-inherit">
+                        <span className="hidden sm:inline"> / </span>
+                        {session.submittedCount} submitted
                       </span>
                     </TableCell>
                     <TableCell className="tabular-nums text-zinc-900">

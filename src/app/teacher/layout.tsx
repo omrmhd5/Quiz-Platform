@@ -10,7 +10,7 @@ export default async function TeacherLayout({
   return (
     <div className="flex min-h-dvh flex-col bg-zinc-50">
       <TeacherNav username={session.username} logoutAction={logoutTeacher} />
-      <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-8 sm:px-6">
+      <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-5 sm:px-6 sm:py-8">
         {children}
       </main>
     </div>

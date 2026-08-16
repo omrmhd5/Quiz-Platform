@@ -17,6 +17,13 @@ import { SESSIONS_PAGE_SIZE, paginateSlice } from "@/lib/pagination";
 import {
   cn,
   panelClassName,
+  tableBodyClassName,
+  tableCellClassName,
+  tableClassName,
+  tableHeadCellClassName,
+  tableHeadClassName,
+  tableHeadRowClassName,
+  tableShellClassName,
 } from "@/lib/utils";
 import {
   getSessionResults,
@@ -190,7 +197,7 @@ export function QuizResultsSection({
           </p>
         </div>
 
-        <div className={`${panelClassName} space-y-4 overflow-x-auto`}>
+        <div className={`${panelClassName} space-y-4`}>
           <PaginationControls
             page={pagination.page}
             pageCount={pagination.pageCount}
@@ -199,56 +206,71 @@ export function QuizResultsSection({
             onPageChange={setPage}
           />
 
-          <table className="min-w-full divide-y divide-zinc-200 text-sm">
-            <thead>
-              <tr className="text-left text-zinc-500">
-                <th className="px-3 py-2 font-medium">Session</th>
-                <th className="px-3 py-2 font-medium">Status</th>
-                <th className="px-3 py-2 font-medium">Joined</th>
-                <th className="px-3 py-2 font-medium">Submitted</th>
-                <th className="px-3 py-2 font-medium">Avg score</th>
-                <th className="px-3 py-2 font-medium">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-zinc-100">
-              {pagination.items.map((session) => (
-                <tr
-                  key={session.sessionId}
-                  id={`session-${session.sessionId}`}
-                  className="ui-table-row scroll-mt-24">
-                  <td className="px-3 py-3 font-medium text-zinc-900">
-                    {formatSessionDateTime(session.launchedAt)}
-                  </td>
-                  <td className="px-3 py-3">
-                    <span
-                      className={cn(
-                        "rounded-full px-2.5 py-0.5 text-xs font-medium capitalize",
-                        sessionStatusBadgeClass(session.status),
-                      )}>
-                      {session.status}
-                    </span>
-                  </td>
-                  <td className="px-3 py-3 tabular-nums text-zinc-700">
-                    {session.joinedCount}
-                  </td>
-                  <td className="px-3 py-3 tabular-nums text-zinc-700">
-                    {session.submittedCount}
-                  </td>
-                  <td className="px-3 py-3 tabular-nums text-zinc-700">
-                    {session.averageScore !== null
-                      ? `${session.averageScore}%`
-                      : "—"}
-                  </td>
-                  <td className="px-3 py-3">
-                    <ActionButton
-                      action={session.status === "active" ? "live" : "open"}
-                      onClick={() => onModalSessionIdChange(session.sessionId)}
-                    />
-                  </td>
+          <div className={tableShellClassName}>
+            <table className={tableClassName}>
+              <thead className={tableHeadClassName}>
+                <tr className={tableHeadRowClassName}>
+                  <th scope="col" className={tableHeadCellClassName}>
+                    Session
+                  </th>
+                  <th scope="col" className={tableHeadCellClassName}>
+                    Status
+                  </th>
+                  <th scope="col" className={tableHeadCellClassName}>
+                    Joined
+                  </th>
+                  <th scope="col" className={tableHeadCellClassName}>
+                    Submitted
+                  </th>
+                  <th scope="col" className={tableHeadCellClassName}>
+                    Avg score
+                  </th>
+                  <th scope="col" className={tableHeadCellClassName}>
+                    Actions
+                  </th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody className={tableBodyClassName}>
+                {pagination.items.map((session) => (
+                  <tr
+                    key={session.sessionId}
+                    id={`session-${session.sessionId}`}
+                    className="ui-table-row scroll-mt-24">
+                    <td className={cn(tableCellClassName, "whitespace-nowrap font-medium text-zinc-900")}>
+                      {formatSessionDateTime(session.launchedAt)}
+                    </td>
+                    <td className={tableCellClassName}>
+                      <span
+                        className={cn(
+                          "rounded-full px-2.5 py-0.5 text-xs font-medium capitalize",
+                          sessionStatusBadgeClass(session.status),
+                        )}>
+                        {session.status}
+                      </span>
+                    </td>
+                    <td className={cn(tableCellClassName, "tabular-nums text-zinc-700")}>
+                      {session.joinedCount}
+                    </td>
+                    <td className={cn(tableCellClassName, "tabular-nums text-zinc-700")}>
+                      {session.submittedCount}
+                    </td>
+                    <td className={cn(tableCellClassName, "tabular-nums text-zinc-700")}>
+                      {session.averageScore !== null
+                        ? `${session.averageScore}%`
+                        : "—"}
+                    </td>
+                    <td className={tableCellClassName}>
+                      <ActionButton
+                        action={session.status === "active" ? "live" : "open"}
+                        compact
+                        onClick={() => onModalSessionIdChange(session.sessionId)}
+                      />
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
 
           <PaginationControls
             page={pagination.page}

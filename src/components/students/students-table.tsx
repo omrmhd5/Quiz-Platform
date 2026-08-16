@@ -282,11 +282,15 @@ export function StudentsTable({ students }: StudentsTableProps) {
 
                             href={`/teacher/students/${student.id}/history`}
 
+                            compact
+
                           />
 
                           <ActionButton
 
                             action="edit"
+
+                            compact
 
                             onClick={() => setEditingId(student.id)}
 
@@ -499,6 +503,8 @@ function DeleteStudentButton({
       <ActionButton
 
         action="delete"
+
+        compact
 
         onClick={() => setOpen(true)}
 

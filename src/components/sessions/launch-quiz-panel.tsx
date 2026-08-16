@@ -162,7 +162,7 @@ export function LaunchQuizPanel({
             <ActionButton
               action="copy"
               onClick={handleCopy}
-              className="shrink-0"
+              className="w-full shrink-0 sm:w-auto"
               label={copyLabel}
             />
           </div>
@@ -171,16 +171,18 @@ export function LaunchQuizPanel({
             phone or tablet and enter their ID.
           </p>
 
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
             <ActionButton
               action="view"
               label="View live results"
               onClick={onViewLiveResults}
+              className="w-full justify-center sm:w-auto"
             />
             <ActionButton
               action="close"
               onClick={handleClose}
               disabled={isClosing}
+              className="w-full justify-center sm:w-auto"
               label={isClosing ? "Closing..." : "Close session"}
             />
           </div>
@@ -189,6 +191,7 @@ export function LaunchQuizPanel({
         <ActionButton
           action="launch"
           disabled={isLaunching}
+          className="w-full sm:w-auto"
           onClick={() => {
             if (otherQuizLive) {
               setReplaceDialogOpen(true);

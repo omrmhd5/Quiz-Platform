@@ -78,13 +78,15 @@ export function ConfirmDialog({
         aria-modal="true"
         aria-labelledby={titleId}
         aria-describedby={descriptionId}
-        className="ui-modal-panel max-w-md">
+        className="ui-modal-panel max-h-[92vh] w-full max-w-md overflow-y-auto">
         <h2
           id={titleId}
-          className="text-lg font-semibold tracking-tight text-zinc-900">
+          className="break-words text-lg font-semibold tracking-tight text-zinc-900">
           {title}
         </h2>
-        <p id={descriptionId} className="mt-2 text-sm text-zinc-600">
+        <p
+          id={descriptionId}
+          className="mt-2 max-h-48 overflow-y-auto break-words text-sm text-zinc-600">
           {description}
         </p>
 
@@ -94,7 +96,7 @@ export function ConfirmDialog({
             type="button"
             disabled={isPending}
             onClick={onCancel}
-            className={cn(buttonSecondaryClassName, "sm:min-w-24")}>
+            className={cn(buttonSecondaryClassName, "w-full sm:min-w-24 sm:w-auto")}>
             {cancelLabel}
           </button>
           <button
@@ -105,7 +107,7 @@ export function ConfirmDialog({
               variant === "danger"
                 ? "ui-btn ui-btn-danger-solid ui-press"
                 : buttonPrimaryClassName,
-              "sm:min-w-24",
+              "w-full sm:min-w-24 sm:w-auto",
             )}>
             {confirmLabel}
           </button>

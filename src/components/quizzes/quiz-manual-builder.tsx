@@ -57,7 +57,7 @@ export function QuizManualBuilder({
           <article
             key={question.id}
             className={`${panelClassName} space-y-4 border-zinc-200`}>
-            <div className="flex items-start justify-between gap-3">
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
               <h3 className="text-sm font-semibold text-zinc-900">
                 Question {questionIndex + 1}
               </h3>
@@ -109,32 +109,34 @@ export function QuizManualBuilder({
                     <div
                       key={option.id}
                       className={cn(
-                        "flex items-center gap-3 rounded-lg border px-3 py-2 transition-colors",
+                        "flex flex-col gap-2 rounded-lg border px-3 py-2 transition-colors sm:flex-row sm:items-center sm:gap-3",
                         isCorrect
                           ? "border-green-300 bg-green-50"
                           : "border-zinc-200 bg-white",
                       )}>
-                      <span className="w-6 shrink-0 font-mono text-sm font-medium text-zinc-500">
-                        {optionLetter(optionIndex)})
-                      </span>
-                      <input
-                        id={inputId}
-                        type="text"
-                        value={option.text}
-                        onChange={(event) =>
-                          updateQuestion(question.id, (current) => ({
-                            ...current,
-                            options: current.options.map((item) =>
-                              item.id === option.id
-                                ? { ...item, text: event.target.value }
-                                : item,
-                            ),
-                          }))
-                        }
-                        placeholder={`Option ${optionLetter(optionIndex)}`}
-                        className="min-w-0 flex-1 border-0 bg-transparent p-0 text-sm text-zinc-900 outline-none focus:ring-0"
-                      />
-                      <div className="flex shrink-0 items-center gap-1.5">
+                      <div className="flex min-w-0 flex-1 items-center gap-3">
+                        <span className="w-6 shrink-0 font-mono text-sm font-medium text-zinc-500">
+                          {optionLetter(optionIndex)})
+                        </span>
+                        <input
+                          id={inputId}
+                          type="text"
+                          value={option.text}
+                          onChange={(event) =>
+                            updateQuestion(question.id, (current) => ({
+                              ...current,
+                              options: current.options.map((item) =>
+                                item.id === option.id
+                                  ? { ...item, text: event.target.value }
+                                  : item,
+                              ),
+                            }))
+                          }
+                          placeholder={`Option ${optionLetter(optionIndex)}`}
+                          className="min-w-0 flex-1 border-0 bg-transparent p-0 text-sm text-zinc-900 outline-none focus:ring-0"
+                        />
+                      </div>
+                      <div className="flex flex-wrap items-center gap-1.5 sm:shrink-0">
                         <button
                           type="button"
                           aria-pressed={isCorrect}
@@ -145,7 +147,7 @@ export function QuizManualBuilder({
                             }))
                           }
                           className={cn(
-                            "ui-btn ui-btn-correct ui-press",
+                            "ui-btn ui-btn-correct ui-press w-full sm:w-auto",
                             isCorrect && "is-active",
                           )}>
                           {isCorrect ? "Correct ✓" : "Mark correct"}

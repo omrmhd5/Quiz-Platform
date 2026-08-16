@@ -12,6 +12,7 @@ type LaunchQuizButtonProps = {
   quizTitle: string;
   questionCount: number;
   activeSession: ActiveSessionInfo | null;
+  compact?: boolean;
 };
 
 export function LaunchQuizButton({
@@ -19,6 +20,7 @@ export function LaunchQuizButton({
   quizTitle,
   questionCount,
   activeSession,
+  compact,
 }: LaunchQuizButtonProps) {
   const router = useRouter();
   const [isLaunching, setIsLaunching] = useState(false);
@@ -48,7 +50,7 @@ export function LaunchQuizButton({
 
   if (isThisQuizLive) {
     return (
-      <ActionLink action="live" href={`/teacher/quizzes/${quizId}`} />
+      <ActionLink action="live" href={`/teacher/quizzes/${quizId}`} compact={compact} />
     );
   }
 
@@ -56,6 +58,7 @@ export function LaunchQuizButton({
     <>
       <ActionButton
         action="launch"
+        compact={compact}
         disabled={!canLaunch || isLaunching}
         title={canLaunch ? undefined : "Add at least one question first"}
         onClick={() => {

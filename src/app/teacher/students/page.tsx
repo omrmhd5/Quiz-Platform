@@ -8,7 +8,7 @@ export default async function StudentsPage() {
   const studentRows = await getStudents();
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6 sm:space-y-8">
       <div>
         <h1 className={pageTitleClassName}>Students</h1>
         <p className={pageDescriptionClassName}>

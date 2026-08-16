@@ -76,16 +76,18 @@ export function ActiveSessionBanner({
           />
         </div>
 
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
           <ActionLink
             action="view"
             label="View live results"
             href={`/teacher/quizzes/${activeSession.quizId}#session-${activeSession.sessionId}`}
+            className="w-full justify-center sm:w-auto"
           />
           <ActionButton
             action="close"
             onClick={handleClose}
             disabled={isClosing}
+            className="w-full justify-center sm:w-auto"
             label={isClosing ? "Closing..." : "Close session"}
           />
         </div>
@@ -101,7 +103,7 @@ export function ActiveSessionBanner({
         <ActionButton
           action="copy"
           onClick={handleCopy}
-          className="ui-btn-sm shrink-0"
+          className="ui-btn-sm w-full shrink-0 sm:w-auto"
           label={copyLabel}
         />
       </div>

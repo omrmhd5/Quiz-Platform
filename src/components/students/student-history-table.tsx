@@ -15,6 +15,7 @@ import { formatSessionDateTime } from "@/lib/session-format";
 import type { StudentHistoryView } from "@/lib/student-history";
 import { STUDENTS_PAGE_SIZE } from "@/lib/pagination";
 import {
+  cn,
   emptyStateClassName,
   panelClassName,
   tableBodyClassName,
@@ -138,7 +139,7 @@ export function StudentHistoryTable({ history }: StudentHistoryTableProps) {
                   <th scope="col" className={tableHeadCellClassName}>
                     Quiz
                   </th>
-                  <th scope="col" className={tableHeadCellClassName}>
+                  <th scope="col" className={cn(tableHeadCellClassName, "hidden sm:table-cell")}>
                     Session
                   </th>
                   <th scope="col" className={tableHeadCellClassName}>
@@ -147,13 +148,13 @@ export function StudentHistoryTable({ history }: StudentHistoryTableProps) {
                   <th scope="col" className={tableHeadCellClassName}>
                     Score
                   </th>
-                  <th scope="col" className={tableHeadCellClassName}>
+                  <th scope="col" className={cn(tableHeadCellClassName, "hidden md:table-cell")}>
                     Correct
                   </th>
-                  <th scope="col" className={tableHeadCellClassName}>
+                  <th scope="col" className={cn(tableHeadCellClassName, "hidden md:table-cell")}>
                     Wrong
                   </th>
-                  <th scope="col" className={tableHeadCellClassName}>
+                  <th scope="col" className={cn(tableHeadCellClassName, "hidden lg:table-cell")}>
                     Skipped
                   </th>
                   <th scope="col" className={tableHeadCellClassName}>
@@ -170,10 +171,12 @@ export function StudentHistoryTable({ history }: StudentHistoryTableProps) {
 
                   return (
                     <TableRow key={attempt.attemptId}>
-                      <TableCell className="font-medium text-zinc-900">
-                        {attempt.quizTitle}
+                      <TableCell className="max-w-[9rem] font-medium text-zinc-900 sm:max-w-none">
+                        <span className="line-clamp-2 sm:line-clamp-none">
+                          {attempt.quizTitle}
+                        </span>
                       </TableCell>
-                      <TableCell className="text-zinc-600">
+                      <TableCell className="hidden whitespace-nowrap text-zinc-600 sm:table-cell">
                         {formatSessionDateTime(attempt.launchedAt)}
                       </TableCell>
                       <TableCell>
@@ -188,19 +191,20 @@ export function StudentHistoryTable({ history }: StudentHistoryTableProps) {
                           ? `${attempt.scorePercent}%`
                           : "—"}
                       </TableCell>
-                      <TableCell className="tabular-nums text-zinc-700">
+                      <TableCell className="hidden tabular-nums text-zinc-700 md:table-cell">
                         {attempt.correctCount ?? "—"}
                       </TableCell>
-                      <TableCell className="tabular-nums text-zinc-700">
+                      <TableCell className="hidden tabular-nums text-zinc-700 md:table-cell">
                         {attempt.wrongCount ?? "—"}
                       </TableCell>
-                      <TableCell className="tabular-nums text-zinc-700">
+                      <TableCell className="hidden tabular-nums text-zinc-700 lg:table-cell">
                         {attempt.unansweredCount ?? "—"}
                       </TableCell>
                       <TableCell>
                         <ActionLink
                           action="view"
                           label="View session"
+                          compact
                           href={`/teacher/quizzes/${attempt.quizId}#session-${attempt.sessionId}`}
                         />
                       </TableCell>

@@ -11,6 +11,12 @@ import {
   cn,
   linkClassName,
   panelClassName,
+  tableBodyClassName,
+  tableCellClassName,
+  tableClassName,
+  tableHeadCellClassName,
+  tableHeadClassName,
+  tableHeadRowClassName,
   tableShellClassName,
 } from "@/lib/utils";
 
@@ -47,35 +53,35 @@ export function QuizzesTable({ quizzes, activeSession }: QuizzesTableProps) {
       />
 
       <div className={tableShellClassName}>
-      <table className="min-w-full divide-y divide-zinc-200 text-sm">
-        <thead>
-          <tr className="text-left text-zinc-500">
-            <th className="px-3 py-2 font-medium">Title</th>
-            <th className="px-3 py-2 font-medium">Questions</th>
-            <th className="px-3 py-2 font-medium">Results</th>
-            <th className="px-3 py-2 font-medium">Status</th>
-            <th className="px-3 py-2 font-medium">Created</th>
-            <th className="px-3 py-2 font-medium">Actions</th>
+      <table className={tableClassName}>
+        <thead className={tableHeadClassName}>
+          <tr className={tableHeadRowClassName}>
+            <th scope="col" className={tableHeadCellClassName}>Title</th>
+            <th scope="col" className={tableHeadCellClassName}>Questions</th>
+            <th scope="col" className={tableHeadCellClassName}>Results</th>
+            <th scope="col" className={tableHeadCellClassName}>Status</th>
+            <th scope="col" className={cn(tableHeadCellClassName, "hidden md:table-cell")}>Created</th>
+            <th scope="col" className={tableHeadCellClassName}>Actions</th>
           </tr>
         </thead>
-        <tbody className="divide-y divide-zinc-100">
+        <tbody className={tableBodyClassName}>
           {pagination.items.map((quiz) => {
             const isLive = activeSession?.quizId === quiz.id;
 
             return (
               <tr key={quiz.id} className="ui-table-row">
-                <td className="px-3 py-3 font-medium text-zinc-900">
-                  <Link href={`/teacher/quizzes/${quiz.id}`} className={linkClassName}>
+                <td className={cn(tableCellClassName, "max-w-[10rem] font-medium text-zinc-900 sm:max-w-none")}>
+                  <Link href={`/teacher/quizzes/${quiz.id}`} className={cn(linkClassName, "line-clamp-2 sm:line-clamp-none")}>
                     {quiz.title}
                   </Link>
                 </td>
-                <td className="px-3 py-3 tabular-nums text-zinc-700">
+                <td className={cn(tableCellClassName, "tabular-nums text-zinc-700")}>
                   {quiz.questionCount}
                 </td>
-                <td className="px-3 py-3 tabular-nums text-zinc-700">
+                <td className={cn(tableCellClassName, "tabular-nums text-zinc-700")}>
                   {quiz.sessionCount}
                 </td>
-                <td className="px-3 py-3">
+                <td className={tableCellClassName}>
                   {isLive ? (
                     <span className="ui-badge ui-badge-active">Live</span>
                   ) : (
@@ -84,24 +90,26 @@ export function QuizzesTable({ quizzes, activeSession }: QuizzesTableProps) {
                     </span>
                   )}
                 </td>
-                <td className="px-3 py-3 text-zinc-600">
+                <td className={cn(tableCellClassName, "hidden whitespace-nowrap text-zinc-600 md:table-cell")}>
                   {quiz.createdAt.toLocaleDateString("en-US", {
                     month: "short",
                     day: "numeric",
                     year: "numeric",
                   })}
                 </td>
-                <td className="px-3 py-3">
+                <td className={tableCellClassName}>
                   <div className="flex flex-wrap gap-2">
                     <LaunchQuizButton
                       quizId={quiz.id}
                       quizTitle={quiz.title}
                       questionCount={quiz.questionCount}
                       activeSession={activeSession}
+                      compact
                     />
                     <ActionLink
                       action="view"
                       href={`/teacher/quizzes/${quiz.id}`}
+                      compact
                     />
                   </div>
                 </td>

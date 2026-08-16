@@ -75,18 +75,20 @@ export function ContentModal({
         aria-labelledby={titleId}
         aria-describedby={description ? descriptionId : undefined}
         className={cn(
-          "ui-modal-panel flex max-h-[90vh] flex-col",
+          "ui-modal-panel flex max-h-[90vh] w-full max-w-[calc(100vw-1.5rem)] flex-col",
           sizeClassName[size],
         )}>
-        <div className="flex shrink-0 items-start justify-between gap-4 border-b border-zinc-200 pb-4">
-          <div className="min-w-0 space-y-1">
+        <div className="flex shrink-0 items-start justify-between gap-3 border-b border-zinc-200 pb-4 sm:gap-4">
+          <div className="min-w-0 flex-1 space-y-1">
             <h2
               id={titleId}
-              className="text-lg font-semibold tracking-tight text-zinc-900">
+              className="break-words text-lg font-semibold tracking-tight text-zinc-900">
               {title}
             </h2>
             {description ? (
-              <p id={descriptionId} className="text-sm text-zinc-600">
+              <p
+                id={descriptionId}
+                className="break-words text-sm text-zinc-600">
                 {description}
               </p>
             ) : null}
@@ -100,7 +102,9 @@ export function ContentModal({
           />
         </div>
 
-        <div className="min-h-0 flex-1 overflow-y-auto pt-4">{children}</div>
+        <div className="min-h-0 flex-1 overflow-x-auto overflow-y-auto pt-4">
+          {children}
+        </div>
       </div>
     </div>,
     document.body,

@@ -51,7 +51,7 @@ export default async function QuizDetailPage({ params }: QuizDetailPageProps) {
 
   return (
     <div className="space-y-8">
-      <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <h1 className={pageTitleClassName}>{quiz.title}</h1>
           <p className={pageDescriptionClassName}>

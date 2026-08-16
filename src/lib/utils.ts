@@ -80,9 +80,10 @@ export const tableCellClassName = "ui-table-cell";
 export const tableEmptyCellClassName = "ui-table-empty-cell";
 
 export const pageTitleClassName =
-  "text-2xl font-semibold tracking-tight text-zinc-900";
+  "text-xl font-semibold tracking-tight text-zinc-900 sm:text-2xl";
 
-export const pageDescriptionClassName = "mt-1 text-sm text-zinc-600";
+export const pageDescriptionClassName =
+  "mt-1 text-sm leading-relaxed text-zinc-600";
 
 export const alertErrorClassName = cn("ui-alert ui-alert-error ui-alert-enter");
 
