@@ -1,5 +1,5 @@
 import { LoginForm } from "@/components/login-form";
-import { clearSessionIfInvalid, getSession } from "@/lib/auth";
+import { getSession } from "@/lib/auth";
 import {
   cn,
   enterClassName,
@@ -8,24 +8,12 @@ import {
   panelClassName,
 } from "@/lib/utils";
 import { redirect } from "next/navigation";
-import { eq } from "drizzle-orm";
-import { db } from "@/db";
-import { teachers } from "@/db/schema";
 
 export default async function LoginPage() {
-  await clearSessionIfInvalid();
   const session = await getSession();
 
   if (session.isLoggedIn) {
-    const [teacher] = await db
-      .select({ id: teachers.id })
-      .from(teachers)
-      .where(eq(teachers.id, session.teacherId))
-      .limit(1);
-
-    if (teacher) {
-      redirect("/teacher/dashboard");
-    }
+    redirect("/teacher/dashboard");
   }
 
   return (
