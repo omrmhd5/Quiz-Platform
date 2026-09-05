@@ -24,7 +24,7 @@ export default async function LoginPage() {
 
   return (
     <div className="flex min-h-dvh items-center justify-center px-4 py-8 sm:py-12">
-      <div className="w-full max-w-md">
+      <div id="demo-login-stack" className="w-full max-w-md">
         <div
           className={cn(
             panelClassName,

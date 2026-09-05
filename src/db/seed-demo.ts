@@ -1,10 +1,9 @@
 import bcrypt from "bcryptjs";
-import { existsSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { drizzle } from "drizzle-orm/postgres-js";
 import { migrate } from "drizzle-orm/postgres-js/migrator";
 import postgres from "postgres";
-import { getDatabaseUrl } from "@/lib/db-url";
+import { resolveSeedDatabaseUrl } from "@/lib/resolve-seed-database-url";
 import {
   attemptAnswers,
   attemptOptionOrder,
@@ -26,19 +25,7 @@ const DEMO_TEACHER_USERNAME = "teacher";
 const DEMO_TEACHER_PASSWORD = "teacher123";
 
 async function seedDemo() {
-  const neonPath = resolve(process.cwd(), ".env.neon.local");
-  if (existsSync(neonPath)) {
-    for (const line of readFileSync(neonPath, "utf8").split("\n")) {
-      const trimmed = line.trim();
-      if (!trimmed || trimmed.startsWith("#") || !trimmed.includes("=")) continue;
-      const separatorIndex = trimmed.indexOf("=");
-      const key = trimmed.slice(0, separatorIndex).trim();
-      const value = trimmed.slice(separatorIndex + 1).trim();
-      if (key) process.env[key] = value;
-    }
-  }
-
-  const connectionString = getDatabaseUrl();
+  const connectionString = await resolveSeedDatabaseUrl();
   const needsSsl = /neon\.tech|sslmode=require|render\.com/i.test(
     connectionString,
   );

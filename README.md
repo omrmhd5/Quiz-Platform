@@ -48,15 +48,15 @@ The app gives teachers a single place to run a class quiz end to end: import stu
 
 ## 📦 Tech Stack
 
-| Layer      | Tech                                      |
-| ---------- | ----------------------------------------- |
-| Framework  | Next.js 16, React 19, TypeScript          |
-| i18n       | next-intl (English / Arabic)              |
-| Database   | PostgreSQL 18, Drizzle ORM                |
-| Auth       | iron-session, bcryptjs                    |
-| Charts     | Recharts                                  |
-| Styling    | Tailwind CSS 4                            |
-| Deployment | Neon + Vercel                             |
+| Layer      | Tech                             |
+| ---------- | -------------------------------- |
+| Framework  | Next.js 16, React 19, TypeScript |
+| i18n       | next-intl (English / Arabic)     |
+| Database   | PostgreSQL 18, Drizzle ORM       |
+| Auth       | iron-session, bcryptjs           |
+| Charts     | Recharts                         |
+| Styling    | Tailwind CSS 4                   |
+| Deployment | Neon + Vercel                    |
 
 ---
 
@@ -71,9 +71,9 @@ The app gives teachers a single place to run a class quiz end to end: import stu
 
 ## 🎬 Site Demo
 
-**[▶ Watch site walkthrough](./docs/quiz-platform-demo.mp4)** (~1 min)
+**[▶ Watch site walkthrough](./docs/quiz-platform-demo.mp4)** (~2 min)
 
-Login → dashboard → students → quizzes → student join → Arabic.
+Login → add a student → build a 2-question quiz → save & launch live → student joins and submits → session results → student history → dashboard analytics (smooth scroll) → Arabic login.
 
 ---
 
@@ -82,23 +82,68 @@ Login → dashboard → students → quizzes → student join → Arabic.
 - Teacher Login
   <img width="1600" height="900" alt="Teacher Login" src="./docs/screenshots/01-login.png" />
 
-- Mobile Preview
-  <img width="390" height="844" alt="Mobile Preview" src="./docs/screenshots/07-mobile-login.png" />
+- Students Roster
+  <img width="1600" height="776" alt="Students Roster" src="./docs/screenshots/02-students.png" />
 
-- Dashboard
-  <img width="1600" height="776" alt="Dashboard" src="./docs/screenshots/02-dashboard.png" />
+- Quizzes List
+  <img width="1600" height="776" alt="Quizzes List" src="./docs/screenshots/03-quizzes.png" />
 
-- Students
-  <img width="1600" height="776" alt="Students" src="./docs/screenshots/03-students.png" />
+- Create Quiz
+  <img width="1600" height="776" alt="Create Quiz" src="./docs/screenshots/04-create-quiz.png" />
 
-- Quizzes
-  <img width="1600" height="776" alt="Quizzes" src="./docs/screenshots/04-quizzes.png" />
+- Quiz Builder
+  <img width="1600" height="776" alt="Quiz Builder" src="./docs/screenshots/05-quiz-builder.png" />
+
+- Edit Quiz
+  <img width="1600" height="776" alt="Edit Quiz" src="./docs/screenshots/06-quiz-edit.png" />
+
+- Answer Key
+  <img width="1600" height="776" alt="Answer Key" src="./docs/screenshots/07-quiz-answer-key.png" />
+
+- Live Session
+  <img width="1600" height="776" alt="Live Session" src="./docs/screenshots/08-quiz-live.png" />
 
 - Student Join
-  <img width="1600" height="900" alt="Student Join" src="./docs/screenshots/05-join.png" />
+  <img width="1600" height="900" alt="Student Join" src="./docs/screenshots/09-join.png" />
+
+- Student Quiz
+  <img width="1600" height="900" alt="Student Quiz" src="./docs/screenshots/10-student-quiz.png" />
+
+- Student Results
+  <img width="1600" height="900" alt="Student Results" src="./docs/screenshots/11-student-results.png" />
+
+- Session Stats
+  <img width="1600" height="776" alt="Session Stats" src="./docs/screenshots/12-session-stats.png" />
+
+- Session Students
+  <img width="1600" height="776" alt="Session Students" src="./docs/screenshots/13-session-students.png" />
+
+- Student History
+  <img width="1600" height="776" alt="Student History" src="./docs/screenshots/14-student-history.png" />
+
+- Dashboard Overview
+  <img width="1600" height="776" alt="Dashboard Overview" src="./docs/screenshots/15-dashboard-overview.png" />
+
+- Dashboard Charts
+  <img width="1600" height="900" alt="Dashboard Charts" src="./docs/screenshots/16-dashboard-charts.png" />
+
+- Dashboard Sessions
+  <img width="1600" height="900" alt="Dashboard Sessions" src="./docs/screenshots/17-dashboard-sessions.png" />
+
+- Dashboard Highlights
+  <img width="1600" height="900" alt="Dashboard Highlights" src="./docs/screenshots/18-dashboard-highlights.png" />
+
+- Dashboard Top Results
+  <img width="1600" height="900" alt="Dashboard Top Results" src="./docs/screenshots/19-dashboard-top-results.png" />
 
 - Arabic Login
-  <img width="1600" height="776" alt="Arabic Login" src="./docs/screenshots/06-login-arabic.png" />
+  <img width="1600" height="900" alt="Arabic Login" src="./docs/screenshots/20-login-arabic.png" />
+
+- Mobile Login
+  <img width="390" height="844" alt="Mobile Login" src="./docs/screenshots/21-mobile-login.png" />
+
+- Mobile Join
+  <img width="390" height="844" alt="Mobile Join" src="./docs/screenshots/22-mobile-join.png" />
 
 ## Live Demo 🚀
 

@@ -34,7 +34,7 @@ export default async function StudentHistoryPage({
   }
 
   return (
-    <div className="space-y-8">
+    <div id="student-history-page" className="space-y-8">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <p className="text-sm text-zinc-500">

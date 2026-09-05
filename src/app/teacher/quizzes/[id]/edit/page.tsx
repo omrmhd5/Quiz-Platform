@@ -31,7 +31,7 @@ export default async function EditQuizPage({ params }: EditQuizPageProps) {
   const isLive = activeSession?.quizId === quiz.id;
 
   return (
-    <div className="space-y-8">
+    <div id="quiz-form-page" className="space-y-8">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <h1 className={pageTitleClassName}>{getMessage(locale, "quizzes.editTitle")}</h1>

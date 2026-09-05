@@ -13,7 +13,7 @@ export default async function StudentsPage() {
   ]);
 
   return (
-    <div className="space-y-6 sm:space-y-8">
+    <div id="students-page" className="space-y-6 sm:space-y-8">
       <div>
         <h1 className={pageTitleClassName}>
           {getMessage(locale, "students.title")}

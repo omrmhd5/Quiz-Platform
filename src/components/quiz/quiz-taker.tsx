@@ -48,6 +48,7 @@ export function QuizTaker({ quiz }: QuizTakerProps) {
 
   return (
     <div
+      id="quiz-attempt"
       className={cn(
         "mx-auto w-full max-w-2xl space-y-6 px-4 py-6 sm:py-8",
         enterClassName,

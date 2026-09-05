@@ -50,6 +50,7 @@ export function DashboardView({
   const { locale } = useAppLocale();
   return (
     <div className="space-y-6 sm:space-y-8">
+      <div id="dashboard-overview" className="space-y-6 sm:space-y-8">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <h1 className={pageTitleClassName}>{t("title")}</h1>
@@ -154,10 +155,11 @@ export function DashboardView({
           </div>
         )}
       </div>
+      </div>
 
       <DashboardCharts stats={stats} />
 
-      <div className={`${panelClassName} space-y-4`}>
+      <div id="dashboard-sessions" className={`${panelClassName} space-y-4`}>
         <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between sm:gap-3">
           <SectionIntro
             title={t("recentSessions")}

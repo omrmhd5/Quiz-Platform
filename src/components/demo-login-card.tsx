@@ -15,7 +15,9 @@ export function DemoLoginCard() {
   return (
     <aside className={`${panelClassName} mt-6 space-y-3 p-4 sm:p-5`}>
       <div>
-        <h2 className="text-sm font-semibold text-zinc-900">{t("demoHeading")}</h2>
+        <h2 className="text-sm font-semibold text-zinc-900">
+          {t("demoHeading")}
+        </h2>
         <p className="mt-1 text-xs text-zinc-500">{t("copyHint")}</p>
       </div>
       <dl className="space-y-2.5 text-sm">

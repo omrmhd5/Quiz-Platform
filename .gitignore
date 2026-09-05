@@ -43,3 +43,8 @@ next-env.d.ts
 .env*
 !.env.demo.example
 docs/.video-temp/
+
+# Demo media capture — tooling lives in Freelancer .cursor/scripts/demo-media/
+scripts/capture-screenshots.mjs
+scripts/record-site-tour.mjs
+scripts/demo-media.config.mjs

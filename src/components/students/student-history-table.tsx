@@ -90,9 +90,7 @@ export function StudentHistoryTable({ history }: StudentHistoryTableProps) {
         />
         <StatCard
           label={t("lowestScore")}
-          value={
-            history.lowestScore !== null ? `${history.lowestScore}%` : "—"
-          }
+          value={history.lowestScore !== null ? `${history.lowestScore}%` : "—"}
           preset="lowestScore"
         />
       </div>
@@ -100,7 +98,15 @@ export function StudentHistoryTable({ history }: StudentHistoryTableProps) {
       <div className={`${panelClassName} space-y-4`}>
         <SectionIntro
           title={tDashboard("quizStats")}
-          description={history.submittedCount === 1 ? tDashboard("quizStatsDescription", { count: history.submittedCount }) : tDashboard("quizStatsDescriptionPlural", { count: history.submittedCount })}
+          description={
+            history.submittedCount === 1
+              ? tDashboard("quizStatsDescription", {
+                  count: history.submittedCount,
+                })
+              : tDashboard("quizStatsDescriptionPlural", {
+                  count: history.submittedCount,
+                })
+          }
         />
         {history.submittedCount === 0 ? (
           <p className={emptyStateClassName}>{tDashboard("noSubmitted")}</p>
@@ -126,9 +132,7 @@ export function StudentHistoryTable({ history }: StudentHistoryTableProps) {
       </div>
 
       {history.totalAttempts === 0 ? (
-        <p className={emptyStateClassName}>
-          {t("noAttempts")}
-        </p>
+        <p className={emptyStateClassName}>{t("noAttempts")}</p>
       ) : (
         <div className={`${panelClassName} space-y-4`}>
           <PaginationControls
@@ -146,7 +150,12 @@ export function StudentHistoryTable({ history }: StudentHistoryTableProps) {
                   <th scope="col" className={tableHeadCellClassName}>
                     {tDashboard("quiz")}
                   </th>
-                  <th scope="col" className={cn(tableHeadCellClassName, "hidden sm:table-cell")}>
+                  <th
+                    scope="col"
+                    className={cn(
+                      tableHeadCellClassName,
+                      "hidden sm:table-cell",
+                    )}>
                     {tDashboard("sessionFallback")}
                   </th>
                   <th scope="col" className={tableHeadCellClassName}>
@@ -155,13 +164,28 @@ export function StudentHistoryTable({ history }: StudentHistoryTableProps) {
                   <th scope="col" className={tableHeadCellClassName}>
                     {tDashboard("averageScore")}
                   </th>
-                  <th scope="col" className={cn(tableHeadCellClassName, "hidden md:table-cell")}>
+                  <th
+                    scope="col"
+                    className={cn(
+                      tableHeadCellClassName,
+                      "hidden md:table-cell",
+                    )}>
                     {tDashboard("correct")}
                   </th>
-                  <th scope="col" className={cn(tableHeadCellClassName, "hidden md:table-cell")}>
+                  <th
+                    scope="col"
+                    className={cn(
+                      tableHeadCellClassName,
+                      "hidden md:table-cell",
+                    )}>
                     {tDashboard("wrong")}
                   </th>
-                  <th scope="col" className={cn(tableHeadCellClassName, "hidden lg:table-cell")}>
+                  <th
+                    scope="col"
+                    className={cn(
+                      tableHeadCellClassName,
+                      "hidden lg:table-cell",
+                    )}>
                     {tDashboard("skipped")}
                   </th>
                   <th scope="col" className={tableHeadCellClassName}>
@@ -174,7 +198,11 @@ export function StudentHistoryTable({ history }: StudentHistoryTableProps) {
                   const status = getAttemptStatusLabel(
                     attempt.sessionStatus,
                     attempt.status,
-                    { submitted: tStatus("submitted"), inProgress: tStatus("inProgress"), didntFinish: tStatus("didntFinish") },
+                    {
+                      submitted: tStatus("submitted"),
+                      inProgress: tStatus("inProgress"),
+                      didntFinish: tStatus("didntFinish"),
+                    },
                   );
 
                   return (

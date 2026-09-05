@@ -105,7 +105,7 @@ export function DashboardCharts({ stats }: DashboardChartsProps) {
     }));
 
   return (
-    <div className="grid gap-6 lg:grid-cols-2">
+    <div id="dashboard-charts" className="grid gap-6 lg:grid-cols-2">
       <ChartPanel
         title={t("answerBreakdown")}
         description={t("answerBreakdownHint")}>

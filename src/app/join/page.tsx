@@ -19,7 +19,7 @@ export default async function JoinPage() {
 
   return (
     <div className="flex min-h-dvh items-center justify-center px-4 py-8 sm:py-12">
-      <div className={cn("w-full max-w-md space-y-8", enterClassName)}>
+      <div id="join-stack" className={cn("w-full max-w-md space-y-8", enterClassName)}>
         <div className="text-center">
           <h1 className={pageTitleClassName}>
             {getMessage(locale, "join.title")}

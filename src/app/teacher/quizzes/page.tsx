@@ -30,7 +30,7 @@ export default async function QuizzesPage() {
       : 0;
 
   return (
-    <div className="space-y-8">
+    <div id="quizzes-page" className="space-y-8">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <h1 className={pageTitleClassName}>

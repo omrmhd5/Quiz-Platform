@@ -13,6 +13,7 @@
     "db:migrate": "drizzle-kit migrate",
     "db:seed": "tsx src/db/seed.ts",
     "seed:demo": "tsx src/db/seed-demo.ts",
+    "seed:demo:local": "set LOCAL_DEMO_SEED=1&& tsx src/db/seed-demo.ts",
     "db:studio": "drizzle-kit studio",
     "docker": "docker compose -f docker/docker-compose.yml --project-directory . up -d",
     "docker:build": "docker compose -f docker/docker-compose.yml --project-directory . up --build",

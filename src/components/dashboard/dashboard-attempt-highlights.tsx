@@ -124,7 +124,7 @@ export function DashboardAttemptHighlights({
       : rankedResults.length === 0;
 
   return (
-    <div className={`${panelClassName} space-y-4`}>
+    <div id="dashboard-highlights" className={`${panelClassName} space-y-4`}>
       <div>
         <h2 className="text-base font-semibold text-zinc-900">
           {t("topCombined")}

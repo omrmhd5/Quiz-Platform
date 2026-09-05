@@ -20,7 +20,7 @@ type QuizResultsProps = {
 export function QuizResults({ results }: QuizResultsProps) {
   const t = useTranslations("quizTake");
   return (
-    <div className={cn("w-full max-w-lg space-y-8", enterClassName)}>
+    <div id="quiz-attempt-results" className={cn("w-full max-w-lg space-y-8", enterClassName)}>
       <div className="text-center">
         <h1 className={pageTitleClassName}>{results.quizTitle}</h1>
         <p className={pageDescriptionClassName}>

@@ -6,7 +6,7 @@ import { pageDescriptionClassName, pageTitleClassName } from "@/lib/utils";
 export default async function NewQuizPage() {
   const locale = await getRequestLocale();
   return (
-    <div className="space-y-8">
+    <div id="quiz-form-page" className="space-y-8">
       <div>
         <h1 className={pageTitleClassName}>{getMessage(locale, "quizzes.newTitle")}</h1>
         <p className={pageDescriptionClassName}>
