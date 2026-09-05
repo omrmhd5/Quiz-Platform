@@ -1,6 +1,6 @@
 "use server";
 
-import { and, eq } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { notFound, redirect } from "next/navigation";
 import { db } from "@/db";
@@ -12,6 +12,7 @@ import {
   students,
 } from "@/db/schema";
 import { requireTeacherSession } from "@/lib/auth";
+import { tMsg, tServer } from "@/lib/i18n/server";
 import type { ActiveSessionInfo } from "@/lib/sessions";
 import { validateStudentId } from "@/lib/students";
 import type { JoinActionState } from "@/lib/sessions";
@@ -28,9 +29,11 @@ export async function getActiveSession(): Promise<ActiveSessionInfo | null> {
       quizId: quizSessions.quizId,
       quizTitle: quizzes.title,
       launchedAt: quizSessions.launchedAt,
+      joinedCount: sql<number>`coalesce(${sessionStats.joinedCount}, 0)::int`,
     })
     .from(quizSessions)
     .innerJoin(quizzes, eq(quizSessions.quizId, quizzes.id))
+    .leftJoin(sessionStats, eq(sessionStats.sessionId, quizSessions.id))
     .where(eq(quizSessions.status, "active"))
     .limit(1);
 
@@ -52,7 +55,7 @@ async function assertQuizOwnership(quizId: string, teacherId: string) {
   }
 
   if (quiz.questionCount < 1) {
-    throw new Error("Add at least one question before launching.");
+    throw new Error(await tServer("errors.launchNeedQuestion"));
   }
 
   return quiz;
@@ -98,7 +101,9 @@ export async function launchQuizSession(quizId: string, replaceActive = false) {
 
     if (!replaceActive) {
       return {
-        error: `Another quiz is already live: "${active.quizTitle}". Close it or confirm to replace it.`,
+        error: await tServer("errors.anotherQuizLive", {
+          title: active.quizTitle,
+        }),
         activeSession: active,
       };
     }
@@ -153,7 +158,7 @@ export async function closeQuizSession(sessionId: string) {
   }
 
   if (session.status !== "active") {
-    return { error: "This session is not active." };
+    return { error: await tServer("errors.sessionNotActive") };
   }
 
   await db.transaction(async (tx) => {
@@ -172,7 +177,7 @@ export async function closeQuizSession(sessionId: string) {
   revalidatePath("/teacher/dashboard");
   revalidatePath("/join");
 
-  return { success: "Quiz session closed." };
+  return { success: await tServer("success.sessionClosed") };
 }
 
 export async function joinByStudentId(
@@ -183,7 +188,7 @@ export async function joinByStudentId(
   const idError = validateStudentId(studentId);
 
   if (idError) {
-    return { error: idError };
+    return { error: await tMsg(idError) };
   }
 
   const [student] = await db
@@ -193,13 +198,13 @@ export async function joinByStudentId(
     .limit(1);
 
   if (!student) {
-    return { error: "Student ID not registered. Ask your teacher to add you." };
+    return { error: await tServer("errors.studentNotRegistered") };
   }
 
   const activeSession = await getActiveSession();
 
   if (!activeSession) {
-    return { error: "No quiz is running right now." };
+    return { error: await tServer("errors.noQuizRunning") };
   }
 
   const [existingAttempt] = await db

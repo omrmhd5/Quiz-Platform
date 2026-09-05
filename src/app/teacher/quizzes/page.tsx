@@ -2,6 +2,8 @@ import { ActiveSessionBanner } from "@/components/sessions/active-session-banner
 import { QuizzesTable } from "@/components/quizzes/quizzes-table";
 import { ActionLink } from "@/components/ui/action-control";
 import { getJoinUrl } from "@/lib/join-url";
+import { getMessage } from "@/lib/i18n/messages";
+import { getRequestLocale } from "@/lib/i18n/server";
 import {
   emptyStateClassName,
   pageDescriptionClassName,
@@ -9,30 +11,25 @@ import {
   panelClassName,
 } from "@/lib/utils";
 import { getQuizzes } from "@/server/actions/quizzes";
-import {
-  getActiveSession,
-  getActiveSessionAttemptCount,
-} from "@/server/actions/sessions";
+import { getActiveSession } from "@/server/actions/sessions";
 
 export default async function QuizzesPage() {
-  const [quizRows, activeSession, joinUrl] = await Promise.all([
+  const [quizRows, activeSession, joinUrl, locale] = await Promise.all([
     getQuizzes(),
     getActiveSession(),
     getJoinUrl(),
+    getRequestLocale(),
   ]);
 
-  const joinedCount =
-    activeSession !== null
-      ? await getActiveSessionAttemptCount(activeSession.sessionId)
-      : 0;
-
   return (
-    <div className="space-y-8">
+    <div id="quizzes-page" className="space-y-8">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <h1 className={pageTitleClassName}>Quizzes</h1>
+          <h1 className={pageTitleClassName}>
+            {getMessage(locale, "quizzes.title")}
+          </h1>
           <p className={pageDescriptionClassName}>
-            Create, save, and manage multiple-choice quizzes.
+            {getMessage(locale, "quizzes.subtitle")}
           </p>
         </div>
         <ActionLink action="createQuiz" href="/teacher/quizzes/new" size="md" />
@@ -42,14 +39,14 @@ export default async function QuizzesPage() {
         <ActiveSessionBanner
           activeSession={activeSession}
           joinUrl={joinUrl}
-          joinedCount={joinedCount}
+          joinedCount={activeSession.joinedCount}
         />
       ) : null}
 
       {quizRows.length === 0 ? (
         <div className={`${panelClassName} space-y-4`}>
           <p className={emptyStateClassName}>
-            No quizzes yet. Create your first MCQ quiz to get started.
+            {getMessage(locale, "quizzes.empty")}
           </p>
           <ActionLink
             action="createQuiz"

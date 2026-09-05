@@ -1,9 +1,10 @@
 import { getIronSession } from "iron-session";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import { cache } from "react";
 import { defaultSession, getSessionOptions, type SessionData } from "./session";
 
-export async function getSession() {
+export const getSession = cache(async () => {
   const session = await getIronSession<SessionData>(
     await cookies(),
     getSessionOptions(),
@@ -14,9 +15,9 @@ export async function getSession() {
   }
 
   return session;
-}
+});
 
-export async function requireTeacherSession() {
+export const requireTeacherSession = cache(async () => {
   const session = await getSession();
 
   if (!session.isLoggedIn) {
@@ -24,4 +25,4 @@ export async function requireTeacherSession() {
   }
 
   return session;
-}
+});
