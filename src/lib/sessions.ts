@@ -16,5 +16,4 @@ export type ActiveSessionInfo = {
   quizId: string;
   quizTitle: string;
   launchedAt: Date | null;
-  joinedCount: number;
 };

@@ -229,28 +229,25 @@ export async function getDashboardStats(): Promise<DashboardView> {
       .limit(1);
   }
 
+  const [studentRow] = await db
+    .select({ studentCount: count(students.id) })
+    .from(students);
+
   const [
-    studentRow,
-    limitedSessionsDesc,
+    recentSessions,
+    trendSessionsDesc,
     topAttemptsHighest,
     topAttemptsLowest,
     topResultsHighest,
     topResultsLowest,
   ] = await Promise.all([
-    db.select({ studentCount: count(students.id) }).from(students),
-    fetchLimitedSessions(
-      teacherId,
-      Math.max(DASHBOARD_RECENT_SESSIONS, DASHBOARD_TREND_SESSIONS),
-      "desc",
-    ),
+    fetchLimitedSessions(teacherId, DASHBOARD_RECENT_SESSIONS, "desc"),
+    fetchLimitedSessions(teacherId, DASHBOARD_TREND_SESSIONS, "desc"),
     fetchTopAttempts(teacherId, "highest"),
     fetchTopAttempts(teacherId, "lowest"),
     fetchTopSessionResults(teacherId, "highest"),
     fetchTopSessionResults(teacherId, "lowest"),
   ]);
-
-  const recentSessions = limitedSessionsDesc.slice(0, DASHBOARD_RECENT_SESSIONS);
-  const trendSessionsDesc = limitedSessionsDesc;
 
   const scoreTrend = [...trendSessionsDesc]
     .reverse()
@@ -264,7 +261,7 @@ export async function getDashboardStats(): Promise<DashboardView> {
     }));
 
   return {
-    studentCount: studentRow[0]?.studentCount ?? 0,
+    studentCount: studentRow?.studentCount ?? 0,
     quizCount: teacherRow?.quizCount ?? 0,
     sessionCount: teacherRow?.sessionCount ?? 0,
     totalAttempts: teacherRow?.totalAttempts ?? 0,
