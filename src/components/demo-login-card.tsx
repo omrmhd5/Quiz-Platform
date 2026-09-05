@@ -18,12 +18,23 @@ export function DemoLoginCard() {
         <h2 className="text-sm font-semibold text-zinc-900">{t("demoHeading")}</h2>
         <p className="mt-1 text-xs text-zinc-500">{t("copyHint")}</p>
       </div>
-      <dl className="grid grid-cols-[auto_1fr_auto] items-center gap-x-3 gap-y-1 text-sm">
-        <dt className="text-zinc-500">{t("demoRole")}</dt>
-        <dd className="select-all font-mono text-zinc-900">{DEMO_TEACHER.username}</dd>
-        <dd className="select-all font-mono text-zinc-900">{DEMO_TEACHER.password}</dd>
+      <dl className="space-y-2.5 text-sm">
+        <div className="flex items-center justify-between gap-4">
+          <dt className="text-zinc-500">{t("username")}</dt>
+          <dd className="select-all font-mono font-medium text-zinc-900">
+            {DEMO_TEACHER.username}
+          </dd>
+        </div>
+        <div className="flex items-center justify-between gap-4">
+          <dt className="text-zinc-500">{t("password")}</dt>
+          <dd className="select-all font-mono font-medium text-zinc-900">
+            {DEMO_TEACHER.password}
+          </dd>
+        </div>
       </dl>
-      <p className="text-xs text-zinc-500">{tBanner("wake")}</p>
+      <p className="text-xs text-zinc-500">
+        {t("demoRole")} · {tBanner("wake")}
+      </p>
     </aside>
   );
 }

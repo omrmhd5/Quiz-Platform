@@ -1,5 +1,4 @@
 import { JoinForm } from "@/components/join/join-form";
-import { LanguageSwitch } from "@/components/language-switch";
 import {
   cn,
   enterClassName,
@@ -21,9 +20,6 @@ export default async function JoinPage() {
   return (
     <div className="flex min-h-dvh items-center justify-center px-4 py-8 sm:py-12">
       <div className={cn("w-full max-w-md space-y-8", enterClassName)}>
-        <div className="flex justify-end">
-          <LanguageSwitch />
-        </div>
         <div className="text-center">
           <h1 className={pageTitleClassName}>
             {getMessage(locale, "join.title")}

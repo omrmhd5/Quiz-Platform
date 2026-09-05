@@ -46,6 +46,7 @@ export function StudentHistoryTable({ history }: StudentHistoryTableProps) {
   const { locale } = useAppLocale();
   const t = useTranslations("history");
   const tDashboard = useTranslations("dashboard");
+  const tStudents = useTranslations("students");
   const tStatus = useTranslations("status");
 
   function handlePageChange(page: number) {
@@ -164,7 +165,7 @@ export function StudentHistoryTable({ history }: StudentHistoryTableProps) {
                     {tDashboard("skipped")}
                   </th>
                   <th scope="col" className={tableHeadCellClassName}>
-                    {tDashboard("actions")}
+                    {tStudents("colActions")}
                   </th>
                 </tr>
               </thead>
