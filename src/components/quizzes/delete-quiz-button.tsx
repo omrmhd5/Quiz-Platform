@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { ConfirmDialog } from "@/components/confirm-dialog";
 import { ActionButton } from "@/components/ui/action-control";
 import { deleteQuiz } from "@/server/actions/quizzes";
@@ -12,28 +13,15 @@ type DeleteQuizButtonProps = {
   isLive?: boolean;
 };
 
-function getDeleteDescription({
-  sessionCount = 0,
-  isLive = false,
-}: Pick<DeleteQuizButtonProps, "sessionCount" | "isLive">) {
-  if (sessionCount > 0) {
-    const sessionLabel = `${sessionCount} session${sessionCount === 1 ? "" : "s"}`;
-    const liveNote = isLive
-      ? " This quiz is live right now — students will immediately lose access."
-      : "";
-
-    return `All questions, ${sessionLabel}, student attempts, and results will be permanently removed.${liveNote} This cannot be undone.`;
-  }
-
-  return "All questions and options will be permanently removed. This cannot be undone.";
-}
-
 export function DeleteQuizButton({
   quizId,
   quizTitle,
   sessionCount = 0,
   isLive = false,
 }: DeleteQuizButtonProps) {
+  const t = useTranslations("quizzes");
+  const tErrors = useTranslations("errors");
+  const tActions = useTranslations("actions");
   const [open, setOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -48,7 +36,7 @@ export function DeleteQuizButton({
       setError(
         deleteError instanceof Error
           ? deleteError.message
-          : "Could not delete quiz.",
+          : tErrors("couldNotDeleteQuiz"),
       );
       setIsDeleting(false);
     }
@@ -64,10 +52,10 @@ export function DeleteQuizButton({
 
       <ConfirmDialog
         open={open}
-        title={`Delete "${quizTitle}"?`}
-        description={getDeleteDescription({ sessionCount, isLive })}
-        confirmLabel={isDeleting ? "Deleting..." : "Delete quiz"}
-        cancelLabel="Cancel"
+        title={t("deleteTitle", { title: quizTitle })}
+        description={sessionCount > 0 ? t("deleteWithHistory", { count: sessionCount, liveNote: isLive ? ` ${t("liveNow")}.` : "" }) : t("deleteEmpty")}
+        confirmLabel={isDeleting ? t("deleting") : t("deleteQuiz")}
+        cancelLabel={tActions("cancel")}
         variant="danger"
         isPending={isDeleting}
         onConfirm={handleConfirm}

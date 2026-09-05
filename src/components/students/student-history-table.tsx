@@ -2,6 +2,8 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
+import { useAppLocale } from "@/components/providers/locale-provider";
 import { PaginationControls } from "@/components/pagination-controls";
 import { SectionIntro } from "@/components/section-intro";
 import { StatCard } from "@/components/stat-display";
@@ -34,12 +36,17 @@ type StudentHistoryTableProps = {
 function getAttemptStatusLabel(
   sessionStatus: StudentHistoryView["attempts"][number]["sessionStatus"],
   attemptStatus: StudentHistoryView["attempts"][number]["status"],
+  labels: Record<"submitted" | "inProgress" | "didntFinish", string>,
 ) {
-  return resolveAttemptStatus(sessionStatus, attemptStatus);
+  return resolveAttemptStatus(sessionStatus, attemptStatus, labels);
 }
 
 export function StudentHistoryTable({ history }: StudentHistoryTableProps) {
   const router = useRouter();
+  const { locale } = useAppLocale();
+  const t = useTranslations("history");
+  const tDashboard = useTranslations("dashboard");
+  const tStatus = useTranslations("status");
 
   function handlePageChange(page: number) {
     router.push(`/teacher/students/${history.studentId}/history?page=${page}`);
@@ -49,17 +56,17 @@ export function StudentHistoryTable({ history }: StudentHistoryTableProps) {
     <div className="space-y-6">
       <div className="grid gap-4 sm:grid-cols-3">
         <StatCard
-          label="Sessions joined"
+          label={t("sessionsJoined")}
           value={history.attemptCount}
           preset="joined"
         />
         <StatCard
-          label="Submitted"
+          label={tDashboard("submitted")}
           value={history.submittedCount}
           preset="submitted"
         />
         <StatCard
-          label="Didn't finish"
+          label={tDashboard("didntFinish")}
           value={history.didntFinishCount}
           preset="didntFinish"
         />
@@ -67,21 +74,21 @@ export function StudentHistoryTable({ history }: StudentHistoryTableProps) {
 
       <div className="grid gap-4 sm:grid-cols-3">
         <StatCard
-          label="Highest score"
+          label={t("highestScore")}
           value={
             history.highestScore !== null ? `${history.highestScore}%` : "—"
           }
           preset="highestScore"
         />
         <StatCard
-          label="Average score"
+          label={t("averageScore")}
           value={
             history.averageScore !== null ? `${history.averageScore}%` : "—"
           }
           preset="averageScore"
         />
         <StatCard
-          label="Lowest score"
+          label={t("lowestScore")}
           value={
             history.lowestScore !== null ? `${history.lowestScore}%` : "—"
           }
@@ -91,25 +98,25 @@ export function StudentHistoryTable({ history }: StudentHistoryTableProps) {
 
       <div className={`${panelClassName} space-y-4`}>
         <SectionIntro
-          title="Quiz stats"
-          description={`Totals across ${history.submittedCount} submitted attempt${history.submittedCount === 1 ? "" : "s"}.`}
+          title={tDashboard("quizStats")}
+          description={history.submittedCount === 1 ? tDashboard("quizStatsDescription", { count: history.submittedCount }) : tDashboard("quizStatsDescriptionPlural", { count: history.submittedCount })}
         />
         {history.submittedCount === 0 ? (
-          <p className={emptyStateClassName}>No submitted quizzes yet.</p>
+          <p className={emptyStateClassName}>{tDashboard("noSubmitted")}</p>
         ) : (
           <div className="grid gap-4 sm:grid-cols-3">
             <StatCard
-              label="Total correct"
+              label={tDashboard("totalCorrect")}
               value={history.totalCorrect}
               preset="correct"
             />
             <StatCard
-              label="Total wrong"
+              label={tDashboard("totalWrong")}
               value={history.totalWrong}
               preset="wrong"
             />
             <StatCard
-              label="Total skipped"
+              label={tDashboard("totalSkipped")}
               value={history.totalSkipped}
               preset="skipped"
             />
@@ -119,8 +126,7 @@ export function StudentHistoryTable({ history }: StudentHistoryTableProps) {
 
       {history.totalAttempts === 0 ? (
         <p className={emptyStateClassName}>
-          No quiz attempts yet. History will appear after this student joins a
-          session.
+          {t("noAttempts")}
         </p>
       ) : (
         <div className={`${panelClassName} space-y-4`}>
@@ -137,28 +143,28 @@ export function StudentHistoryTable({ history }: StudentHistoryTableProps) {
               <thead className={tableHeadClassName}>
                 <tr className={tableHeadRowClassName}>
                   <th scope="col" className={tableHeadCellClassName}>
-                    Quiz
+                    {tDashboard("quiz")}
                   </th>
                   <th scope="col" className={cn(tableHeadCellClassName, "hidden sm:table-cell")}>
-                    Session
+                    {tDashboard("sessionFallback")}
                   </th>
                   <th scope="col" className={tableHeadCellClassName}>
-                    Status
+                    {tDashboard("colStatus")}
                   </th>
                   <th scope="col" className={tableHeadCellClassName}>
-                    Score
+                    {tDashboard("averageScore")}
                   </th>
                   <th scope="col" className={cn(tableHeadCellClassName, "hidden md:table-cell")}>
-                    Correct
+                    {tDashboard("correct")}
                   </th>
                   <th scope="col" className={cn(tableHeadCellClassName, "hidden md:table-cell")}>
-                    Wrong
+                    {tDashboard("wrong")}
                   </th>
                   <th scope="col" className={cn(tableHeadCellClassName, "hidden lg:table-cell")}>
-                    Skipped
+                    {tDashboard("skipped")}
                   </th>
                   <th scope="col" className={tableHeadCellClassName}>
-                    Actions
+                    {tDashboard("actions")}
                   </th>
                 </tr>
               </thead>
@@ -167,6 +173,7 @@ export function StudentHistoryTable({ history }: StudentHistoryTableProps) {
                   const status = getAttemptStatusLabel(
                     attempt.sessionStatus,
                     attempt.status,
+                    { submitted: tStatus("submitted"), inProgress: tStatus("inProgress"), didntFinish: tStatus("didntFinish") },
                   );
 
                   return (
@@ -177,7 +184,7 @@ export function StudentHistoryTable({ history }: StudentHistoryTableProps) {
                         </span>
                       </TableCell>
                       <TableCell className="hidden whitespace-nowrap text-zinc-600 sm:table-cell">
-                        {formatSessionDateTime(attempt.launchedAt)}
+                        {formatSessionDateTime(attempt.launchedAt, locale)}
                       </TableCell>
                       <TableCell>
                         <AttemptStatusBadge
@@ -203,7 +210,7 @@ export function StudentHistoryTable({ history }: StudentHistoryTableProps) {
                       <TableCell>
                         <ActionLink
                           action="view"
-                          label="View session"
+                          label={t("viewSession")}
                           compact
                           href={`/teacher/quizzes/${attempt.quizId}#session-${attempt.sessionId}`}
                         />

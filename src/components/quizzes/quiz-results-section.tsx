@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { useTranslations } from "next-intl";
+import { useAppLocale } from "@/components/providers/locale-provider";
 import { ContentModal } from "@/components/content-modal";
 import { PaginationControls } from "@/components/pagination-controls";
 import { ActionButton } from "@/components/ui/action-control";
@@ -58,6 +60,10 @@ export function QuizResultsSection({
   modalSessionId,
   onModalSessionIdChange,
 }: QuizResultsSectionProps) {
+  const { locale } = useAppLocale();
+  const t = useTranslations("quizzes");
+  const tDashboard = useTranslations("dashboard");
+  const tSession = useTranslations("session");
   const [sessions, setSessions] = useState(initialSessions);
   const [page, setPage] = useState(1);
   const [modalResults, setModalResults] = useState<SessionResultsView | null>(
@@ -191,9 +197,9 @@ export function QuizResultsSection({
     <>
       <div id="results" className="scroll-mt-24 space-y-4">
         <div>
-          <h2 className="text-base font-semibold text-zinc-900">Results</h2>
+          <h2 className="text-base font-semibold text-zinc-900">{t("results")}</h2>
           <p className="mt-1 text-sm text-zinc-600">
-            Open a session to view student scores.
+            {t("openSession")}
           </p>
         </div>
 
@@ -211,22 +217,22 @@ export function QuizResultsSection({
               <thead className={tableHeadClassName}>
                 <tr className={tableHeadRowClassName}>
                   <th scope="col" className={tableHeadCellClassName}>
-                    Session
+                    {tDashboard("sessionFallback")}
                   </th>
                   <th scope="col" className={tableHeadCellClassName}>
-                    Status
+                    {tDashboard("colStatus")}
                   </th>
                   <th scope="col" className={tableHeadCellClassName}>
-                    Joined
+                    {tDashboard("colJoined")}
                   </th>
                   <th scope="col" className={tableHeadCellClassName}>
-                    Submitted
+                    {tDashboard("submitted")}
                   </th>
                   <th scope="col" className={tableHeadCellClassName}>
-                    Avg score
+                    {t("avgScore")}
                   </th>
                   <th scope="col" className={tableHeadCellClassName}>
-                    Actions
+                    {t("actions")}
                   </th>
                 </tr>
               </thead>
@@ -237,7 +243,7 @@ export function QuizResultsSection({
                     id={`session-${session.sessionId}`}
                     className="ui-table-row scroll-mt-24">
                     <td className={cn(tableCellClassName, "whitespace-nowrap font-medium text-zinc-900")}>
-                      {formatSessionDateTime(session.launchedAt)}
+                      {formatSessionDateTime(session.launchedAt, locale)}
                     </td>
                     <td className={tableCellClassName}>
                       <span
@@ -245,7 +251,11 @@ export function QuizResultsSection({
                           "rounded-full px-2.5 py-0.5 text-xs font-medium capitalize",
                           sessionStatusBadgeClass(session.status),
                         )}>
-                        {session.status}
+                        {session.status === "active"
+                          ? tSession("live")
+                          : session.status === "closed"
+                            ? tSession("closed")
+                            : tSession("waiting")}
                       </span>
                     </td>
                     <td className={cn(tableCellClassName, "tabular-nums text-zinc-700")}>
@@ -286,19 +296,19 @@ export function QuizResultsSection({
         open={modalSessionId !== null}
         title={
           modalSummary
-            ? `Results · ${formatSessionDateTime(modalSummary.launchedAt)}`
-            : "Session results"
+            ? `${t("results")} · ${formatSessionDateTime(modalSummary.launchedAt, locale)}`
+            : tSession("sessionResults")
         }
         description={
           modalSummary
-            ? `${modalSummary.joinedCount} joined · ${modalSummary.submittedCount} submitted`
+            ? `${tSession("joinedCount", { count: modalSummary.joinedCount })} · ${tDashboard("submitted")} ${modalSummary.submittedCount}`
             : undefined
         }
         size="lg"
         onClose={() => onModalSessionIdChange(null)}>
         {modalLoading ? (
           <p className="py-8 text-center text-sm text-zinc-600">
-            Loading session results…
+            {t("loadingResults")}
           </p>
         ) : modalResults ? (
           <SessionResultsDetail results={modalResults} showHeader />

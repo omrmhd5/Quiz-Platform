@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState, useEffect, useRef, useState } from "react";
+import { useTranslations } from "next-intl";
 import { ConfirmDialog } from "@/components/confirm-dialog";
 import { useAppLocale } from "@/components/providers/locale-provider";
 import { getMessage } from "@/lib/i18n/messages";
@@ -38,15 +39,6 @@ type QuizFormProps = {
   initialData?: QuizFormInitialData;
 };
 
-function getEditWipeDescription(sessionCount: number, isLive: boolean) {
-  const sessionLabel = `${sessionCount} session${sessionCount === 1 ? "" : "s"}`;
-  const liveNote = isLive
-    ? " This quiz is live right now — students will immediately lose access."
-    : "";
-
-  return `Saving will permanently delete ${sessionLabel}, all student attempts, and results.${liveNote} This cannot be undone.`;
-}
-
 type CreationMethod = "manual" | "paste";
 type FormStep = "method" | "build" | "title";
 
@@ -58,6 +50,8 @@ export function QuizForm({
   initialData,
 }: QuizFormProps) {
   const { locale } = useAppLocale();
+  const t = useTranslations("quizzes");
+  const tSession = useTranslations("session");
   const formRef = useRef<HTMLFormElement>(null);
   const action =
     mode === "edit" && quizId ? updateQuiz.bind(null, quizId) : createQuiz;
@@ -109,13 +103,13 @@ export function QuizForm({
   const stepLabels =
     mode === "create"
       ? [
-          { id: "method" as const, label: "Method" },
-          { id: "build" as const, label: "Questions" },
-          { id: "title" as const, label: "Save" },
+          { id: "method" as const, label: t("method") },
+          { id: "build" as const, label: t("questionsTab") },
+          { id: "title" as const, label: t("saveQuiz") },
         ]
       : [
-          { id: "build" as const, label: "Questions" },
-          { id: "title" as const, label: "Save" },
+          { id: "build" as const, label: t("questionsTab") },
+          { id: "title" as const, label: t("saveQuiz") },
         ];
 
   function stepIndex(current: FormStep) {
@@ -204,10 +198,10 @@ export function QuizForm({
           <div className="space-y-4">
             <div>
               <h2 className="text-base font-semibold text-zinc-900">
-                How do you want to add questions?
+                {t("methodHint")}
               </h2>
               <p className="mt-1 text-sm text-zinc-600">
-                Build question-by-question or paste a block of text.
+                {t("methodDescription")}
               </p>
             </div>
 
@@ -216,9 +210,9 @@ export function QuizForm({
                 type="button"
                 onClick={() => selectMethod("manual")}
                 className={methodCardClassName}>
-                <p className="font-semibold text-zinc-900">Build manually</p>
+                <p className="font-semibold text-zinc-900">{t("buildManually")}</p>
                 <p className="mt-1 text-sm text-zinc-600">
-                  Type each question and answer, like Google Forms.
+                  {t("buildManuallyHint")}
                 </p>
               </button>
 
@@ -226,9 +220,9 @@ export function QuizForm({
                 type="button"
                 onClick={() => selectMethod("paste")}
                 className={methodCardClassName}>
-                <p className="font-semibold text-zinc-900">Paste from text</p>
+                <p className="font-semibold text-zinc-900">{t("pasteFromText")}</p>
                 <p className="mt-1 text-sm text-zinc-600">
-                  Paste many questions at once, then mark correct answers.
+                  {t("pasteFromTextHint")}
                 </p>
               </button>
             </div>
@@ -265,18 +259,17 @@ export function QuizForm({
           <div className="space-y-4">
             <div>
               <h2 className="text-base font-semibold text-zinc-900">
-                Name and save
+                {t("nameAndSave")}
               </h2>
               <p className="mt-1 text-sm text-zinc-600">
-                {questionPayload?.length ?? 0} MCQ
-                {(questionPayload?.length ?? 0) === 1 ? "" : "s"} ready to save.
+                {t("questionsReady", { count: questionPayload?.length ?? 0 })}
               </p>
             </div>
             <div className="space-y-2">
               <label
                 htmlFor="title"
                 className="block text-sm font-medium text-zinc-700">
-                Quiz title
+                {t("quizTitle")}
               </label>
               <input
                 id="title"
@@ -285,14 +278,16 @@ export function QuizForm({
                 required
                 value={title}
                 onChange={(event) => setTitle(event.target.value)}
-                placeholder="Chapter 5 review"
+                placeholder={t("titlePlaceholder")}
                 className={inputClassName}
               />
             </div>
             {requiresHistoryWipe ? (
               <p className="text-sm text-red-700">
-                {getEditWipeDescription(sessionCount, isLive)} You will be asked
-                to confirm when you click Update quiz.
+                {t("editWillErase", {
+                  count: sessionCount,
+                  liveNote: isLive ? ` ${tSession("liveNow")}.` : "",
+                })}
               </p>
             ) : null}
             <div className="flex flex-wrap gap-2">
@@ -309,10 +304,10 @@ export function QuizForm({
                 onClick={handleSaveClick}
                 label={
                   isPending
-                    ? "Saving..."
+                    ? t("saving")
                     : mode === "edit"
-                      ? "Update quiz"
-                      : "Save quiz"
+                      ? t("updateQuiz")
+                      : t("saveQuiz")
                 }
               />
             </div>
@@ -322,10 +317,10 @@ export function QuizForm({
 
       <ConfirmDialog
         open={confirmOpen}
-        title="Erase session history and save?"
-        description={getEditWipeDescription(sessionCount, isLive)}
-        confirmLabel={isPending ? "Saving..." : "Save and erase history"}
-        cancelLabel="Keep editing"
+        title={t("wipeTitle")}
+        description={t("editWillErase", { count: sessionCount, liveNote: isLive ? ` ${tSession("liveNow")}.` : "" })}
+        confirmLabel={isPending ? t("saving") : t("saveAndErase")}
+        cancelLabel={t("keepEditing")}
         variant="danger"
         isPending={isPending}
         onConfirm={() => {

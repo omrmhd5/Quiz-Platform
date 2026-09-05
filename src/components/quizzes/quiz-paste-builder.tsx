@@ -1,7 +1,10 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { ActionButton } from "@/components/ui/action-control";
+import { useAppLocale } from "@/components/providers/locale-provider";
+import { getMessage, type TMsg } from "@/lib/i18n/messages";
 import { parseQuizPaste, type ParsedQuestion } from "@/lib/quiz-parser";
 import { type QuizQuestionPayload } from "@/lib/quizzes";
 import {
@@ -63,12 +66,14 @@ export function QuizPasteBuilder({
   onComplete,
   onBack,
 }: QuizPasteBuilderProps) {
+  const { locale } = useAppLocale();
+  const t = useTranslations("quizzes");
   const [subStep, setSubStep] = useState<"paste" | "answers">("paste");
   const [paste, setPaste] = useState("");
   const [parsedQuestions, setParsedQuestions] = useState<ParsedQuestion[]>([]);
   const [correctAnswers, setCorrectAnswers] = useState<string[]>([]);
   const [error, setError] = useState<string | null>(null);
-  const [errors, setErrors] = useState<string[]>([]);
+  const [errors, setErrors] = useState<TMsg[]>([]);
 
   function handleParse() {
     const { questions: nextQuestions, errors: parseErrors } =
@@ -96,7 +101,7 @@ export function QuizPasteBuilder({
     });
 
     if (missing) {
-      setError("Select the correct answer for every question.");
+      setError(t("selectCorrect"));
       return;
     }
 
@@ -108,15 +113,10 @@ export function QuizPasteBuilder({
       <div className="space-y-4">
         <div>
           <h2 className="text-base font-semibold text-zinc-900">
-            Paste your questions
+            {t("pasteQuestions")}
           </h2>
           <p className="mt-1 text-sm text-zinc-600">
-            Separate each question with a blank line. Use{" "}
-            <code className="rounded bg-zinc-100 px-1.5 py-0.5 font-mono text-xs text-zinc-800">
-              A)
-            </code>{" "}
-            style options (2–6 per question). Question count is detected
-            automatically.
+            {t("pasteQuestionsHint")}
           </p>
         </div>
 
@@ -135,10 +135,10 @@ export function QuizPasteBuilder({
 
         {errors.length > 0 ? (
           <div role="alert" className={alertErrorClassName}>
-            <p className="font-medium">Fix these issues:</p>
+            <p className="font-medium">{t("fixIssues")}</p>
             <ul className="mt-2 list-disc space-y-1 pl-5">
-              {errors.map((message) => (
-                <li key={message}>{message}</li>
+              {errors.map((message, index) => (
+                <li key={`${message.key}-${index}`}>{getMessage(locale, message.key, message.values)}</li>
               ))}
             </ul>
           </div>
@@ -162,12 +162,10 @@ export function QuizPasteBuilder({
     <div className="space-y-4">
       <div>
         <h2 className="text-base font-semibold text-zinc-900">
-          Mark correct answers
+          {t("markCorrectAnswers")}
         </h2>
         <p className="mt-1 text-sm text-zinc-600">
-          {parsedQuestions.length} question
-          {parsedQuestions.length === 1 ? "" : "s"} found — select the correct
-          option for each.
+          {t("questionsFound", { count: parsedQuestions.length })}
         </p>
       </div>
 

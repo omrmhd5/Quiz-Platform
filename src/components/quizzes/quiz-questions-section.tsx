@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { useTranslations } from "next-intl";
 import { ContentModal } from "@/components/content-modal";
 import { PaginationControls } from "@/components/pagination-controls";
 import { ActionButton } from "@/components/ui/action-control";
@@ -23,6 +24,7 @@ type QuizQuestionsSectionProps = {
 };
 
 export function QuizQuestionsSection({ questions }: QuizQuestionsSectionProps) {
+  const t = useTranslations("quizzes");
   const [open, setOpen] = useState(false);
   const [page, setPage] = useState(1);
 
@@ -44,10 +46,9 @@ export function QuizQuestionsSection({ questions }: QuizQuestionsSectionProps) {
       <div
         className={`${panelClassName} flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between`}>
         <div>
-          <h2 className="text-base font-semibold text-zinc-900">Questions</h2>
+          <h2 className="text-base font-semibold text-zinc-900">{t("questionsTab")}</h2>
           <p className="mt-1 text-sm text-zinc-600">
-            {questions.length} question{questions.length === 1 ? "" : "s"} ·
-            answer key for this quiz
+            {t("answerKeySummary", { count: questions.length })}
           </p>
         </div>
         <ActionButton action="answerKey" onClick={() => setOpen(true)} />
@@ -55,8 +56,8 @@ export function QuizQuestionsSection({ questions }: QuizQuestionsSectionProps) {
 
       <ContentModal
         open={open}
-        title="Answer key"
-        description={`${questions.length} question${questions.length === 1 ? "" : "s"} · students see shuffled order`}
+        title={t("answerKey")}
+        description={t("answerKeyDescription", { count: questions.length })}
         size="lg"
         onClose={() => setOpen(false)}>
         <div className="space-y-4">
@@ -99,7 +100,7 @@ export function QuizQuestionsSection({ questions }: QuizQuestionsSectionProps) {
                         {option.text}
                         {isCorrect ? (
                           <span className="ml-2 text-xs font-medium uppercase tracking-wide text-green-700">
-                            Correct
+                            {t("correct")}
                           </span>
                         ) : null}
                       </li>

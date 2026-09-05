@@ -2,6 +2,8 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
+import { useTranslations } from "next-intl";
+import { useAppLocale } from "@/components/providers/locale-provider";
 import { PaginationControls } from "@/components/pagination-controls";
 import { LaunchQuizButton } from "@/components/sessions/launch-quiz-button";
 import { ActionLink } from "@/components/ui/action-control";
@@ -35,6 +37,9 @@ type QuizzesTableProps = {
 };
 
 export function QuizzesTable({ quizzes, activeSession }: QuizzesTableProps) {
+  const { locale } = useAppLocale();
+  const t = useTranslations("quizzes");
+  const tStatus = useTranslations("status");
   const [page, setPage] = useState(1);
 
   const pagination = useMemo(
@@ -56,12 +61,12 @@ export function QuizzesTable({ quizzes, activeSession }: QuizzesTableProps) {
       <table className={tableClassName}>
         <thead className={tableHeadClassName}>
           <tr className={tableHeadRowClassName}>
-            <th scope="col" className={tableHeadCellClassName}>Title</th>
-            <th scope="col" className={tableHeadCellClassName}>Questions</th>
-            <th scope="col" className={tableHeadCellClassName}>Results</th>
-            <th scope="col" className={tableHeadCellClassName}>Status</th>
-            <th scope="col" className={cn(tableHeadCellClassName, "hidden md:table-cell")}>Created</th>
-            <th scope="col" className={tableHeadCellClassName}>Actions</th>
+            <th scope="col" className={tableHeadCellClassName}>{t("colTitle")}</th>
+            <th scope="col" className={tableHeadCellClassName}>{t("colQuestions")}</th>
+            <th scope="col" className={tableHeadCellClassName}>{t("results")}</th>
+            <th scope="col" className={tableHeadCellClassName}>{t("status")}</th>
+            <th scope="col" className={cn(tableHeadCellClassName, "hidden md:table-cell")}>{t("created")}</th>
+            <th scope="col" className={tableHeadCellClassName}>{t("actions")}</th>
           </tr>
         </thead>
         <tbody className={tableBodyClassName}>
@@ -83,15 +88,15 @@ export function QuizzesTable({ quizzes, activeSession }: QuizzesTableProps) {
                 </td>
                 <td className={tableCellClassName}>
                   {isLive ? (
-                    <span className="ui-badge ui-badge-active">Live</span>
+                    <span className="ui-badge ui-badge-active">{t("liveNow")}</span>
                   ) : (
                     <span className="ui-badge ui-badge-closed capitalize">
-                      {quiz.status}
+                      {tStatus(quiz.status)}
                     </span>
                   )}
                 </td>
                 <td className={cn(tableCellClassName, "hidden whitespace-nowrap text-zinc-600 md:table-cell")}>
-                  {quiz.createdAt.toLocaleDateString("en-US", {
+                  {quiz.createdAt.toLocaleDateString(locale === "ar" ? "ar-EG" : "en-US", {
                     month: "short",
                     day: "numeric",
                     year: "numeric",

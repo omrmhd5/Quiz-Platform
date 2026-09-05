@@ -2,6 +2,8 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
+import { useTranslations } from "next-intl";
+import { useAppLocale } from "@/components/providers/locale-provider";
 import { PaginationControls } from "@/components/pagination-controls";
 import { SessionQuizStats } from "@/components/sessions/session-quiz-stats";
 import { StatCard } from "@/components/stat-display";
@@ -48,8 +50,9 @@ function parseStudentIdFilter(query: string) {
 function getAttemptStatusDisplay(
   sessionStatus: SessionResultsView["status"],
   attemptStatus: SessionResultsView["attempts"][number]["status"],
+  labels: Record<"submitted" | "inProgress" | "didntFinish", string>,
 ) {
-  const status = resolveAttemptStatus(sessionStatus, attemptStatus);
+  const status = resolveAttemptStatus(sessionStatus, attemptStatus, labels);
 
   return {
     kind: status.kind,
@@ -62,6 +65,11 @@ export function SessionResultsDetail({
   results,
   showHeader = false,
 }: SessionResultsDetailProps) {
+  const { locale } = useAppLocale();
+  const t = useTranslations("session");
+  const tDashboard = useTranslations("dashboard");
+  const tStatus = useTranslations("status");
+  const tActions = useTranslations("actions");
   const isLive = results.status === "active";
   const [activeTab, setActiveTab] = useState<SessionResultsTab>("stats");
   const [idFilter, setIdFilter] = useState("");
@@ -119,19 +127,23 @@ export function SessionResultsDetail({
                 "rounded-full px-2.5 py-0.5 text-xs font-medium capitalize",
                 sessionStatusBadgeClass(results.status),
               )}>
-              {results.status}
+              {results.status === "active"
+                ? t("live")
+                : results.status === "closed"
+                  ? t("closed")
+                  : t("waiting")}
             </span>
             {isLive ? (
               <span className="flex items-center gap-2 text-sm text-green-800">
                 <span className="ui-live-dot" aria-hidden="true" />
-                <span aria-live="polite">Updating live</span>
+                <span aria-live="polite">{t("updatingLive")}</span>
               </span>
             ) : null}
           </div>
           <p className="text-sm text-zinc-600">
-            Launched {formatSessionDateTime(results.launchedAt)}
+            {t("launched", { date: formatSessionDateTime(results.launchedAt, locale) })}
             {results.closedAt
-              ? ` · Closed ${formatSessionDateTime(results.closedAt)}`
+              ? ` · ${t("closedAt", { date: formatSessionDateTime(results.closedAt, locale) })}`
               : null}
           </p>
         </div>
@@ -149,7 +161,7 @@ export function SessionResultsDetail({
             "w-full justify-center",
             activeTab === "stats" && "is-active",
           )}>
-          Stats
+          {t("stats")}
         </button>
         <button
           type="button"
@@ -160,7 +172,7 @@ export function SessionResultsDetail({
             "w-full justify-center",
             activeTab === "students" && "is-active",
           )}>
-          Students
+          {tActions("students")}
           <span className="ml-1.5 tabular-nums text-zinc-500">
             ({results.joinedCount})
           </span>
@@ -171,7 +183,7 @@ export function SessionResultsDetail({
         <div className="space-y-5">
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             <StatCard
-              label="Joined / registered"
+              label={t("joinedRegistered")}
               preset="joined"
               value={
                 <>
@@ -184,17 +196,17 @@ export function SessionResultsDetail({
               }
             />
             <StatCard
-              label="Submitted"
+              label={tDashboard("submitted")}
               value={results.submittedCount}
               preset="submitted"
             />
             <StatCard
-              label="In progress"
+              label={tDashboard("inProgress")}
               value={liveInProgress}
               preset="inProgress"
             />
             <StatCard
-              label="Didn't finish"
+              label={tDashboard("didntFinish")}
               value={didntFinishCount}
               preset="didntFinish"
             />
@@ -202,7 +214,7 @@ export function SessionResultsDetail({
 
           <div className="grid gap-4 sm:grid-cols-3">
             <StatCard
-              label="Highest score"
+              label={t("highestScore")}
               value={
                 results.highestScore !== null
                   ? `${results.highestScore}%`
@@ -211,7 +223,7 @@ export function SessionResultsDetail({
               preset="highestScore"
             />
             <StatCard
-              label="Average score"
+              label={tDashboard("averageScore")}
               value={
                 results.averageScore !== null
                   ? `${results.averageScore}%`
@@ -220,7 +232,7 @@ export function SessionResultsDetail({
               preset="averageScore"
             />
             <StatCard
-              label="Lowest score"
+              label={t("lowestScore")}
               value={
                 results.lowestScore !== null ? `${results.lowestScore}%` : "—"
               }
@@ -242,7 +254,7 @@ export function SessionResultsDetail({
             <label
               htmlFor={`student-id-filter-${results.sessionId}`}
               className={labelClassName}>
-              Search by student ID
+              {t("searchStudentId")}
             </label>
             <input
               id={`student-id-filter-${results.sessionId}`}
@@ -253,14 +265,11 @@ export function SessionResultsDetail({
               className={inputClassName}
             />
             <p className="text-xs text-zinc-500">
-              Separate multiple IDs with commas.
-              {filterIds.length > 0
-                ? ` Showing ${displayedAttempts.length} of ${results.attempts.length}.`
-                : null}
+              {t("filterIdsHint", { count: filterIds.length > 0 ? t("showingAttempts", { shown: displayedAttempts.length, total: results.attempts.length }) : "" })}
             </p>
             {missingIds.length > 0 ? (
               <p className="text-xs text-amber-800">
-                Not in this session: {missingIds.join(", ")}
+                {t("notInSession", { ids: missingIds.join(", ") })}
               </p>
             ) : null}
           </div>
@@ -277,13 +286,13 @@ export function SessionResultsDetail({
             <table className={tableClassName}>
               <thead className={tableHeadClassName}>
                 <tr className={tableHeadRowClassName}>
-                  <th scope="col" className={tableHeadCellClassName}>Student</th>
+                  <th scope="col" className={tableHeadCellClassName}>{tDashboard("student")}</th>
                   <th scope="col" className={cn(tableHeadCellClassName, "hidden sm:table-cell")}>ID</th>
-                  <th scope="col" className={tableHeadCellClassName}>Status</th>
-                  <th scope="col" className={tableHeadCellClassName}>Score</th>
-                  <th scope="col" className={cn(tableHeadCellClassName, "hidden md:table-cell")}>Correct</th>
-                  <th scope="col" className={cn(tableHeadCellClassName, "hidden md:table-cell")}>Wrong</th>
-                  <th scope="col" className={cn(tableHeadCellClassName, "hidden lg:table-cell")}>Skipped</th>
+                  <th scope="col" className={tableHeadCellClassName}>{tDashboard("colStatus")}</th>
+                  <th scope="col" className={tableHeadCellClassName}>{tDashboard("averageScore")}</th>
+                  <th scope="col" className={cn(tableHeadCellClassName, "hidden md:table-cell")}>{tDashboard("correct")}</th>
+                  <th scope="col" className={cn(tableHeadCellClassName, "hidden md:table-cell")}>{tDashboard("wrong")}</th>
+                  <th scope="col" className={cn(tableHeadCellClassName, "hidden lg:table-cell")}>{tDashboard("skipped")}</th>
                 </tr>
               </thead>
               <tbody className={tableBodyClassName}>
@@ -292,7 +301,7 @@ export function SessionResultsDetail({
                     <td
                       colSpan={7}
                       className="px-3 py-8 text-center text-zinc-600">
-                      No students have joined this session yet.
+                      {t("noStudentsJoined")}
                     </td>
                   </tr>
                 ) : displayedAttempts.length === 0 ? (
@@ -300,7 +309,7 @@ export function SessionResultsDetail({
                     <td
                       colSpan={7}
                       className="px-3 py-8 text-center text-zinc-600">
-                      No students match these IDs.
+                      {t("noStudentsMatch")}
                     </td>
                   </tr>
                 ) : (
@@ -308,6 +317,7 @@ export function SessionResultsDetail({
                     const attemptStatus = getAttemptStatusDisplay(
                       results.status,
                       attempt.status,
+                      { submitted: tStatus("submitted"), inProgress: tStatus("inProgress"), didntFinish: tStatus("didntFinish") },
                     );
 
                     return (

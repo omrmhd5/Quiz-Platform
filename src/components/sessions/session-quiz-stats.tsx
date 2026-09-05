@@ -1,3 +1,6 @@
+"use client";
+
+import { useTranslations } from "next-intl";
 import type { SessionQuestionStat } from "@/lib/session-results";
 import { SectionIntro } from "@/components/section-intro";
 import { StatCard } from "@/components/stat-display";
@@ -47,6 +50,8 @@ export function SessionQuizStats({
   totalWrong,
   totalSkipped,
 }: SessionQuizStatsProps) {
+  const t = useTranslations("session");
+  const tDashboard = useTranslations("dashboard");
   const { mostMissed, easiest } = getHighlightedQuestions(questionStats);
 
   if (questionStats.length === 0) {
@@ -56,26 +61,26 @@ export function SessionQuizStats({
   return (
     <div className="space-y-4">
       <SectionIntro
-        title="Quiz stats"
+        title={tDashboard("quizStats")}
         titleAs="h3"
-        description={`Based on ${submittedCount} submitted attempt${submittedCount === 1 ? "" : "s"}.`}
+        description={t("submittedAttempts", { count: submittedCount })}
       />
 
       {submittedCount === 0 ? (
         <p className={emptyStateClassName}>
-          No submissions yet — question stats will appear after students submit.
+          {t("noSubmissionsStats")}
         </p>
       ) : (
         <>
           <div className="grid gap-4 sm:grid-cols-3">
             <StatCard
-              label="Total correct"
+              label={tDashboard("totalCorrect")}
               value={totalCorrect}
               preset="correct"
             />
-            <StatCard label="Total wrong" value={totalWrong} preset="wrong" />
+            <StatCard label={tDashboard("totalWrong")} value={totalWrong} preset="wrong" />
             <StatCard
-              label="Total skipped"
+              label={tDashboard("totalSkipped")}
               value={totalSkipped}
               preset="skipped"
             />
@@ -87,26 +92,26 @@ export function SessionQuizStats({
               {mostMissed ? (
                 <div className={`${panelClassName} space-y-1`}>
                   <p className="text-xs font-medium uppercase tracking-wide text-red-700">
-                    Most missed
+                    {t("mostMissed")}
                   </p>
                   <p className="text-sm font-medium leading-snug text-zinc-900">
                     {mostMissed.orderIndex + 1}. {mostMissed.prompt}
                   </p>
                   <p className="text-sm tabular-nums text-zinc-600">
-                    {mostMissed.correctPercent}% correct
+                    {mostMissed.correctPercent}% {tDashboard("correct").toLowerCase()}
                   </p>
                 </div>
               ) : null}
               {easiest ? (
                 <div className={`${panelClassName} space-y-1`}>
                   <p className="text-xs font-medium uppercase tracking-wide text-green-700">
-                    Easiest
+                    {t("easiest")}
                   </p>
                   <p className="text-sm font-medium leading-snug text-zinc-900">
                     {easiest.orderIndex + 1}. {easiest.prompt}
                   </p>
                   <p className="text-sm tabular-nums text-zinc-600">
-                    {easiest.correctPercent}% correct
+                    {easiest.correctPercent}% {tDashboard("correct").toLowerCase()}
                   </p>
                 </div>
               ) : null}
@@ -115,7 +120,7 @@ export function SessionQuizStats({
 
           <div className={`${panelClassName} space-y-3`}>
             <p className="text-sm font-medium text-zinc-900">
-              Correct rate by question
+              {t("correctRate")}
             </p>
             <ul className="space-y-3">
               {questionStats.map((question) => (

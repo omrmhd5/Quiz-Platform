@@ -2,6 +2,8 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
+import { useTranslations } from "next-intl";
+import { useAppLocale } from "@/components/providers/locale-provider";
 import {
   Bar,
   BarChart,
@@ -55,18 +57,22 @@ function formatAttemptChartLabel(attempt: DashboardAttemptRow) {
   return `${name} (${attempt.studentId})`;
 }
 
-function formatResultChartLabel(result: DashboardSessionResultRow) {
+function formatResultChartLabel(
+  result: DashboardSessionResultRow,
+  locale: "en" | "ar",
+  sessionFallback: string,
+) {
   const title =
     result.quizTitle.length > 16
       ? `${result.quizTitle.slice(0, 16)}…`
       : result.quizTitle;
 
   const dateLabel = result.launchedAt
-    ? result.launchedAt.toLocaleDateString("en-US", {
+    ? result.launchedAt.toLocaleDateString(locale === "ar" ? "ar-EG" : "en-US", {
         month: "short",
         day: "numeric",
       })
-    : "Session";
+    : sessionFallback;
 
   return `${title} · ${dateLabel}`;
 }
@@ -77,6 +83,9 @@ export function DashboardAttemptHighlights({
   topResultsHighest,
   topResultsLowest,
 }: DashboardAttemptHighlightsProps) {
+  const { locale } = useAppLocale();
+  const t = useTranslations("dashboard");
+  const tSession = useTranslations("session");
   const [viewTab, setViewTab] = useState<ViewTab>("attempts");
   const [direction, setDirection] = useState<RankDirection>("highest");
 
@@ -100,9 +109,9 @@ export function DashboardAttemptHighlights({
       rankedResults.map((result, index) => ({
         label: `#${index + 1}`,
         score: result.averageScore as number,
-        name: formatResultChartLabel(result),
+        name: formatResultChartLabel(result, locale, t("sessionFallback")),
       })),
-    [rankedResults],
+    [locale, rankedResults, t],
   );
 
   const barColor =
@@ -118,18 +127,17 @@ export function DashboardAttemptHighlights({
     <div className={`${panelClassName} space-y-4`}>
       <div>
         <h2 className="text-base font-semibold text-zinc-900">
-          Top attempts &amp; results
+          {t("topCombined")}
         </h2>
         <p className="mt-1 text-sm text-zinc-600">
-          Top {DASHBOARD_ATTEMPT_HIGHLIGHTS}{" "}
           {viewTab === "attempts"
-            ? "student attempts by score %."
-            : "quiz session results by average score %."}
+            ? t("topDescriptionAttempts", { count: DASHBOARD_ATTEMPT_HIGHLIGHTS })
+            : t("topDescriptionResults", { count: DASHBOARD_ATTEMPT_HIGHLIGHTS })}
         </p>
       </div>
 
       <nav
-        aria-label="Ranking view"
+        aria-label={t("rankingView")}
         className={cn(segmentClassName, "grid-cols-2")}>
         <button
           type="button"
@@ -140,7 +148,7 @@ export function DashboardAttemptHighlights({
             "flex w-full justify-center text-center",
             viewTab === "attempts" && "is-active",
           )}>
-          Top attempts
+          {t("topAttempts")}
         </button>
         <button
           type="button"
@@ -151,12 +159,12 @@ export function DashboardAttemptHighlights({
             "flex w-full justify-center text-center",
             viewTab === "results" && "is-active",
           )}>
-          Top results
+          {t("topResults")}
         </button>
       </nav>
 
       <nav
-        aria-label="Rank direction"
+        aria-label={t("rankDirection")}
         className={cn(segmentClassName, "grid-cols-2")}>
         <button
           type="button"
@@ -167,7 +175,7 @@ export function DashboardAttemptHighlights({
             "flex w-full justify-center text-center",
             direction === "highest" && "is-active",
           )}>
-          Highest scores
+          {t("highestScores")}
         </button>
         <button
           type="button"
@@ -178,15 +186,15 @@ export function DashboardAttemptHighlights({
             "flex w-full justify-center text-center",
             direction === "lowest" && "is-active",
           )}>
-          Lowest scores
+          {t("lowestScores")}
         </button>
       </nav>
 
       {isEmpty ? (
         <p className={emptyStateClassName}>
           {viewTab === "attempts"
-            ? "Attempt rankings appear after students submit quizzes."
-            : "Session result rankings appear after students submit quizzes."}
+            ? t("attemptsEmpty")
+            : t("resultsEmpty")}
         </p>
       ) : (
         <>
@@ -234,13 +242,13 @@ export function DashboardAttemptHighlights({
               <table className="min-w-full divide-y divide-zinc-200 text-sm">
                 <thead className="bg-zinc-50">
                   <tr className="text-left text-zinc-500">
-                    <th className="px-3 py-2 font-medium">Student</th>
-                    <th className="px-3 py-2 font-medium">Quiz</th>
-                    <th className="px-3 py-2 font-medium">Submitted</th>
-                    <th className="px-3 py-2 font-medium">Score</th>
-                    <th className="px-3 py-2 font-medium">Correct</th>
-                    <th className="px-3 py-2 font-medium">Wrong</th>
-                    <th className="px-3 py-2 font-medium">Skipped</th>
+                    <th className="px-3 py-2 font-medium">{t("student")}</th>
+                    <th className="px-3 py-2 font-medium">{t("quiz")}</th>
+                    <th className="px-3 py-2 font-medium">{t("submitted")}</th>
+                    <th className="px-3 py-2 font-medium">{t("averageScore")}</th>
+                    <th className="px-3 py-2 font-medium">{t("correct")}</th>
+                    <th className="px-3 py-2 font-medium">{t("wrong")}</th>
+                    <th className="px-3 py-2 font-medium">{t("skipped")}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-zinc-100 bg-white">
@@ -264,7 +272,7 @@ export function DashboardAttemptHighlights({
                         </Link>
                       </td>
                       <td className="px-3 py-3 text-zinc-600">
-                        {formatSessionDateTime(attempt.submittedAt)}
+                        {formatSessionDateTime(attempt.submittedAt, locale)}
                       </td>
                       <td className="px-3 py-3 tabular-nums font-medium text-zinc-900">
                         {attempt.scorePercent}%
@@ -288,13 +296,13 @@ export function DashboardAttemptHighlights({
               <table className="min-w-full divide-y divide-zinc-200 text-sm">
                 <thead className="bg-zinc-50">
                   <tr className="text-left text-zinc-500">
-                    <th className="px-3 py-2 font-medium">Quiz</th>
-                    <th className="px-3 py-2 font-medium">When</th>
-                    <th className="px-3 py-2 font-medium">Status</th>
-                    <th className="px-3 py-2 font-medium">Joined</th>
-                    <th className="px-3 py-2 font-medium">Average</th>
-                    <th className="px-3 py-2 font-medium">Highest</th>
-                    <th className="px-3 py-2 font-medium">Lowest</th>
+                    <th className="px-3 py-2 font-medium">{t("quiz")}</th>
+                    <th className="px-3 py-2 font-medium">{t("when")}</th>
+                    <th className="px-3 py-2 font-medium">{t("colStatus")}</th>
+                    <th className="px-3 py-2 font-medium">{t("colJoined")}</th>
+                    <th className="px-3 py-2 font-medium">{t("average")}</th>
+                    <th className="px-3 py-2 font-medium">{t("highest")}</th>
+                    <th className="px-3 py-2 font-medium">{t("lowest")}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-zinc-100 bg-white">
@@ -308,7 +316,7 @@ export function DashboardAttemptHighlights({
                         </Link>
                       </td>
                       <td className="px-3 py-3 text-zinc-600">
-                        {formatSessionDateTime(result.launchedAt)}
+                        {formatSessionDateTime(result.launchedAt, locale)}
                       </td>
                       <td className="px-3 py-3">
                         <span
@@ -316,14 +324,18 @@ export function DashboardAttemptHighlights({
                             "rounded-full px-2.5 py-0.5 text-xs font-medium capitalize",
                             sessionStatusBadgeClass(result.status),
                           )}>
-                          {result.status}
+                          {result.status === "active"
+                            ? tSession("live")
+                            : result.status === "closed"
+                              ? tSession("closed")
+                              : tSession("waiting")}
                         </span>
                       </td>
                       <td className="px-3 py-3 tabular-nums text-zinc-700">
                         {result.joinedCount}
                         <span className="text-zinc-400">
                           {" "}
-                          / {result.submittedCount} submitted
+                          / {result.submittedCount} {t("submitted")}
                         </span>
                       </td>
                       <td className="px-3 py-3 tabular-nums font-medium text-zinc-900">

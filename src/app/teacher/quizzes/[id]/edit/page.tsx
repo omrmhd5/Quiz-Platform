@@ -2,6 +2,8 @@ import { notFound } from "next/navigation";
 import { QuizForm } from "@/components/quizzes/quiz-form";
 import { ActionLink } from "@/components/ui/action-control";
 import { quizQuestionsToPayload } from "@/lib/quizzes";
+import { getRequestLocale } from "@/lib/i18n/server";
+import { getMessage } from "@/lib/i18n/messages";
 import {
   pageDescriptionClassName,
   pageTitleClassName,
@@ -15,6 +17,7 @@ type EditQuizPageProps = {
 
 export default async function EditQuizPage({ params }: EditQuizPageProps) {
   const { id } = await params;
+  const locale = await getRequestLocale();
   const [quiz, activeSession] = await Promise.all([
     getQuizById(id),
     getActiveSession(),
@@ -31,9 +34,9 @@ export default async function EditQuizPage({ params }: EditQuizPageProps) {
     <div className="space-y-8">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <h1 className={pageTitleClassName}>Edit quiz</h1>
+          <h1 className={pageTitleClassName}>{getMessage(locale, "quizzes.editTitle")}</h1>
           <p className={pageDescriptionClassName}>
-            Update questions or correct answers for &ldquo;{quiz.title}&rdquo;.
+            {getMessage(locale, "quizzes.editDescription", { title: quiz.title })}
           </p>
         </div>
         <ActionLink
@@ -45,13 +48,12 @@ export default async function EditQuizPage({ params }: EditQuizPageProps) {
 
       {sessionCount > 0 ? (
         <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-900">
-          <p className="font-medium">Saving will erase session history</p>
+          <p className="font-medium">{getMessage(locale, "quizzes.eraseHistoryTitle")}</p>
           <p className="mt-1">
-            This quiz has {sessionCount} recorded session
-            {sessionCount === 1 ? "" : "s"}. Updating it will permanently delete
-            all sessions, student attempts, and results
-            {isLive ? " — including the live session running right now" : ""}.
-            You must confirm before saving.
+            {getMessage(locale, "quizzes.eraseHistoryDescription", {
+              count: sessionCount,
+              liveNote: isLive ? ` — ${getMessage(locale, "quizzes.liveNow")}` : "",
+            })}
           </p>
         </div>
       ) : null}

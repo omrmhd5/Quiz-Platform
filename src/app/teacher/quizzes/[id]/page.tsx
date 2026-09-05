@@ -3,6 +3,8 @@ import { DeleteQuizButton } from "@/components/quizzes/delete-quiz-button";
 import { QuizDetailBody } from "@/components/quizzes/quiz-detail-body";
 import { ActionLink } from "@/components/ui/action-control";
 import { getJoinUrl } from "@/lib/join-url";
+import { getRequestLocale } from "@/lib/i18n/server";
+import { getMessage } from "@/lib/i18n/messages";
 import {
   pageDescriptionClassName,
   pageTitleClassName,
@@ -20,6 +22,7 @@ type QuizDetailPageProps = {
 
 export default async function QuizDetailPage({ params }: QuizDetailPageProps) {
   const { id } = await params;
+  const locale = await getRequestLocale();
   const [quiz, activeSession, joinUrl, sessionSummaries] = await Promise.all([
     getQuizById(id),
     getActiveSession(),
@@ -55,19 +58,19 @@ export default async function QuizDetailPage({ params }: QuizDetailPageProps) {
         <div>
           <h1 className={pageTitleClassName}>{quiz.title}</h1>
           <p className={pageDescriptionClassName}>
-            {quiz.questionCount} question{quiz.questionCount === 1 ? "" : "s"} ·{" "}
+            {getMessage(locale, "quizzes.questionsCount", { count: quiz.questionCount })} ·{" "}
             {isThisQuizLive
-              ? "Live now"
+              ? getMessage(locale, "quizzes.liveNow")
               : hasSessions
-                ? `${quiz.sessions.length} session${quiz.sessions.length === 1 ? "" : "s"} recorded`
-                : "Not launched yet"}
+                ? getMessage(locale, "quizzes.sessionsRecorded", { count: quiz.sessions.length })
+                : getMessage(locale, "quizzes.notLaunched")}
           </p>
         </div>
 
         <div className="flex flex-wrap gap-2">
           <ActionLink
             action="back"
-            label="Back to list"
+            label={getMessage(locale, "quizzes.backToList")}
             href="/teacher/quizzes"
             size="md"
           />
@@ -87,8 +90,7 @@ export default async function QuizDetailPage({ params }: QuizDetailPageProps) {
 
       {hasSessions ? (
         <p className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-900">
-          This quiz has session history. Editing will erase all sessions,
-          attempts, and results. Deleting removes the quiz entirely.
+          {getMessage(locale, "quizzes.sessionHistoryWarning")}
         </p>
       ) : null}
 

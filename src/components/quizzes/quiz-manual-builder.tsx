@@ -1,6 +1,7 @@
 "use client";
 
 import { createEmptyQuestion, type QuizQuestionDraft } from "@/lib/quizzes";
+import { useTranslations } from "next-intl";
 import { ActionButton } from "@/components/ui/action-control";
 import { cn, inputClassName, panelClassName } from "@/lib/utils";
 
@@ -21,8 +22,10 @@ export function QuizManualBuilder({
   onChange,
   onContinue,
   onBack,
-  continueLabel = "Continue",
+  continueLabel,
 }: QuizManualBuilderProps) {
+  const t = useTranslations("quizzes");
+  const tActions = useTranslations("actions");
   function updateQuestion(
     questionId: string,
     updater: (question: QuizQuestionDraft) => QuizQuestionDraft,
@@ -42,13 +45,10 @@ export function QuizManualBuilder({
     <div className="space-y-4">
       <div>
         <h2 className="text-base font-semibold text-zinc-900">
-          Build your quiz
+          {t("buildYourQuiz")}
         </h2>
         <p className="mt-1 text-sm text-zinc-600">
-          Add each question, type the answer choices, and mark the correct one.
-          Students will see options in{" "}
-          <strong className="font-medium">random order</strong>— the A/B/C
-          labels here are only for you while building.
+          {t("buildHint")}
         </p>
       </div>
 
@@ -59,12 +59,12 @@ export function QuizManualBuilder({
             className={`${panelClassName} space-y-4 border-zinc-200`}>
             <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
               <h3 className="text-sm font-semibold text-zinc-900">
-                Question {questionIndex + 1}
+                {t("questionPrompt")} {questionIndex + 1}
               </h3>
               {questions.length > 1 ? (
                 <ActionButton
                   action="delete"
-                  label="Remove"
+                  label={tActions("remove")}
                   onClick={() =>
                     onChange(questions.filter((item) => item.id !== question.id))
                   }
@@ -76,7 +76,7 @@ export function QuizManualBuilder({
               <label
                 htmlFor={`prompt-${question.id}`}
                 className="block text-sm font-medium text-zinc-700">
-                Question
+                {t("questionPrompt")}
               </label>
               <input
                 id={`prompt-${question.id}`}
@@ -88,17 +88,14 @@ export function QuizManualBuilder({
                     prompt: event.target.value,
                   }))
                 }
-                placeholder="What is the capital of France?"
+                placeholder={t("promptPlaceholder")}
                 className={inputClassName}
               />
             </div>
 
             <div className="space-y-2">
               <p className="text-sm font-medium text-zinc-700">
-                Answer choices{" "}
-                <span className="font-normal text-zinc-500">
-                  (click Mark correct on the right answer)
-                </span>
+                {t("answerChoices")}
               </p>
               <div className="space-y-2">
                 {question.options.map((option, optionIndex) => {
@@ -132,7 +129,7 @@ export function QuizManualBuilder({
                               ),
                             }))
                           }
-                          placeholder={`Option ${optionLetter(optionIndex)}`}
+                          placeholder={t("optionPlaceholder", { letter: optionLetter(optionIndex) })}
                           className="min-w-0 flex-1 border-0 bg-transparent p-0 text-sm text-zinc-900 outline-none focus:ring-0"
                         />
                       </div>
@@ -150,12 +147,12 @@ export function QuizManualBuilder({
                             "ui-btn ui-btn-correct ui-press w-full sm:w-auto",
                             isCorrect && "is-active",
                           )}>
-                          {isCorrect ? "Correct ✓" : "Mark correct"}
+                          {isCorrect ? t("correct") : t("markCorrect")}
                         </button>
                         {question.options.length > 2 ? (
                           <ActionButton
                             action="delete"
-                            label="Remove"
+                            label={tActions("remove")}
                             onClick={() =>
                               updateQuestion(question.id, (current) => {
                                 const nextOptions = current.options.filter(
@@ -216,7 +213,7 @@ export function QuizManualBuilder({
           action="continue"
           onClick={onContinue}
           size="md"
-          label={continueLabel}
+          label={continueLabel ?? tActions("continue")}
         />
       </div>
     </div>

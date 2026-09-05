@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 import { getActiveSessionAttemptCount } from "@/server/actions/sessions";
 
 type LiveJoinedCountProps = {
@@ -16,6 +17,7 @@ export function LiveJoinedCount({
   className,
   prefix = "",
 }: LiveJoinedCountProps) {
+  const t = useTranslations("session");
   const [count, setCount] = useState(initialCount);
 
   useEffect(() => {
@@ -47,7 +49,7 @@ export function LiveJoinedCount({
   return (
     <span className={className}>
       {prefix}
-      {count} student{count === 1 ? "" : "s"} joined
+      {t("studentsJoined", { count })}
     </span>
   );
 }

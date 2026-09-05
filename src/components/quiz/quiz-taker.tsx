@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState, useMemo, useRef, useState } from "react";
+import { useTranslations } from "next-intl";
 import { ConfirmDialog } from "@/components/confirm-dialog";
 import { PaginationControls } from "@/components/pagination-controls";
 import { ActionButton } from "@/components/ui/action-control";
@@ -23,6 +24,7 @@ type QuizTakerProps = {
 };
 
 export function QuizTaker({ quiz }: QuizTakerProps) {
+  const t = useTranslations("quizTake");
   const formRef = useRef<HTMLFormElement>(null);
   const [state, formAction, isPending] = useActionState(
     submitAttempt,
@@ -53,8 +55,7 @@ export function QuizTaker({ quiz }: QuizTakerProps) {
       <div className="space-y-1 text-center sm:text-left">
         <h1 className={pageTitleClassName}>{quiz.quizTitle}</h1>
         <p className={pageDescriptionClassName}>
-          {quiz.studentName} · {quiz.totalQuestions} question
-          {quiz.totalQuestions === 1 ? "" : "s"}
+          {t("studentQuestions", { name: quiz.studentName, count: quiz.totalQuestions })}
         </p>
       </div>
 
@@ -86,7 +87,7 @@ export function QuizTaker({ quiz }: QuizTakerProps) {
             </h2>
 
             <fieldset className="space-y-2">
-              <legend className="sr-only">Choose an answer</legend>
+              <legend className="sr-only">{t("chooseAnswer")}</legend>
               {question.options.map((option) => (
                 <label key={option.id} className={optionLabelClassName}>
                   <input
@@ -128,7 +129,7 @@ export function QuizTaker({ quiz }: QuizTakerProps) {
               action="previous"
               onClick={() => setPage((current) => current - 1)}
               className="w-full sm:w-auto"
-              aria-label="Previous questions"
+              aria-label={t("previousQuestions")}
             />
           ) : null}
           {pagination.page < pagination.pageCount ? (
@@ -136,7 +137,7 @@ export function QuizTaker({ quiz }: QuizTakerProps) {
               action="next"
               onClick={() => setPage((current) => current + 1)}
               className="w-full sm:w-auto"
-              aria-label="Next questions"
+              aria-label={t("nextQuestions")}
             />
           ) : null}
           <ActionButton
@@ -144,16 +145,16 @@ export function QuizTaker({ quiz }: QuizTakerProps) {
             disabled={isPending}
             onClick={() => setConfirmOpen(true)}
             className="w-full sm:ml-auto sm:w-auto"
-            label={isPending ? "Submitting..." : "Submit quiz"}
+            label={isPending ? t("submitting") : t("submit")}
           />
         </div>
 
         <ConfirmDialog
           open={confirmOpen}
-          title="Submit quiz?"
-          description="You can't change your answers after submitting."
-          confirmLabel={isPending ? "Submitting..." : "Submit"}
-          cancelLabel="Keep reviewing"
+          title={t("submitTitle")}
+          description={t("submitHint")}
+          confirmLabel={isPending ? t("submitting") : t("submit")}
+          cancelLabel={t("keepReviewing")}
           isPending={isPending}
           onConfirm={() => {
             setConfirmOpen(false);

@@ -16,6 +16,7 @@ const statusPresetKey: Record<
 export function resolveAttemptStatus(
   sessionStatus: "active" | "closed" | "waiting",
   attemptStatus: string,
+  labels: Record<AttemptStatusKind, string>,
 ): {
   kind: AttemptStatusKind;
   label: string;
@@ -24,7 +25,7 @@ export function resolveAttemptStatus(
   if (attemptStatus === "submitted") {
     return {
       kind: "submitted",
-      label: "Submitted",
+      label: labels.submitted,
       className: "ui-badge-success",
     };
   }
@@ -32,14 +33,14 @@ export function resolveAttemptStatus(
   if (sessionStatus === "closed") {
     return {
       kind: "didntFinish",
-      label: "Didn't finish",
+      label: labels.didntFinish,
       className: "ui-badge-danger",
     };
   }
 
   return {
     kind: "inProgress",
-    label: "In progress",
+    label: labels.inProgress,
     className: "ui-badge-progress",
   };
 }

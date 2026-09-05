@@ -8,6 +8,8 @@ import {
   pageTitleClassName,
 } from "@/lib/utils";
 import { getStudentHistory } from "@/server/actions/student-history";
+import { getRequestLocale } from "@/lib/i18n/server";
+import { getMessage } from "@/lib/i18n/messages";
 
 type StudentHistoryPageProps = {
   params: Promise<{ id: string }>;
@@ -19,6 +21,7 @@ export default async function StudentHistoryPage({
   searchParams,
 }: StudentHistoryPageProps) {
   const { id } = await params;
+  const locale = await getRequestLocale();
   const { page: pageParam } = await searchParams;
   const page = Number(pageParam ?? "1");
   const history = await getStudentHistory(
@@ -36,23 +39,21 @@ export default async function StudentHistoryPage({
         <div>
           <p className="text-sm text-zinc-500">
             <Link href="/teacher/students" className={linkClassName}>
-              Students
+              {getMessage(locale, "students.title")}
             </Link>
           </p>
           <h1 className={pageTitleClassName}>{history.studentName}</h1>
           <p className={pageDescriptionClassName}>
-            ID {history.studentId} · Registered{" "}
-            {history.registeredAt.toLocaleDateString("en-US", {
+            {history.studentId} · {getMessage(locale, "history.registered", { date: history.registeredAt.toLocaleDateString(locale === "ar" ? "ar-EG" : "en-US", {
               month: "short",
               day: "numeric",
               year: "numeric",
-            })}{" "}
-            · quiz history across all sessions
+            }) })} · {getMessage(locale, "history.allSessions")}
           </p>
         </div>
         <ActionLink
           action="back"
-          label="Back to roster"
+          label={getMessage(locale, "history.backToRoster")}
           href="/teacher/students"
           size="md"
         />

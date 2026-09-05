@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { ConfirmDialog } from "@/components/confirm-dialog";
 import { SectionIntro } from "@/components/section-intro";
 import { LiveJoinedCount } from "@/components/sessions/live-joined-count";
@@ -35,6 +36,9 @@ export function LaunchQuizPanel({
   joinedCount,
   onViewLiveResults,
 }: LaunchQuizPanelProps) {
+  const t = useTranslations("session");
+  const tActions = useTranslations("actions");
+  const tErrors = useTranslations("errors");
   const isThisQuizLive = activeSession?.quizId === quizId;
   const otherQuizLive =
     activeSession && activeSession.quizId !== quizId ? activeSession : null;
@@ -43,7 +47,7 @@ export function LaunchQuizPanel({
   const [success, setSuccess] = useState<string | null>(null);
   const [isLaunching, setIsLaunching] = useState(false);
   const [isClosing, setIsClosing] = useState(false);
-  const [copyLabel, setCopyLabel] = useState("Copy link");
+  const [copyLabel, setCopyLabel] = useState(tActions("copy"));
   const [replaceDialogOpen, setReplaceDialogOpen] = useState(false);
   const router = useRouter();
 
@@ -61,7 +65,7 @@ export function LaunchQuizPanel({
       }
 
       setSuccess(
-        `"${quizTitle}" is now live. Share the join link with students.`,
+        t("nowLive", { title: quizTitle }),
       );
       setReplaceDialogOpen(false);
       router.refresh();
@@ -69,7 +73,7 @@ export function LaunchQuizPanel({
       setError(
         launchError instanceof Error
           ? launchError.message
-          : "Could not launch quiz.",
+          : tErrors("couldNotLaunch"),
       );
     } finally {
       setIsLaunching(false);
@@ -93,13 +97,13 @@ export function LaunchQuizPanel({
         return;
       }
 
-      setSuccess("Quiz session closed. Students can no longer join.");
+      setSuccess(t("sessionClosedStudents"));
       router.refresh();
     } catch (closeError) {
       setError(
         closeError instanceof Error
           ? closeError.message
-          : "Could not close session.",
+          : tErrors("couldNotClose"),
       );
     } finally {
       setIsClosing(false);
@@ -109,29 +113,28 @@ export function LaunchQuizPanel({
   async function handleCopy() {
     try {
       await navigator.clipboard.writeText(joinUrl);
-      setCopyLabel("Copied!");
-      window.setTimeout(() => setCopyLabel("Copy link"), 2000);
+      setCopyLabel(t("copied"));
+      window.setTimeout(() => setCopyLabel(tActions("copy")), 2000);
     } catch {
-      setCopyLabel("Copy failed");
-      window.setTimeout(() => setCopyLabel("Copy link"), 2000);
+      setCopyLabel(t("copyFailed"));
+      window.setTimeout(() => setCopyLabel(tActions("copy")), 2000);
     }
   }
 
   return (
     <div className={`${panelClassName} space-y-4`}>
       <SectionIntro
-        title="Launch quiz"
+        title={t("launchTitle")}
         description={
           isThisQuizLive
-            ? "Students can join using the link below."
-            : "Start a live session so students can join from their devices."
+            ? t("studentsCanJoin")
+            : t("startLive")
         }
       />
 
       {otherQuizLive ? (
         <p className={alertWarningClassName}>
-          Another quiz is live: <strong>{otherQuizLive.quizTitle}</strong>.
-          Launching this quiz will close that session.
+          {t("anotherLive", { title: otherQuizLive.quizTitle })}
         </p>
       ) : null}
 
@@ -139,7 +142,7 @@ export function LaunchQuizPanel({
         <div className="space-y-3">
           <div className="flex items-center gap-2">
             <span className="ui-live-dot" aria-hidden="true" />
-            <span className="text-sm font-medium text-green-800">Live now</span>
+            <span className="text-sm font-medium text-green-800">{t("liveNow")}</span>
             <LiveJoinedCount
               key={activeSession!.sessionId}
               sessionId={activeSession!.sessionId}
@@ -150,7 +153,7 @@ export function LaunchQuizPanel({
           </div>
 
           <label htmlFor="join-url" className={labelClassName}>
-            Student join link
+            {t("joinLink")}
           </label>
           <div className="flex flex-col gap-2 sm:flex-row">
             <input
@@ -167,14 +170,13 @@ export function LaunchQuizPanel({
             />
           </div>
           <p className="text-xs text-zinc-500">
-            Share this URL on your classroom network. Students open it on their
-            phone or tablet and enter their ID.
+            {t("shareJoinHint")}
           </p>
 
           <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
             <ActionButton
               action="view"
-              label="View live results"
+              label={t("viewLiveResults")}
               onClick={onViewLiveResults}
               className="w-full justify-center sm:w-auto"
             />
@@ -183,7 +185,7 @@ export function LaunchQuizPanel({
               onClick={handleClose}
               disabled={isClosing}
               className="w-full justify-center sm:w-auto"
-              label={isClosing ? "Closing..." : "Close session"}
+              label={isClosing ? t("closing") : tActions("close")}
             />
           </div>
         </div>
@@ -200,7 +202,7 @@ export function LaunchQuizPanel({
 
             void handleLaunch(false);
           }}
-          label={isLaunching ? "Launching..." : "Launch quiz"}
+          label={isLaunching ? t("launching") : t("launchQuiz")}
         />
       )}
 
@@ -214,10 +216,10 @@ export function LaunchQuizPanel({
 
       <ConfirmDialog
         open={replaceDialogOpen}
-        title="Replace live quiz?"
-        description={`"${otherQuizLive?.quizTitle ?? "The current quiz"}" is live. Launching "${quizTitle}" will close that session.`}
-        confirmLabel={isLaunching ? "Launching..." : "Launch this quiz"}
-        cancelLabel="Cancel"
+        title={t("replaceTitle")}
+        description={t("replaceDescription", { current: otherQuizLive?.quizTitle ?? quizTitle, next: quizTitle })}
+        confirmLabel={isLaunching ? t("launching") : t("launchThis")}
+        cancelLabel={tActions("cancel")}
         variant="danger"
         isPending={isLaunching}
         onConfirm={() => handleLaunch(true)}

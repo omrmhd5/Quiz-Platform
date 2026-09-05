@@ -1,13 +1,18 @@
+import type { AppLocale } from "@/lib/i18n/messages";
+
 export type SessionStatus = "waiting" | "active" | "closed";
 
-export function formatSessionDateTime(value: Date | string | null) {
+export function formatSessionDateTime(
+  value: Date | string | null,
+  locale: AppLocale = "en",
+) {
   if (!value) {
     return "—";
   }
 
   const date = typeof value === "string" ? new Date(value) : value;
 
-  return date.toLocaleString("en-US", {
+  return date.toLocaleString(locale === "ar" ? "ar-EG" : "en-US", {
     month: "short",
     day: "numeric",
     year: "numeric",

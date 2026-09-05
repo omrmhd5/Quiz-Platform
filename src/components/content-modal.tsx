@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useId, useRef, type ReactNode } from "react";
+import { useTranslations } from "next-intl";
 import { createPortal } from "react-dom";
 import { ActionButton } from "@/components/ui/action-control";
 import { useModalMotion } from "@/lib/use-modal-motion";
@@ -29,6 +30,7 @@ export function ContentModal({
   children,
   size = "md",
 }: ContentModalProps) {
+  const t = useTranslations("actions");
   const titleId = useId();
   const descriptionId = useId();
   const closeRef = useRef<HTMLButtonElement>(null);
@@ -66,7 +68,7 @@ export function ContentModal({
       <button
         type="button"
         className="ui-modal-backdrop"
-        aria-label="Close dialog"
+        aria-label={t("closeDialog")}
         onClick={onClose}
       />
       <div
@@ -96,7 +98,7 @@ export function ContentModal({
           <ActionButton
             ref={closeRef}
             action="cancel"
-            label="Close"
+            label={t("closeDialog")}
             onClick={onClose}
             className="shrink-0"
           />

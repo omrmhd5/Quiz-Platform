@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useTranslations } from "next-intl";
+import { useAppLocale } from "@/components/providers/locale-provider";
 import { DashboardAttemptHighlights } from "@/components/dashboard/dashboard-attempt-highlights";
 import { DashboardCharts } from "@/components/dashboard/dashboard-charts";
 import { SectionIntro } from "@/components/section-intro";
@@ -46,6 +47,7 @@ export function DashboardView({
 }: DashboardViewProps) {
   const t = useTranslations("dashboard");
   const tSession = useTranslations("session");
+  const { locale } = useAppLocale();
   return (
     <div className="space-y-6 sm:space-y-8">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
@@ -208,7 +210,7 @@ export function DashboardView({
                       </Link>
                     </TableCell>
                     <TableCell className="whitespace-nowrap text-zinc-600">
-                      {formatSessionDateTime(session.launchedAt)}
+                      {formatSessionDateTime(session.launchedAt, locale)}
                     </TableCell>
                     <TableCell>
                       <StatusBadge

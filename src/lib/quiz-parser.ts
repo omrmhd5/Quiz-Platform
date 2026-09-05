@@ -1,3 +1,5 @@
+import { msg, type TMsg } from "@/lib/i18n/messages";
+
 export type ParsedOption = {
   letter: string;
   text: string;
@@ -28,27 +30,23 @@ function looksLikeOptionStart(line: string) {
 function parseQuestionBlock(
   block: string,
   questionNumber: number,
-): { question?: ParsedQuestion; errors: string[] } {
+): { question?: ParsedQuestion; errors: TMsg[] } {
   const lines = block
     .split(/\r?\n/)
     .map((line) => line.trim())
     .filter(Boolean);
 
-  const errors: string[] = [];
+  const errors: TMsg[] = [];
 
   if (lines.length < 2) {
     return {
-      errors: [
-        `Question ${questionNumber}: add a question line and at least 2 options (A), B), …).`,
-      ],
+      errors: [msg("errors.parserNeedLines", { n: questionNumber })],
     };
   }
 
   if (looksLikeOptionStart(lines[0])) {
     return {
-      errors: [
-        `Question ${questionNumber}: missing question line. Start with your question (e.g. "Q${questionNumber}. What is 2+2?"), then put each answer on its own line below.`,
-      ],
+      errors: [msg("errors.parserMissingPrompt", { n: questionNumber })],
     };
   }
 
@@ -56,7 +54,7 @@ function parseQuestionBlock(
 
   if (!prompt) {
     return {
-      errors: [`Question ${questionNumber}: question text cannot be empty.`],
+      errors: [msg("errors.parserEmptyPrompt", { n: questionNumber })],
     };
   }
 
@@ -65,13 +63,9 @@ function parseQuestionBlock(
 
   for (let index = 1; index < lines.length; index += 1) {
     const line = lines[index];
-    const lineLabel = `Question ${questionNumber}, line ${index + 1}`;
-
     if (OPTION_EMPTY.test(line)) {
       const letter = line.match(/^([A-Fa-f])/)?.[1]?.toUpperCase() ?? "?";
-      errors.push(
-        `${lineLabel}: option ${letter} is empty — type the answer after "${letter})".`,
-      );
+      errors.push(msg("errors.parserEmptyOption", { n: questionNumber, line: index + 1, letter }));
       optionLinesHadErrors = true;
       continue;
     }
@@ -83,9 +77,7 @@ function parseQuestionBlock(
       const text = withText[2].trim();
 
       if (!text) {
-        errors.push(
-          `${lineLabel}: option ${letter} is empty — type the answer after "${letter})".`,
-        );
+        errors.push(msg("errors.parserEmptyOption", { n: questionNumber, line: index + 1, letter }));
         optionLinesHadErrors = true;
         continue;
       }
@@ -96,16 +88,12 @@ function parseQuestionBlock(
 
     if (OPTION_MISSING_PAREN.test(line)) {
       const letter = line.match(/^([A-Fa-f])/)?.[1]?.toUpperCase() ?? "A";
-      errors.push(
-        `${lineLabel}: use "${letter}) answer text" — put a closing parenthesis after the letter.`,
-      );
+      errors.push(msg("errors.parserNeedParen", { n: questionNumber, line: index + 1, letter }));
       optionLinesHadErrors = true;
       continue;
     }
 
-    errors.push(
-      `${lineLabel}: use "A) answer text" format (letter, closing parenthesis, then the answer).`,
-    );
+    errors.push(msg("errors.parserFormat", { n: questionNumber, line: index + 1 }));
     optionLinesHadErrors = true;
   }
 
@@ -115,15 +103,13 @@ function parseQuestionBlock(
 
   if (options.length < 2) {
     return {
-      errors: [
-        `Question ${questionNumber}: needs at least 2 options. You have ${options.length}.`,
-      ],
+      errors: [msg("errors.parserMinOptions", { n: questionNumber, count: options.length })],
     };
   }
 
   if (options.length > 6) {
     return {
-      errors: [`Question ${questionNumber}: maximum 6 options (A–F).`],
+      errors: [msg("errors.parserMaxOptions", { n: questionNumber })],
     };
   }
 
@@ -137,9 +123,7 @@ function parseQuestionBlock(
     const got = options[firstWrongIndex].letter;
 
     return {
-      errors: [
-        `Question ${questionNumber}: options must run A, B, C… without skipping. Expected ${expected}) on option ${firstWrongIndex + 1}, found ${got}).`,
-      ],
+      errors: [msg("errors.parserLetterOrder", { n: questionNumber, expected, index: firstWrongIndex + 1, got })],
     };
   }
 
@@ -156,15 +140,15 @@ function parseQuestionBlock(
 export function parseQuizPaste(
   text: string,
   expectedCount?: number,
-): { questions: ParsedQuestion[]; errors: string[] } {
+): { questions: ParsedQuestion[]; errors: TMsg[] } {
   const trimmed = text.trim();
 
   if (!trimmed) {
-    return { questions: [], errors: ["Paste your quiz questions first."] };
+    return { questions: [], errors: [msg("errors.pasteQuestionsFirst")] };
   }
 
   const blocks = trimmed.split(/\r?\n\s*\r?\n/).filter((block) => block.trim());
-  const errors: string[] = [];
+  const errors: TMsg[] = [];
   const questions: ParsedQuestion[] = [];
 
   blocks.forEach((block, index) => {
@@ -177,9 +161,7 @@ export function parseQuizPaste(
   });
 
   if (expectedCount !== undefined && questions.length !== expectedCount) {
-    errors.push(
-      `Expected ${expectedCount} question${expectedCount === 1 ? "" : "s"} but found ${questions.length}. Separate each question with a blank line.`,
-    );
+    errors.push(msg("errors.parserExpectedCount", { expected: expectedCount, found: questions.length }));
   }
 
   return { questions, errors };
@@ -188,9 +170,9 @@ export function parseQuizPaste(
 export function validateCorrectAnswers(
   questions: ParsedQuestion[],
   correctLetters: string[],
-): string | null {
+): TMsg | null {
   if (correctLetters.length !== questions.length) {
-    return "Select the correct answer for every question.";
+    return msg("errors.selectCorrectAll");
   }
 
   for (let index = 0; index < questions.length; index += 1) {
@@ -200,7 +182,7 @@ export function validateCorrectAnswers(
     );
 
     if (!letter || !validLetters.has(letter)) {
-      return `Question ${index + 1}: choose a valid correct answer.`;
+      return msg("errors.parserValidCorrect", { n: index + 1 });
     }
   }
 

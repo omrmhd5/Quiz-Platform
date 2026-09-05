@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { ConfirmDialog } from "@/components/confirm-dialog";
 import { ActionButton, ActionLink } from "@/components/ui/action-control";
 import type { ActiveSessionInfo } from "@/lib/sessions";
@@ -22,6 +23,8 @@ export function LaunchQuizButton({
   activeSession,
   compact,
 }: LaunchQuizButtonProps) {
+  const t = useTranslations("session");
+  const tActions = useTranslations("actions");
   const router = useRouter();
   const [isLaunching, setIsLaunching] = useState(false);
   const [replaceDialogOpen, setReplaceDialogOpen] = useState(false);
@@ -60,7 +63,7 @@ export function LaunchQuizButton({
         action="launch"
         compact={compact}
         disabled={!canLaunch || isLaunching}
-        title={canLaunch ? undefined : "Add at least one question first"}
+        title={canLaunch ? undefined : t("needQuestion")}
         onClick={() => {
           if (otherQuizLive) {
             setReplaceDialogOpen(true);
@@ -69,15 +72,15 @@ export function LaunchQuizButton({
 
           void handleLaunch(false);
         }}
-        label={isLaunching ? "Launching..." : "Launch"}
+        label={isLaunching ? t("launching") : tActions("launch")}
       />
 
       <ConfirmDialog
         open={replaceDialogOpen}
-        title="Replace live quiz?"
-        description={`"${otherQuizLive?.quizTitle ?? "The current quiz"}" is live. Launching "${quizTitle}" will close that session.`}
-        confirmLabel={isLaunching ? "Launching..." : "Launch this quiz"}
-        cancelLabel="Cancel"
+        title={t("replaceTitle")}
+        description={t("replaceDescription", { current: otherQuizLive?.quizTitle ?? quizTitle, next: quizTitle })}
+        confirmLabel={isLaunching ? t("launching") : t("launchThis")}
+        cancelLabel={tActions("cancel")}
         variant="danger"
         isPending={isLaunching}
         onConfirm={() => handleLaunch(true)}

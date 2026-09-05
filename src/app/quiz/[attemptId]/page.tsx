@@ -1,6 +1,8 @@
 import { QuizResults } from "@/components/quiz/quiz-results";
 import { QuizTaker } from "@/components/quiz/quiz-taker";
 import { ActionLink } from "@/components/ui/action-control";
+import { getRequestLocale } from "@/lib/i18n/server";
+import { getMessage } from "@/lib/i18n/messages";
 import {
   cn,
   enterClassName,
@@ -22,6 +24,7 @@ export default async function QuizAttemptPage({
   params,
 }: QuizAttemptPageProps) {
   const { attemptId } = await params;
+  const locale = await getRequestLocale();
   const pageState = await getAttemptPageState(attemptId);
 
   if (pageState.status === "submitted") {
@@ -45,12 +48,11 @@ export default async function QuizAttemptPage({
 
           <div className={`${panelClassName} space-y-4 text-center`}>
             <p className="text-sm text-zinc-700">
-              This quiz session has ended. Contact your teacher if you still
-              need to participate.
+              {getMessage(locale, "quizTake.sessionEnded")}
             </p>
             <ActionLink
               action="join"
-              label="Back to join"
+              label={getMessage(locale, "quizTake.backToJoin")}
               href="/join"
               size="md"
               className="inline-flex w-full justify-center"

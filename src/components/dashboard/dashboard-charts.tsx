@@ -13,6 +13,7 @@ import {
   YAxis,
   CartesianGrid,
 } from "recharts";
+import { useTranslations } from "next-intl";
 import { DASHBOARD_TREND_SESSIONS, type DashboardView } from "@/lib/dashboard";
 import {
   cn,
@@ -71,25 +72,26 @@ function EmptyChart({ message }: { message: string }) {
 }
 
 export function DashboardCharts({ stats }: DashboardChartsProps) {
+  const t = useTranslations("dashboard");
   const answerBreakdown = [
-    { name: "Correct", value: stats.totalCorrect, color: CHART_COLORS.correct },
-    { name: "Wrong", value: stats.totalWrong, color: CHART_COLORS.wrong },
-    { name: "Skipped", value: stats.totalSkipped, color: CHART_COLORS.skipped },
+    { name: t("correct"), value: stats.totalCorrect, color: CHART_COLORS.correct },
+    { name: t("wrong"), value: stats.totalWrong, color: CHART_COLORS.wrong },
+    { name: t("skipped"), value: stats.totalSkipped, color: CHART_COLORS.skipped },
   ].filter((item) => item.value > 0);
 
   const participationBreakdown = [
     {
-      name: "Submitted",
+      name: t("submitted"),
       value: stats.submittedCount,
       color: CHART_COLORS.submitted,
     },
     {
-      name: "Didn't finish",
+      name: t("didntFinish"),
       value: stats.didntFinishCount,
       color: CHART_COLORS.didntFinish,
     },
     {
-      name: "In progress",
+      name: t("inProgress"),
       value: stats.liveInProgressCount,
       color: CHART_COLORS.inProgress,
     },
@@ -105,10 +107,10 @@ export function DashboardCharts({ stats }: DashboardChartsProps) {
   return (
     <div className="grid gap-6 lg:grid-cols-2">
       <ChartPanel
-        title="Answer breakdown"
-        description="Share of correct, wrong, and skipped answers across all submissions.">
+        title={t("answerBreakdown")}
+        description={t("answerBreakdownHint")}>
         {answerBreakdown.length === 0 ? (
-          <EmptyChart message="Answer chart appears after students submit quizzes." />
+          <EmptyChart message={t("answerChartEmpty")} />
         ) : (
           <div className="h-56 sm:h-72">
             <ResponsiveContainer width="100%" height="100%">
@@ -127,7 +129,7 @@ export function DashboardCharts({ stats }: DashboardChartsProps) {
                   ))}
                 </Pie>
                 <Tooltip
-                  formatter={(value) => [value, "Answers"]}
+                  formatter={(value) => [value, t("answers")]}
                   contentStyle={{
                     borderRadius: "8px",
                     borderColor: "#e4e4e7",
@@ -142,10 +144,10 @@ export function DashboardCharts({ stats }: DashboardChartsProps) {
       </ChartPanel>
 
       <ChartPanel
-        title="Participation"
-        description="Submitted vs didn't finish vs still in progress.">
+        title={t("participation")}
+        description={t("participationHint")}>
         {participationBreakdown.length === 0 ? (
-          <EmptyChart message="Participation chart appears after students join sessions." />
+          <EmptyChart message={t("participationEmpty")} />
         ) : (
           <div className="h-56 sm:h-72">
             <ResponsiveContainer width="100%" height="100%">
@@ -163,7 +165,7 @@ export function DashboardCharts({ stats }: DashboardChartsProps) {
                   ))}
                 </Pie>
                 <Tooltip
-                  formatter={(value) => [value, "Attempts"]}
+                  formatter={(value) => [value, t("attempts")]}
                   contentStyle={{
                     borderRadius: "8px",
                     borderColor: "#e4e4e7",
@@ -178,11 +180,11 @@ export function DashboardCharts({ stats }: DashboardChartsProps) {
       </ChartPanel>
 
       <ChartPanel
-        title="Average score trend"
-        description={`Session averages for the last ${DASHBOARD_TREND_SESSIONS} quiz runs (oldest to newest).`}
+        title={t("scoreTrend")}
+        description={t("lastSessionsTrend", { count: DASHBOARD_TREND_SESSIONS })}
         className="lg:col-span-2">
         {scoreTrendData.length === 0 ? (
-          <EmptyChart message="Score trend appears after sessions with submissions." />
+          <EmptyChart message={t("scoreTrendEmpty")} />
         ) : (
           <div className="h-56 sm:h-72">
             <ResponsiveContainer width="100%" height="100%">
@@ -201,7 +203,7 @@ export function DashboardCharts({ stats }: DashboardChartsProps) {
                   tickFormatter={(value) => `${value}%`}
                 />
                 <Tooltip
-                  formatter={(value) => [`${value}%`, "Average score"]}
+                  formatter={(value) => [`${value}%`, t("averageScore")]}
                   contentStyle={{
                     borderRadius: "8px",
                     borderColor: "#e4e4e7",
