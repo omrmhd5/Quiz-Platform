@@ -2,6 +2,18 @@
 
 Local-network quiz platform for classroom use. One teacher runs the app on their device; students join from phones or tablets on the same Wi‑Fi using their student ID.
 
+## View live demo
+
+- App: https://quiz-platform-demo-nine.vercel.app
+
+### Demo logins
+
+| Role    | Username | Password    |
+| ------- | -------- | ----------- |
+| Teacher | teacher  | teacher123  |
+
+Students join from `/join` with a seeded ID such as `s001`.
+
 ## Stack
 
 - Next.js 16 (App Router)
