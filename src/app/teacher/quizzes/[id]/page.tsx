@@ -13,7 +13,6 @@ import { getQuizById } from "@/server/actions/quizzes";
 import { getQuizSessionSummaries } from "@/server/actions/session-results";
 import {
   getActiveSession,
-  getActiveSessionAttemptCount,
 } from "@/server/actions/sessions";
 
 type QuizDetailPageProps = {
@@ -37,9 +36,7 @@ export default async function QuizDetailPage({ params }: QuizDetailPageProps) {
   const hasSessions = quiz.sessions.length > 0;
   const isThisQuizLive = activeSession?.quizId === quiz.id;
   const joinedCount =
-    isThisQuizLive && activeSession
-      ? await getActiveSessionAttemptCount(activeSession.sessionId)
-      : 0;
+    isThisQuizLive && activeSession ? activeSession.joinedCount : 0;
 
   const questionViews = quiz.questions.map((question) => ({
     id: question.id,

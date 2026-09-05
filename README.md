@@ -63,8 +63,10 @@ The app gives teachers a single place to run a class quiz end to end: import stu
 ## 🌐 Deployment Notes
 
 - Fully responsive teacher console and student join / quiz-taking flow
-- Demo database on Neon with a wipe-and-reseed script (`npm run seed:demo`)
-- Public demo hosted on Vercel; first load may take a few seconds to wake
+- Demo database on Neon with a wipe-and-reseed script (`npm run seed:demo`) — probes local Docker Postgres first, then Neon
+- Public demo hosted on Vercel from the `demo` branch; first load after idle may take a few seconds while Vercel and Neon wake
+- Serverless-friendly Postgres pooling (single reused connection per lambda) and fewer dashboard queries on each load
+- Route-level loading skeletons on login, join, and teacher pages for faster perceived response
 - Designed for classroom LAN use as well as a hosted demo URL
 
 ---
@@ -79,71 +81,118 @@ Login → add a student → build a 2-question quiz → save & launch live → s
 
 ## 📸 Screenshots
 
-- Teacher Login
-  <img width="1600" height="900" alt="Teacher Login" src="./docs/screenshots/01-login.png" />
-
-- Students Roster
-  <img width="1600" height="776" alt="Students Roster" src="./docs/screenshots/02-students.png" />
-
-- Quizzes List
-  <img width="1600" height="776" alt="Quizzes List" src="./docs/screenshots/03-quizzes.png" />
-
-- Create Quiz
-  <img width="1600" height="776" alt="Create Quiz" src="./docs/screenshots/04-create-quiz.png" />
-
-- Quiz Builder
-  <img width="1600" height="776" alt="Quiz Builder" src="./docs/screenshots/05-quiz-builder.png" />
-
-- Edit Quiz
-  <img width="1600" height="776" alt="Edit Quiz" src="./docs/screenshots/06-quiz-edit.png" />
-
-- Answer Key
-  <img width="1600" height="776" alt="Answer Key" src="./docs/screenshots/07-quiz-answer-key.png" />
-
-- Live Session
-  <img width="1600" height="776" alt="Live Session" src="./docs/screenshots/08-quiz-live.png" />
-
-- Student Join
-  <img width="1600" height="900" alt="Student Join" src="./docs/screenshots/09-join.png" />
-
-- Student Quiz
-  <img width="1600" height="900" alt="Student Quiz" src="./docs/screenshots/10-student-quiz.png" />
-
-- Student Results
-  <img width="1600" height="900" alt="Student Results" src="./docs/screenshots/11-student-results.png" />
-
-- Session Stats
-  <img width="1600" height="776" alt="Session Stats" src="./docs/screenshots/12-session-stats.png" />
-
-- Session Students
-  <img width="1600" height="776" alt="Session Students" src="./docs/screenshots/13-session-students.png" />
-
-- Student History
-  <img width="1600" height="776" alt="Student History" src="./docs/screenshots/14-student-history.png" />
-
-- Dashboard Overview
-  <img width="1600" height="776" alt="Dashboard Overview" src="./docs/screenshots/15-dashboard-overview.png" />
-
-- Dashboard Charts
-  <img width="1600" height="900" alt="Dashboard Charts" src="./docs/screenshots/16-dashboard-charts.png" />
-
-- Dashboard Sessions
-  <img width="1600" height="900" alt="Dashboard Sessions" src="./docs/screenshots/17-dashboard-sessions.png" />
-
-- Dashboard Highlights
-  <img width="1600" height="900" alt="Dashboard Highlights" src="./docs/screenshots/18-dashboard-highlights.png" />
-
-- Dashboard Top Results
-  <img width="1600" height="900" alt="Dashboard Top Results" src="./docs/screenshots/19-dashboard-top-results.png" />
-
-- Arabic Login
-  <img width="1600" height="900" alt="Arabic Login" src="./docs/screenshots/20-login-arabic.png" />
-
-- Mobile Login
-  <img width="390" height="844" alt="Mobile Login" src="./docs/screenshots/21-mobile-login.png" />
-
-- Mobile Join
-  <img width="390" height="844" alt="Mobile Join" src="./docs/screenshots/22-mobile-join.png" />
+<table>
+  <tr>
+    <td width="50%" valign="top">
+      <strong>Teacher Login</strong><br />
+      <img width="100%" alt="Teacher Login" src="./docs/screenshots/01-login.png" />
+    </td>
+    <td width="50%" valign="top">
+      <strong>Students Roster</strong><br />
+      <img width="100%" alt="Students Roster" src="./docs/screenshots/02-students.png" />
+    </td>
+  </tr>
+  <tr>
+    <td width="50%" valign="top">
+      <strong>Quizzes List</strong><br />
+      <img width="100%" alt="Quizzes List" src="./docs/screenshots/03-quizzes.png" />
+    </td>
+    <td width="50%" valign="top">
+      <strong>Create Quiz</strong><br />
+      <img width="100%" alt="Create Quiz" src="./docs/screenshots/04-create-quiz.png" />
+    </td>
+  </tr>
+  <tr>
+    <td width="50%" valign="top">
+      <strong>Quiz Builder</strong><br />
+      <img width="100%" alt="Quiz Builder" src="./docs/screenshots/05-quiz-builder.png" />
+    </td>
+    <td width="50%" valign="top">
+      <strong>Edit Quiz</strong><br />
+      <img width="100%" alt="Edit Quiz" src="./docs/screenshots/06-quiz-edit.png" />
+    </td>
+  </tr>
+  <tr>
+    <td width="50%" valign="top">
+      <strong>Answer Key</strong><br />
+      <img width="100%" alt="Answer Key" src="./docs/screenshots/07-quiz-answer-key.png" />
+    </td>
+    <td width="50%" valign="top">
+      <strong>Live Session</strong><br />
+      <img width="100%" alt="Live Session" src="./docs/screenshots/08-quiz-live.png" />
+    </td>
+  </tr>
+  <tr>
+    <td width="50%" valign="top">
+      <strong>Student Join</strong><br />
+      <img width="100%" alt="Student Join" src="./docs/screenshots/09-join.png" />
+    </td>
+    <td width="50%" valign="top">
+      <strong>Student Quiz</strong><br />
+      <img width="100%" alt="Student Quiz" src="./docs/screenshots/10-student-quiz.png" />
+    </td>
+  </tr>
+  <tr>
+    <td width="50%" valign="top">
+      <strong>Student Results</strong><br />
+      <img width="100%" alt="Student Results" src="./docs/screenshots/11-student-results.png" />
+    </td>
+    <td width="50%" valign="top">
+      <strong>Session Stats</strong><br />
+      <img width="100%" alt="Session Stats" src="./docs/screenshots/12-session-stats.png" />
+    </td>
+  </tr>
+  <tr>
+    <td width="50%" valign="top">
+      <strong>Session Students</strong><br />
+      <img width="100%" alt="Session Students" src="./docs/screenshots/13-session-students.png" />
+    </td>
+    <td width="50%" valign="top">
+      <strong>Student History</strong><br />
+      <img width="100%" alt="Student History" src="./docs/screenshots/14-student-history.png" />
+    </td>
+  </tr>
+  <tr>
+    <td width="50%" valign="top">
+      <strong>Dashboard Overview</strong><br />
+      <img width="100%" alt="Dashboard Overview" src="./docs/screenshots/15-dashboard-overview.png" />
+    </td>
+    <td width="50%" valign="top">
+      <strong>Dashboard Charts</strong><br />
+      <img width="100%" alt="Dashboard Charts" src="./docs/screenshots/16-dashboard-charts.png" />
+    </td>
+  </tr>
+  <tr>
+    <td width="50%" valign="top">
+      <strong>Dashboard Sessions</strong><br />
+      <img width="100%" alt="Dashboard Sessions" src="./docs/screenshots/17-dashboard-sessions.png" />
+    </td>
+    <td width="50%" valign="top">
+      <strong>Dashboard Highlights</strong><br />
+      <img width="100%" alt="Dashboard Highlights" src="./docs/screenshots/18-dashboard-highlights.png" />
+    </td>
+  </tr>
+  <tr>
+    <td width="50%" valign="top">
+      <strong>Dashboard Top Results</strong><br />
+      <img width="100%" alt="Dashboard Top Results" src="./docs/screenshots/19-dashboard-top-results.png" />
+    </td>
+    <td width="50%" valign="top">
+      <strong>Arabic Login</strong><br />
+      <img width="100%" alt="Arabic Login" src="./docs/screenshots/20-login-arabic.png" />
+    </td>
+  </tr>
+  <tr>
+    <td width="50%" valign="top">
+      <strong>Mobile Login</strong><br />
+      <img width="100%" alt="Mobile Login" src="./docs/screenshots/21-mobile-login.png" />
+    </td>
+    <td width="50%" valign="top">
+      <strong>Mobile Join</strong><br />
+      <img width="100%" alt="Mobile Join" src="./docs/screenshots/22-mobile-join.png" />
+    </td>
+  </tr>
+</table>
 
 ## Live Demo 🚀
 

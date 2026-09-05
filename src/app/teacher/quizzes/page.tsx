@@ -11,10 +11,7 @@ import {
   panelClassName,
 } from "@/lib/utils";
 import { getQuizzes } from "@/server/actions/quizzes";
-import {
-  getActiveSession,
-  getActiveSessionAttemptCount,
-} from "@/server/actions/sessions";
+import { getActiveSession } from "@/server/actions/sessions";
 
 export default async function QuizzesPage() {
   const [quizRows, activeSession, joinUrl, locale] = await Promise.all([
@@ -23,11 +20,6 @@ export default async function QuizzesPage() {
     getJoinUrl(),
     getRequestLocale(),
   ]);
-
-  const joinedCount =
-    activeSession !== null
-      ? await getActiveSessionAttemptCount(activeSession.sessionId)
-      : 0;
 
   return (
     <div id="quizzes-page" className="space-y-8">
@@ -47,7 +39,7 @@ export default async function QuizzesPage() {
         <ActiveSessionBanner
           activeSession={activeSession}
           joinUrl={joinUrl}
-          joinedCount={joinedCount}
+          joinedCount={activeSession.joinedCount}
         />
       ) : null}
 

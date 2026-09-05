@@ -13,32 +13,37 @@ declare global {
   var __quizPlatformClient: ReturnType<typeof postgres> | undefined;
 }
 
+function isServerlessRuntime() {
+  return process.env.VERCEL === "1" || process.env.NODE_ENV === "production";
+}
+
 function createDb() {
   const connectionString = getDatabaseUrl();
   const needsSsl =
     process.env.NODE_ENV === "production" ||
-    /render\.com|sslmode=require/i.test(connectionString);
+    /neon\.tech|render\.com|sslmode=require/i.test(connectionString);
+  const serverless = isServerlessRuntime();
 
   const client = postgres(connectionString, {
-    max: 10,
+    max: serverless ? 1 : 10,
+    idle_timeout: serverless ? 20 : 0,
+    connect_timeout: 10,
     ...(needsSsl ? { ssl: "require" } : {}),
   });
   const database = drizzle(client, { schema: fullSchema });
 
-  if (process.env.NODE_ENV !== "production") {
-    global.__quizPlatformClient = client;
-    global.__quizPlatformDb = database;
-  }
+  global.__quizPlatformClient = client;
+  global.__quizPlatformDb = database;
 
   return { client, database };
 }
 
 function getDb() {
-  if (global.__quizPlatformDb) {
-    return global.__quizPlatformDb;
+  if (!global.__quizPlatformDb) {
+    createDb();
   }
 
-  return createDb().database;
+  return global.__quizPlatformDb!;
 }
 
 export const db = new Proxy({} as Db, {

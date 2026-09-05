@@ -1,6 +1,6 @@
 "use server";
 
-import { and, eq } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { notFound, redirect } from "next/navigation";
 import { db } from "@/db";
@@ -29,9 +29,11 @@ export async function getActiveSession(): Promise<ActiveSessionInfo | null> {
       quizId: quizSessions.quizId,
       quizTitle: quizzes.title,
       launchedAt: quizSessions.launchedAt,
+      joinedCount: sql<number>`coalesce(${sessionStats.joinedCount}, 0)::int`,
     })
     .from(quizSessions)
     .innerJoin(quizzes, eq(quizSessions.quizId, quizzes.id))
+    .leftJoin(sessionStats, eq(sessionStats.sessionId, quizSessions.id))
     .where(eq(quizSessions.status, "active"))
     .limit(1);
 
