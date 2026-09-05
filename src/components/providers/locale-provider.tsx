@@ -1,6 +1,7 @@
 "use client";
 
 import { NextIntlClientProvider } from "next-intl";
+import { useRouter } from "next/navigation";
 import {
   createContext,
   useCallback,
@@ -37,6 +38,7 @@ function applyDocumentLocale(locale: AppLocale) {
 }
 
 export function LocaleProvider({ children }: { children: ReactNode }) {
+  const router = useRouter();
   const [locale, setLocaleState] = useState<AppLocale>("en");
   const [ready, setReady] = useState(false);
 
@@ -54,11 +56,15 @@ export function LocaleProvider({ children }: { children: ReactNode }) {
     applyDocumentLocale(locale);
   }, [locale, ready]);
 
-  const setLocale = useCallback((next: AppLocale) => {
-    setLocaleState(next);
-    localStorage.setItem(LOCALE_COOKIE, next);
-    applyDocumentLocale(next);
-  }, []);
+  const setLocale = useCallback(
+    (next: AppLocale) => {
+      setLocaleState(next);
+      localStorage.setItem(LOCALE_COOKIE, next);
+      applyDocumentLocale(next);
+      router.refresh();
+    },
+    [router],
+  );
 
   return (
     <LocaleContext.Provider value={{ locale, setLocale }}>

@@ -12,6 +12,8 @@ import { getMessage } from "@/lib/i18n/messages";
 import { getRequestLocale } from "@/lib/i18n/server";
 import { redirect } from "next/navigation";
 
+export const dynamic = "force-dynamic";
+
 export default async function LoginPage() {
   const session = await getSession();
   const locale = await getRequestLocale();
