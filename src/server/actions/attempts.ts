@@ -20,6 +20,7 @@ import type {
 } from "@/lib/attempts";
 import { shuffleArray } from "@/lib/shuffle";
 import { applyAttemptSubmitted } from "@/server/stats/rollup";
+import { tServer } from "@/lib/i18n/server";
 
 async function getAttemptContext(attemptId: string) {
   const attempt = await db.query.attempts.findFirst({
@@ -181,17 +182,17 @@ export async function submitAttempt(
   const attemptId = String(formData.get("attemptId") ?? "").trim();
 
   if (!attemptId) {
-    return { error: "Missing attempt." };
+    return { error: await tServer("errors.missingAttempt") };
   }
 
   const attempt = await getAttemptContext(attemptId);
 
   if (attempt.status === "submitted") {
-    return { error: "This quiz has already been submitted." };
+    return { error: await tServer("errors.alreadySubmitted") };
   }
 
   if (attempt.status !== "in_progress") {
-    return { error: "This attempt is not active." };
+    return { error: await tServer("errors.attemptNotActive") };
   }
 
   const session = await db.query.quizSessions.findFirst({
@@ -246,7 +247,7 @@ export async function submitAttempt(
     );
 
     if (!selectedOption || selectedOption.questionId !== question.id) {
-      return { error: "Invalid answer selection." };
+      return { error: await tServer("errors.invalidAnswer") };
     }
 
     if (selectedOption.isCorrect) {

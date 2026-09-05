@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState, useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 import {
   studentActionInitialState,
   type StudentActionState,
@@ -15,6 +16,7 @@ import { ActionButton } from "@/components/ui/action-control";
 import { createStudent } from "@/server/actions/students";
 
 export function AddStudentForm() {
+  const t = useTranslations("students");
   const [state, formAction, isPending] = useActionState<
     StudentActionState,
     FormData
@@ -33,18 +35,14 @@ export function AddStudentForm() {
       action={formAction}
       className={`${panelClassName} space-y-4`}>
       <div>
-        <h2 className="text-base font-semibold text-zinc-900">Add student</h2>
-        <p className="mt-1 text-sm text-zinc-600">
-          Student ID must be unique letters and numbers only.
-        </p>
+        <h2 className="text-base font-semibold text-zinc-900">{t("addTitle")}</h2>
+        <p className="mt-1 text-sm text-zinc-600">{t("subtitle")}</p>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="space-y-2">
-          <label
-            htmlFor="id"
-            className="block text-sm font-medium text-zinc-700">
-            Student ID
+          <label htmlFor="id" className="block text-sm font-medium text-zinc-700">
+            {t("id")}
           </label>
           <input
             id="id"
@@ -60,14 +58,14 @@ export function AddStudentForm() {
           <label
             htmlFor="name"
             className="block text-sm font-medium text-zinc-700">
-            Name
+            {t("name")}
           </label>
           <input
             id="name"
             name="name"
             type="text"
             required
-            placeholder="Alex Smith"
+            placeholder={t("namePlaceholder")}
             className={inputClassName}
           />
         </div>
@@ -87,7 +85,7 @@ export function AddStudentForm() {
         action="add"
         type="submit"
         disabled={isPending}
-        label={isPending ? "Adding..." : "Add student"}
+        label={isPending ? t("adding") : t("addTitle")}
       />
     </form>
   );

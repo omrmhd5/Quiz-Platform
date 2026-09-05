@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState, useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 import {
   studentActionInitialState,
   type StudentActionState,
@@ -15,6 +16,7 @@ import { ActionButton } from "@/components/ui/action-control";
 import { importStudents } from "@/server/actions/students";
 
 export function ImportStudentsForm() {
+  const t = useTranslations("students");
   const [state, formAction, isPending] = useActionState<
     StudentActionState,
     FormData
@@ -30,13 +32,10 @@ export function ImportStudentsForm() {
   return (
     <form action={formAction} className={`${panelClassName} space-y-4`}>
       <div>
-        <h2 className="text-base font-semibold text-zinc-900">Bulk import</h2>
-        <p className="mt-1 text-sm text-zinc-600">
-          One student per line:{" "}
-          <code className="rounded bg-zinc-100 px-1.5 py-0.5 font-mono text-xs text-zinc-800">
-            id,name
-          </code>
-        </p>
+        <h2 className="text-base font-semibold text-zinc-900">
+          {t("importTitle")}
+        </h2>
+        <p className="mt-1 text-sm text-zinc-600">{t("importHint")}</p>
       </div>
 
       <textarea
@@ -44,9 +43,7 @@ export function ImportStudentsForm() {
         rows={6}
         value={bulk}
         onChange={(event) => setBulk(event.target.value)}
-        placeholder={
-          "2024001,Alex Smith\n2024002,Jordan Lee\n2024003,Sam Patel"
-        }
+        placeholder={t("importPlaceholder")}
         className={`${inputClassName} font-mono`}
       />
 
@@ -64,7 +61,7 @@ export function ImportStudentsForm() {
         action="import"
         type="submit"
         disabled={isPending}
-        label={isPending ? "Importing..." : "Import students"}
+        label={isPending ? t("importing") : t("importTitle")}
       />
     </form>
   );

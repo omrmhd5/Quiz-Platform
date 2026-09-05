@@ -1,18 +1,25 @@
 import { AddStudentForm } from "@/components/students/add-student-form";
 import { ImportStudentsForm } from "@/components/students/import-students-form";
 import { StudentsTable } from "@/components/students/students-table";
+import { getMessage } from "@/lib/i18n/messages";
+import { getRequestLocale } from "@/lib/i18n/server";
 import { pageDescriptionClassName, pageTitleClassName } from "@/lib/utils";
 import { getStudents } from "@/server/actions/students";
 
 export default async function StudentsPage() {
-  const studentRows = await getStudents();
+  const [studentRows, locale] = await Promise.all([
+    getStudents(),
+    getRequestLocale(),
+  ]);
 
   return (
     <div className="space-y-6 sm:space-y-8">
       <div>
-        <h1 className={pageTitleClassName}>Students</h1>
+        <h1 className={pageTitleClassName}>
+          {getMessage(locale, "students.title")}
+        </h1>
         <p className={pageDescriptionClassName}>
-          Manage your student roster by ID and name.
+          {getMessage(locale, "students.subtitle")}
         </p>
       </div>
 

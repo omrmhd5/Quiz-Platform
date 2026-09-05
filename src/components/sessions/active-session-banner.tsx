@@ -12,6 +12,7 @@ import {
   linkClassName,
   liveBannerClassName,
 } from "@/lib/utils";
+import { useTranslations } from "next-intl";
 import { closeQuizSession } from "@/server/actions/sessions";
 
 type ActiveSessionBannerProps = {
@@ -25,18 +26,20 @@ export function ActiveSessionBanner({
   joinUrl,
   joinedCount,
 }: ActiveSessionBannerProps) {
+  const t = useTranslations("session");
+  const tActions = useTranslations("actions");
   const router = useRouter();
-  const [copyLabel, setCopyLabel] = useState("Copy link");
+  const [copyLabel, setCopyLabel] = useState(tActions("copy"));
   const [isClosing, setIsClosing] = useState(false);
 
   async function handleCopy() {
     try {
       await navigator.clipboard.writeText(joinUrl);
-      setCopyLabel("Copied!");
-      window.setTimeout(() => setCopyLabel("Copy link"), 2000);
+      setCopyLabel(t("copied"));
+      window.setTimeout(() => setCopyLabel(tActions("copy")), 2000);
     } catch {
-      setCopyLabel("Copy failed");
-      window.setTimeout(() => setCopyLabel("Copy link"), 2000);
+      setCopyLabel(t("copyFailed"));
+      window.setTimeout(() => setCopyLabel(tActions("copy")), 2000);
     }
   }
 
@@ -58,7 +61,7 @@ export function ActiveSessionBanner({
           <div className="flex items-center gap-2">
             <span className="ui-live-dot" aria-hidden="true" />
             <span className="text-sm font-medium text-green-900">
-              Live quiz running
+              {t("launchTitle")}
             </span>
           </div>
           <p className="text-base font-semibold text-zinc-900">
@@ -79,7 +82,7 @@ export function ActiveSessionBanner({
         <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
           <ActionLink
             action="view"
-            label="View live results"
+            label={t("viewLiveResults")}
             href={`/teacher/quizzes/${activeSession.quizId}#session-${activeSession.sessionId}`}
             className="w-full justify-center sm:w-auto"
           />
@@ -88,7 +91,7 @@ export function ActiveSessionBanner({
             onClick={handleClose}
             disabled={isClosing}
             className="w-full justify-center sm:w-auto"
-            label={isClosing ? "Closing..." : "Close session"}
+            label={isClosing ? t("closing") : tActions("close")}
           />
         </div>
       </div>
@@ -97,7 +100,7 @@ export function ActiveSessionBanner({
         <input
           readOnly
           value={joinUrl}
-          aria-label="Student join link"
+          aria-label={t("joinLink")}
           className={cn(inputClassName, "font-mono text-xs")}
         />
         <ActionButton

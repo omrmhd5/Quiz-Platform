@@ -1,4 +1,7 @@
+"use client";
+
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { DashboardAttemptHighlights } from "@/components/dashboard/dashboard-attempt-highlights";
 import { DashboardCharts } from "@/components/dashboard/dashboard-charts";
 import { SectionIntro } from "@/components/section-intro";
@@ -41,14 +44,14 @@ export function DashboardView({
   joinUrl,
   joinedCount,
 }: DashboardViewProps) {
+  const t = useTranslations("dashboard");
+  const tSession = useTranslations("session");
   return (
     <div className="space-y-6 sm:space-y-8">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <h1 className={pageTitleClassName}>Dashboard</h1>
-          <p className={pageDescriptionClassName}>
-            All-time overview of classroom activity.
-          </p>
+          <h1 className={pageTitleClassName}>{t("title")}</h1>
+          <p className={pageDescriptionClassName}>{t("subtitle")}</p>
         </div>
         <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:gap-3">
           <ActionLink
@@ -75,39 +78,39 @@ export function DashboardView({
       <div className="space-y-4">
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           <StatCard
-            label="Registered students"
+            label={t("registeredStudents")}
             value={stats.studentCount}
             preset="students"
           />
           <StatCard
-            label="Total quizzes"
+            label={t("totalQuizzes")}
             value={stats.quizCount}
             preset="quizzes"
           />
           <StatCard
-            label="Total sessions"
+            label={t("totalSessions")}
             value={stats.sessionCount}
             preset="sessions"
           />
         </div>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <StatCard
-            label="Submitted"
+            label={t("submitted")}
             value={stats.submittedCount}
             preset="submitted"
           />
           <StatCard
-            label="In progress"
+            label={t("inProgress")}
             value={stats.liveInProgressCount}
             preset="inProgress"
           />
           <StatCard
-            label="Didn't finish"
+            label={t("didntFinish")}
             value={stats.didntFinishCount}
             preset="didntFinish"
           />
           <StatCard
-            label="Average score"
+            label={t("averageScore")}
             value={
               stats.overallAverageScore !== null
                 ? `${stats.overallAverageScore}%`
@@ -120,25 +123,29 @@ export function DashboardView({
 
       <div className={`${panelClassName} space-y-4`}>
         <SectionIntro
-          title="Quiz stats"
-          description={`Totals across ${stats.submittedCount} submitted attempt${stats.submittedCount === 1 ? "" : "s"}.`}
+          title={t("quizStats")}
+          description={
+            stats.submittedCount === 1
+              ? t("quizStatsDescription", { count: stats.submittedCount })
+              : t("quizStatsDescriptionPlural", { count: stats.submittedCount })
+          }
         />
         {stats.submittedCount === 0 ? (
-          <p className={emptyStateClassName}>No submitted quizzes yet.</p>
+          <p className={emptyStateClassName}>{t("noSubmitted")}</p>
         ) : (
           <div className="grid gap-4 sm:grid-cols-3">
             <StatCard
-              label="Total correct"
+              label={t("totalCorrect")}
               value={stats.totalCorrect}
               preset="correct"
             />
             <StatCard
-              label="Total wrong"
+              label={t("totalWrong")}
               value={stats.totalWrong}
               preset="wrong"
             />
             <StatCard
-              label="Total skipped"
+              label={t("totalSkipped")}
               value={stats.totalSkipped}
               preset="skipped"
             />
@@ -151,20 +158,22 @@ export function DashboardView({
       <div className={`${panelClassName} space-y-4`}>
         <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between sm:gap-3">
           <SectionIntro
-            title="Recent sessions"
-            description={`Most recent ${DASHBOARD_RECENT_SESSIONS} quiz runs.`}
+            title={t("recentSessions")}
+            description={t("recentSessionsDescription", {
+              count: DASHBOARD_RECENT_SESSIONS,
+            })}
             className="mb-0 min-w-0 flex-1"
           />
           <Link
             href="/teacher/quizzes"
             className={cn(linkClassName, "shrink-0 self-start")}>
-            All quizzes
+            {t("allQuizzes")}
           </Link>
         </div>
 
         {stats.recentSessions.length === 0 ? (
           <p className={emptyStateClassName}>
-            No sessions yet. Launch a quiz to see activity here.
+            {t("noSessions")}
           </p>
         ) : (
           <div className={tableShellClassName}>
@@ -172,19 +181,19 @@ export function DashboardView({
               <thead className={tableHeadClassName}>
                 <tr className={tableHeadRowClassName}>
                   <th scope="col" className={tableHeadCellClassName}>
-                    Quiz
+                    {t("colQuiz")}
                   </th>
                   <th scope="col" className={tableHeadCellClassName}>
-                    When
+                    {t("colWhen")}
                   </th>
                   <th scope="col" className={tableHeadCellClassName}>
-                    Status
+                    {t("colStatus")}
                   </th>
                   <th scope="col" className={tableHeadCellClassName}>
-                    Joined
+                    {t("colJoined")}
                   </th>
                   <th scope="col" className={tableHeadCellClassName}>
-                    Avg
+                    {t("colAverage")}
                   </th>
                 </tr>
               </thead>
@@ -207,14 +216,18 @@ export function DashboardView({
                           "capitalize",
                           sessionStatusBadgeClass(session.status),
                         )}>
-                        {session.status}
+                        {session.status === "active"
+                          ? tSession("live")
+                          : session.status === "closed"
+                            ? tSession("closed")
+                            : tSession("waiting")}
                       </StatusBadge>
                     </TableCell>
                     <TableCell className="tabular-nums text-zinc-700">
                       {session.joinedCount}
                       <span className="block text-xs text-zinc-400 sm:inline sm:text-inherit">
                         <span className="hidden sm:inline"> / </span>
-                        {session.submittedCount} submitted
+                        {session.submittedCount} {t("submitted")}
                       </span>
                     </TableCell>
                     <TableCell className="tabular-nums text-zinc-900">

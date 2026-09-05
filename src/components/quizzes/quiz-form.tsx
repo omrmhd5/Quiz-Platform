@@ -2,6 +2,8 @@
 
 import { useActionState, useEffect, useRef, useState } from "react";
 import { ConfirmDialog } from "@/components/confirm-dialog";
+import { useAppLocale } from "@/components/providers/locale-provider";
+import { getMessage } from "@/lib/i18n/messages";
 import { QuizManualBuilder } from "@/components/quizzes/quiz-manual-builder";
 import { QuizPasteBuilder } from "@/components/quizzes/quiz-paste-builder";
 import { ActionButton, ActionLink } from "@/components/ui/action-control";
@@ -55,6 +57,7 @@ export function QuizForm({
   isLive = false,
   initialData,
 }: QuizFormProps) {
+  const { locale } = useAppLocale();
   const formRef = useRef<HTMLFormElement>(null);
   const action =
     mode === "edit" && quizId ? updateQuiz.bind(null, quizId) : createQuiz;
@@ -135,7 +138,9 @@ export function QuizForm({
     const validationError = validateQuestionDrafts(manualDrafts);
 
     if (validationError) {
-      setStepError(validationError);
+      setStepError(
+        getMessage(locale, validationError.key, validationError.values),
+      );
       return;
     }
 

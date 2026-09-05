@@ -1,3 +1,5 @@
+import { msg, type TMsg } from "@/lib/i18n/messages";
+
 export type QuizActionState = {
   error?: string;
   success?: string;
@@ -37,15 +39,15 @@ export function createEmptyQuestion(): QuizQuestionDraft {
   };
 }
 
-export function validateQuizTitle(title: string): string | null {
+export function validateQuizTitle(title: string): TMsg | null {
   const trimmed = title.trim();
 
   if (!trimmed) {
-    return "Quiz title is required.";
+    return msg("errors.titleRequired");
   }
 
   if (trimmed.length > 120) {
-    return "Quiz title must be 120 characters or fewer.";
+    return msg("errors.titleTooLong");
   }
 
   return null;
@@ -53,21 +55,21 @@ export function validateQuizTitle(title: string): string | null {
 
 export function validateQuizQuestions(
   questions: QuizQuestionPayload[],
-): string | null {
+): TMsg | null {
   if (questions.length < 1) {
-    return "Add at least one question.";
+    return msg("errors.addOneQuestion");
   }
 
   for (let index = 0; index < questions.length; index += 1) {
     const question = questions[index];
-    const label = `Question ${index + 1}`;
+    const n = index + 1;
 
     if (!question.prompt.trim()) {
-      return `${label}: enter the question text.`;
+      return msg("errors.questionPrompt", { n });
     }
 
     if (question.options.length < 2 || question.options.length > 6) {
-      return `${label}: must have between 2 and 6 options.`;
+      return msg("errors.questionOptionCount", { n });
     }
 
     const correctCount = question.options.filter(
@@ -75,7 +77,7 @@ export function validateQuizQuestions(
     ).length;
 
     if (correctCount !== 1) {
-      return `${label}: select exactly one correct answer.`;
+      return msg("errors.questionOneCorrect", { n });
     }
 
     for (
@@ -87,7 +89,7 @@ export function validateQuizQuestions(
       const letter = String.fromCharCode(65 + optionIndex);
 
       if (!option.text.trim()) {
-        return `${label}, option ${letter}: answer text cannot be empty.`;
+        return msg("errors.optionEmpty", { n, letter });
       }
     }
   }
@@ -97,7 +99,7 @@ export function validateQuizQuestions(
 
 export function validateQuestionDrafts(
   drafts: QuizQuestionDraft[],
-): string | null {
+): TMsg | null {
   return validateQuizQuestions(draftsToPayload(drafts));
 }
 

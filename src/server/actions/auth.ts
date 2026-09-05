@@ -7,6 +7,7 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { db } from "@/db";
 import { teachers } from "@/db/schema";
+import { tServer } from "@/lib/i18n/server";
 import { getSessionOptions, type SessionData } from "@/lib/session";
 
 export type LoginState = {
@@ -21,7 +22,7 @@ export async function loginTeacher(
   const password = String(formData.get("password") ?? "");
 
   if (!username || !password) {
-    return { error: "Username and password are required." };
+    return { error: await tServer("errors.usernamePasswordRequired") };
   }
 
   const [teacher] = await db
@@ -31,13 +32,13 @@ export async function loginTeacher(
     .limit(1);
 
   if (!teacher) {
-    return { error: "Invalid username or password." };
+    return { error: await tServer("errors.invalidCredentials") };
   }
 
   const isValid = await bcrypt.compare(password, teacher.passwordHash);
 
   if (!isValid) {
-    return { error: "Invalid username or password." };
+    return { error: await tServer("errors.invalidCredentials") };
   }
 
   const session = await getIronSession<SessionData>(

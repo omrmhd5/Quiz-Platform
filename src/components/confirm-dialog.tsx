@@ -2,6 +2,7 @@
 
 import { useEffect, useId, useRef } from "react";
 import { createPortal } from "react-dom";
+import { useTranslations } from "next-intl";
 import { useModalMotion } from "@/lib/use-modal-motion";
 import {
   buttonPrimaryClassName,
@@ -25,13 +26,16 @@ export function ConfirmDialog({
   open,
   title,
   description,
-  confirmLabel = "Confirm",
-  cancelLabel = "Cancel",
+  confirmLabel,
+  cancelLabel,
   variant = "default",
   isPending = false,
   onConfirm,
   onCancel,
 }: ConfirmDialogProps) {
+  const t = useTranslations("actions");
+  const confirmText = confirmLabel ?? t("confirm");
+  const cancelText = cancelLabel ?? t("cancel");
   const titleId = useId();
   const descriptionId = useId();
   const cancelRef = useRef<HTMLButtonElement>(null);
@@ -69,7 +73,7 @@ export function ConfirmDialog({
       <button
         type="button"
         className="ui-modal-backdrop"
-        aria-label="Close dialog"
+        aria-label={t("closeDialog")}
         disabled={isPending}
         onClick={onCancel}
       />
@@ -97,7 +101,7 @@ export function ConfirmDialog({
             disabled={isPending}
             onClick={onCancel}
             className={cn(buttonSecondaryClassName, "w-full sm:min-w-24 sm:w-auto")}>
-            {cancelLabel}
+            {cancelText}
           </button>
           <button
             type="button"
@@ -109,7 +113,7 @@ export function ConfirmDialog({
                 : buttonPrimaryClassName,
               "w-full sm:min-w-24 sm:w-auto",
             )}>
-            {confirmLabel}
+            {confirmText}
           </button>
         </div>
       </div>

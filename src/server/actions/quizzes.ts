@@ -6,6 +6,8 @@ import { notFound, redirect } from "next/navigation";
 import { db } from "@/db";
 import { questionOptions, questions, quizSessions, quizzes } from "@/db/schema";
 import { requireTeacherSession } from "@/lib/auth";
+import { msg, type TMsg } from "@/lib/i18n/messages";
+import { tMsg, tServer } from "@/lib/i18n/server";
 import {
   validateQuizQuestions,
   validateQuizTitle,
@@ -32,7 +34,11 @@ async function getOwnedQuiz(quizId: string, teacherId: string) {
   return quiz;
 }
 
-function parseSavePayload(formData: FormData) {
+function parseSavePayload(
+  formData: FormData,
+):
+  | { error: TMsg }
+  | { title: string; questions: QuizQuestionPayload[] } {
   const title = String(formData.get("title") ?? "").trim();
   const questionsRaw = String(formData.get("questions") ?? "[]");
 
@@ -47,12 +53,12 @@ function parseSavePayload(formData: FormData) {
     const parsed = JSON.parse(questionsRaw);
 
     if (!Array.isArray(parsed)) {
-      return { error: "Invalid quiz data." as const };
+      return { error: msg("errors.invalidQuizData") };
     }
 
     parsedQuestions = parsed;
   } catch {
-    return { error: "Invalid quiz data." as const };
+    return { error: msg("errors.invalidQuizData") };
   }
 
   const questionsError = validateQuizQuestions(parsedQuestions);
@@ -166,7 +172,7 @@ export async function createQuiz(
   const payload = parseSavePayload(formData);
 
   if ("error" in payload) {
-    return { error: payload.error };
+    return { error: await tMsg(payload.error) };
   }
 
   const quiz = await db.transaction(async (tx) => {
@@ -204,8 +210,7 @@ export async function updateQuiz(
 
     if (!confirmed) {
       return {
-        error:
-          "Confirm that you want to erase all session history before saving.",
+        error: await tServer("errors.confirmWipe"),
       };
     }
 
@@ -216,7 +221,7 @@ export async function updateQuiz(
   const payload = parseSavePayload(formData);
 
   if ("error" in payload) {
-    return { error: payload.error };
+    return { error: await tMsg(payload.error) };
   }
 
   await db

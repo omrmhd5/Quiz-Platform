@@ -4,12 +4,24 @@ import { asc, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { db } from "@/db";
 import { students } from "@/db/schema";
+import { tMsg, tServer } from "@/lib/i18n/server";
 import {
   parseBulkImport,
   validateStudentId,
   validateStudentName,
   type StudentActionState,
 } from "@/lib/students";
+
+async function flattenImportError(message: {
+  key: string;
+  values?: Record<string, string | number>;
+}) {
+  const values = { ...message.values };
+  if (typeof values.detail === "string" && values.detail.startsWith("errors.")) {
+    values.detail = await tServer(values.detail);
+  }
+  return tServer(message.key, values);
+}
 
 export async function getStudents() {
   return db.select().from(students).orderBy(asc(students.id));
@@ -24,12 +36,12 @@ export async function createStudent(
 
   const idError = validateStudentId(id);
   if (idError) {
-    return { error: idError };
+    return { error: await tMsg(idError) };
   }
 
   const nameError = validateStudentName(name);
   if (nameError) {
-    return { error: nameError };
+    return { error: await tMsg(nameError) };
   }
 
   const [existing] = await db
@@ -39,13 +51,13 @@ export async function createStudent(
     .limit(1);
 
   if (existing) {
-    return { error: `Student ID "${id}" is already registered.` };
+    return { error: await tServer("errors.studentIdTaken", { id }) };
   }
 
   await db.insert(students).values({ id, name });
 
   revalidatePath("/teacher/students");
-  return { success: `Student "${name}" added.` };
+  return { success: await tServer("success.studentAdded", { name }) };
 }
 
 export async function updateStudent(
@@ -57,7 +69,7 @@ export async function updateStudent(
   const nameError = validateStudentName(name);
 
   if (nameError) {
-    return { error: nameError };
+    return { error: await tMsg(nameError) };
   }
 
   const [existing] = await db
@@ -67,13 +79,13 @@ export async function updateStudent(
     .limit(1);
 
   if (!existing) {
-    return { error: "Student not found." };
+    return { error: await tServer("errors.studentNotFound") };
   }
 
   await db.update(students).set({ name }).where(eq(students.id, studentId));
 
   revalidatePath("/teacher/students");
-  return { success: "Student updated." };
+  return { success: await tServer("success.studentUpdated") };
 }
 
 export async function deleteStudent(studentId: string) {
@@ -88,17 +100,20 @@ export async function importStudents(
   const bulk = String(formData.get("bulk") ?? "");
 
   if (!bulk.trim()) {
-    return { error: "Paste at least one student line." };
+    return { error: await tServer("errors.pasteStudents") };
   }
 
   const { rows, errors } = parseBulkImport(bulk);
 
   if (errors.length > 0) {
-    return { error: errors.slice(0, 5).join(" ") };
+    const translated = await Promise.all(
+      errors.slice(0, 5).map((error) => flattenImportError(error)),
+    );
+    return { error: translated.join(" ") };
   }
 
   if (rows.length === 0) {
-    return { error: "No valid students found in import." };
+    return { error: await tServer("errors.noValidStudents") };
   }
 
   const existing = await db.select({ id: students.id }).from(students);
@@ -110,7 +125,9 @@ export async function importStudents(
 
   if (duplicateIds.length > 0) {
     return {
-      error: `These IDs already exist: ${duplicateIds.slice(0, 5).join(", ")}.`,
+      error: await tServer("errors.idsExist", {
+        ids: duplicateIds.slice(0, 5).join(", "),
+      }),
     };
   }
 
@@ -122,5 +139,7 @@ export async function importStudents(
   );
 
   revalidatePath("/teacher/students");
-  return { success: `${rows.length} students imported.` };
+  return {
+    success: await tServer("success.studentsImported", { count: rows.length }),
+  };
 }

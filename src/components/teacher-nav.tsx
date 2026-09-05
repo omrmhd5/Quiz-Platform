@@ -2,7 +2,9 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { ActionButton } from "@/components/ui/action-control";
+import { LanguageSwitch } from "@/components/language-switch";
 import {
   brandLinkClassName,
   cn,
@@ -11,9 +13,9 @@ import {
 } from "@/lib/utils";
 
 const links = [
-  { href: "/teacher/dashboard", label: "Dashboard" },
-  { href: "/teacher/students", label: "Students" },
-  { href: "/teacher/quizzes", label: "Quizzes" },
+  { href: "/teacher/dashboard", key: "dashboard" as const },
+  { href: "/teacher/students", key: "students" as const },
+  { href: "/teacher/quizzes", key: "quizzes" as const },
 ];
 
 type TeacherNavProps = {
@@ -23,6 +25,7 @@ type TeacherNavProps = {
 
 export function TeacherNav({ username, logoutAction }: TeacherNavProps) {
   const pathname = usePathname();
+  const t = useTranslations("nav");
 
   return (
     <header className="ui-site-header">
@@ -30,12 +33,13 @@ export function TeacherNav({ username, logoutAction }: TeacherNavProps) {
         <div className="flex min-w-0 items-center justify-between gap-3">
           <Link href="/teacher/dashboard" className={cn(brandLinkClassName, "min-w-0")}>
             <p className="ui-brand-title truncate text-lg font-semibold tracking-tight text-zinc-900">
-              Quiz Platform
+              {t("brand")}
             </p>
-            <p className="truncate text-sm text-zinc-500">Teacher console</p>
+            <p className="truncate text-sm text-zinc-500">{t("console")}</p>
           </Link>
 
           <div className="flex shrink-0 items-center gap-2 sm:gap-3">
+            <LanguageSwitch />
             <span className="max-w-[7rem] truncate text-sm text-zinc-600 sm:max-w-none">
               {username}
             </span>
@@ -46,7 +50,7 @@ export function TeacherNav({ username, logoutAction }: TeacherNavProps) {
         </div>
 
         <nav
-          aria-label="Teacher sections"
+          aria-label={t("sections")}
           className={cn(segmentClassName, "grid w-full grid-cols-3")}>
           {links.map((link) => {
             const isActive =
@@ -62,7 +66,7 @@ export function TeacherNav({ username, logoutAction }: TeacherNavProps) {
                   "w-full justify-center text-center",
                   isActive && "is-active",
                 )}>
-                {link.label}
+                {t(link.key)}
               </Link>
             );
           })}

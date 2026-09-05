@@ -1,5 +1,8 @@
+"use client";
+
 import Link from "next/link";
 import { forwardRef, type ComponentPropsWithoutRef } from "react";
+import { useTranslations } from "next-intl";
 import { UiIcon } from "@/components/ui/icon";
 import { type ActionKey, actionPresets } from "@/lib/action-ui";
 import { buttonSecondaryClassName, cn } from "@/lib/utils";
@@ -35,8 +38,9 @@ export function ActionLink({
   hideLabel,
   compact,
 }: ActionLinkProps) {
+  const t = useTranslations("actions");
   const preset = actionPresets[action];
-  const text = label ?? preset.label;
+  const text = label ?? t(action);
   const showLabel = !hideLabel && !preset.hideLabel;
   const labelHidden = compact && showLabel;
 
@@ -77,8 +81,9 @@ export const ActionButton = forwardRef<HTMLButtonElement, ActionButtonProps>(
     },
     ref,
   ) {
+    const t = useTranslations("actions");
     const preset = actionPresets[action];
-    const text = label ?? preset.label;
+    const text = label ?? t(action);
     const showLabel = !hideLabel && !preset.hideLabel;
     const labelHidden = compact && showLabel;
 

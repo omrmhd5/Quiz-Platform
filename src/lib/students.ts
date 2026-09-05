@@ -1,32 +1,34 @@
+import { msg, type TMsg } from "@/lib/i18n/messages";
+
 export const STUDENT_ID_PATTERN = /^[a-zA-Z0-9]+$/;
 
-export function validateStudentId(id: string): string | null {
+export function validateStudentId(id: string): TMsg | null {
   const trimmed = id.trim();
 
   if (!trimmed) {
-    return "Student ID is required.";
+    return msg("errors.studentIdRequired");
   }
 
   if (trimmed.length > 32) {
-    return "Student ID must be 32 characters or fewer.";
+    return msg("errors.studentIdTooLong");
   }
 
   if (!STUDENT_ID_PATTERN.test(trimmed)) {
-    return "Student ID must contain only letters and numbers.";
+    return msg("errors.studentIdCharset");
   }
 
   return null;
 }
 
-export function validateStudentName(name: string): string | null {
+export function validateStudentName(name: string): TMsg | null {
   const trimmed = name.trim();
 
   if (!trimmed) {
-    return "Name is required.";
+    return msg("errors.nameRequired");
   }
 
   if (trimmed.length > 100) {
-    return "Name must be 100 characters or fewer.";
+    return msg("errors.nameTooLong");
   }
 
   return null;
@@ -47,11 +49,11 @@ export const studentActionInitialState: StudentActionState = {};
 
 export function parseBulkImport(text: string): {
   rows: ParsedStudentRow[];
-  errors: string[];
+  errors: TMsg[];
 } {
   const lines = text.split(/\r?\n/);
   const rows: ParsedStudentRow[] = [];
-  const errors: string[] = [];
+  const errors: TMsg[] = [];
   const seenIds = new Set<string>();
 
   lines.forEach((line, index) => {
@@ -65,7 +67,7 @@ export function parseBulkImport(text: string): {
     const commaIndex = trimmedLine.indexOf(",");
 
     if (commaIndex === -1) {
-      errors.push(`Line ${lineNumber}: use the format id,name`);
+      errors.push(msg("errors.importLineFormat", { line: lineNumber }));
       return;
     }
 
@@ -74,18 +76,26 @@ export function parseBulkImport(text: string): {
 
     const idError = validateStudentId(id);
     if (idError) {
-      errors.push(`Line ${lineNumber}: ${idError}`);
+      errors.push({
+        key: "errors.importLineError",
+        values: { line: lineNumber, detail: idError.key },
+      });
       return;
     }
 
     const nameError = validateStudentName(name);
     if (nameError) {
-      errors.push(`Line ${lineNumber}: ${nameError}`);
+      errors.push({
+        key: "errors.importLineError",
+        values: { line: lineNumber, detail: nameError.key },
+      });
       return;
     }
 
     if (seenIds.has(id)) {
-      errors.push(`Line ${lineNumber}: duplicate ID "${id}" in import list.`);
+      errors.push(
+        msg("errors.importDuplicate", { line: lineNumber, id }),
+      );
       return;
     }
 
