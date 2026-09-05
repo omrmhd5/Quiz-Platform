@@ -11,6 +11,7 @@ import {
   type ReactNode,
 } from "react";
 import {
+  APP_TIME_ZONE,
   LOCALE_COOKIE,
   messages,
   type AppLocale,
@@ -68,7 +69,10 @@ export function LocaleProvider({ children }: { children: ReactNode }) {
 
   return (
     <LocaleContext.Provider value={{ locale, setLocale }}>
-      <NextIntlClientProvider locale={locale} messages={messages[locale]}>
+      <NextIntlClientProvider
+        locale={locale}
+        messages={messages[locale]}
+        timeZone={APP_TIME_ZONE}>
         {children}
       </NextIntlClientProvider>
     </LocaleContext.Provider>

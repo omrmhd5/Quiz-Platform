@@ -10,6 +10,9 @@ export const messages: Record<AppLocale, typeof enMessages> = {
 
 export const LOCALE_COOKIE = "language";
 
+/** Fixed TZ so server/client and Vercel/local agree (next-intl ENVIRONMENT_FALLBACK). */
+export const APP_TIME_ZONE = "UTC";
+
 function resolveMessage(
   source: Record<string, unknown>,
   key: string,
