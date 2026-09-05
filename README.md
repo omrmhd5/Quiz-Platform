@@ -1,215 +1,121 @@
-# Quiz Platform
+# 📝 Quiz Platform — Live Classroom Quizzes
 
-Local-network quiz platform for classroom use. One teacher runs the app on their device; students join from phones or tablets on the same Wi‑Fi using their student ID.
+A bilingual classroom quiz platform built so a teacher can launch multiple-choice quizzes from one device while students join from their phones on the same network — or from the public demo — using a student ID. The console covers roster management, quiz authoring, live sessions, auto-grading, and an all-time results dashboard.
 
-## View live demo
+The app gives teachers a single place to run a class quiz end to end: import students, build questions by hand or paste, launch a live session, watch join counts, then review scores, participation, and question-level stats in English or Arabic.
 
-- App: https://quiz-platform-demo-nine.vercel.app
+---
 
-### Demo logins
+## 🔧 Features
 
-| Role    | Username | Password    |
-| ------- | -------- | ----------- |
-| Teacher | teacher  | teacher123  |
+### 👩‍🏫 Teacher Console
 
-Students join from `/join` with a seeded ID such as `s001`.
+- Dashboard with all-time stats, charts, and top attempts / session results
+- Student roster: add, edit, delete, search, and bulk import by ID
+- Per-student quiz history with scores and session links
+- Create, edit, and delete MCQ quizzes (manual builder or paste import)
 
-## Stack
+### 📡 Live Sessions
 
-- Next.js 16 (App Router)
-- PostgreSQL 18
-- Drizzle ORM
-- Recharts
-- Docker Compose
+- Launch one live quiz at a time and share a join link
+- Students join at `/join` with a registered ID — no student login
+- Questions and options shuffled per attempt, then auto-graded on submit
+- Live joined counts, session results, and close-session controls
 
-## Quick start (development)
+### 📊 Results & Analytics
 
-1. Install [Docker Desktop](https://www.docker.com/products/docker-desktop/) and Node.js.
+- Session results: participation, submitted vs in progress, score range
+- Question stats: most missed, easiest, and correct-rate per item
+- Charts for answer breakdown, participation mix, and score trend
+- Recent sessions table with jump links into each run
 
-2. Create a `.env` file in the project root (see [Environment variables](#environment-variables) below).
+### 🌍 Multilingual Experience
 
-3. Start PostgreSQL (Docker, background):
+- Full English and Arabic UI via `next-intl`
+- RTL / LTR layout with a language toggle on login and the teacher shell
+- Localized validation, API errors, and status labels
 
-```bash
-npm run docker
-```
+---
 
-4. First time only — migrate and seed:
+## 💡 Impact
 
-```bash
-npm run db:migrate
-npm run db:seed
-```
+- Turned a LAN classroom quiz flow into a public, bilingual demo teachers can explore without setup
+- Centralized roster, authoring, live launch, and results in one Next.js console
+- Gave students a phone-friendly join path that only needs a student ID
+- Made session outcomes visible immediately: scores, participation, and question difficulty
 
-5. Start the app with hot reload:
+---
 
-```bash
-npm run dev
-```
+## 📦 Tech Stack
 
-Open [http://localhost:3000/login](http://localhost:3000/login).
+| Layer      | Tech                                      |
+| ---------- | ----------------------------------------- |
+| Framework  | Next.js 16, React 19, TypeScript          |
+| i18n       | next-intl (English / Arabic)              |
+| Database   | PostgreSQL 18, Drizzle ORM                |
+| Auth       | iron-session, bcryptjs                    |
+| Charts     | Recharts                                  |
+| Styling    | Tailwind CSS 4                            |
+| Deployment | Neon + Vercel                             |
 
-Default teacher credentials (from `.env`):
+---
 
-- **Username:** `admin` (or your `TEACHER_USERNAME`)
-- **Password:** `admin123` (or your `TEACHER_PASSWORD`)
+## 🌐 Deployment Notes
 
-Stop the database when done:
+- Fully responsive teacher console and student join / quiz-taking flow
+- Demo database on Neon with a wipe-and-reseed script (`npm run seed:demo`)
+- Public demo hosted on Vercel; first load may take a few seconds to wake
+- Designed for classroom LAN use as well as a hosted demo URL
 
-```bash
-npm run docker:down
-```
+---
 
-> Docker runs **Postgres only**. Use `npm run dev` for the app with hot reload.
+## 🎬 Site Demo
 
-## LAN access for students
+**[▶ Watch site walkthrough](./docs/quiz-platform-demo.mp4)** (~1 min)
 
-Students connect using the teacher device's local IP address, not `localhost`.
+Login → dashboard → students → quizzes → student join → Arabic.
 
-### Find your LAN IP
+---
 
-**Windows (PowerShell):**
+## 📸 Screenshots
 
-```powershell
-Get-NetIPAddress -AddressFamily IPv4 | Where-Object { $_.InterfaceAlias -notmatch 'Loopback' } | Select-Object IPAddress, InterfaceAlias
-```
+- Teacher Login
+  <img width="1600" height="900" alt="Teacher Login" src="./docs/screenshots/01-login.png" />
 
-**macOS / Linux:**
+- Mobile Preview
+  <img width="390" height="844" alt="Mobile Preview" src="./docs/screenshots/07-mobile-login.png" />
 
-```bash
-ip addr show | grep "inet "
-```
+- Dashboard
+  <img width="1600" height="776" alt="Dashboard" src="./docs/screenshots/02-dashboard.png" />
 
-Share this link with students (replace with your IP):
+- Students
+  <img width="1600" height="776" alt="Students" src="./docs/screenshots/03-students.png" />
 
-```
-http://192.168.1.100:3000/join
-```
+- Quizzes
+  <img width="1600" height="776" alt="Quizzes" src="./docs/screenshots/04-quizzes.png" />
 
-Students open `/join` on the teacher's LAN IP, enter their student ID, and join the active quiz session. When you use the teacher console on `localhost`, the join link automatically uses your machine's LAN IP (e.g. `http://192.168.1.100:3000/join`). Set `LAN_HOST` in `.env` to override if you have multiple network adapters.
+- Student Join
+  <img width="1600" height="900" alt="Student Join" src="./docs/screenshots/05-join.png" />
 
-> **Phone can't load the page?** The app works on any phone browser — there is no mobile app and **HTTP is fine** on a local network (HTTPS is not required). Use `/join` (not `/`, which goes to teacher login). Phone and PC must be on the **same Wi‑Fi** (not guest/isolated Wi‑Fi, not mobile data).
+- Arabic Login
+  <img width="1600" height="776" alt="Arabic Login" src="./docs/screenshots/06-login-arabic.png" />
 
-**Most common fix on Windows:** your PC allows `localhost` but blocks other devices. Open **PowerShell as Administrator** in the project folder and run:
+## Live Demo 🚀
 
-```powershell
-npm run dev:firewall
-```
+[**View Live Demo**](https://quiz-platform-demo-nine.vercel.app)
 
-Then restart `npm run dev` and try `http://YOUR_LAN_IP:3000/join` on the phone again.
+| Role    | Username | Password   |
+| ------- | -------- | ---------- |
+| Teacher | teacher  | teacher123 |
 
-If it still fails: confirm the phone is on Wi‑Fi (not cellular), disable VPN on the phone, and check the router does not use "AP isolation" / "client isolation".
+Students open `/join` and use a seeded ID such as `s001`.
 
-## Database commands
+---
 
-| Command               | Description                                |
-| --------------------- | ------------------------------------------ |
-| `npm run db:generate` | Generate migration SQL from schema changes |
-| `npm run db:migrate`  | Apply pending migrations                   |
-| `npm run db:seed`     | Seed default teacher account               |
-| `npm run db:studio`   | Open Drizzle Studio (local dev)            |
+## Author
 
-## Project structure
-
-```
-docker/
-  docker-compose.yml    Postgres only (dev)
-src/
-  app/
-    login/              Teacher login
-    join/               Student join flow
-    quiz/               Student quiz taking and results
-    teacher/            Protected teacher console
-      dashboard/        All-time stats and charts
-      students/         Roster and per-student history
-      quizzes/          Quiz list, detail, create, edit
-  proxy.ts              Teacher route protection (Next.js 16)
-  db/
-    schema.ts           Drizzle table definitions
-    relations.ts        Drizzle relations
-    seed.ts             Default teacher seed
-  lib/
-    auth.ts             Session helpers
-    session.ts          Iron session config
-  server/actions/       Server actions
-  server/stats/         Incremental rollup updates on join/submit/close
-drizzle/                SQL migrations
-```
-
-## Increments
-
-This project is built in 8 increments.
-
-- **Increment 1** — Docker, Drizzle, teacher login, protected shell
-- **Increment 2** — Student roster CRUD + bulk import at `/teacher/students`
-- **Increment 3** — MCQ quiz creation at `/teacher/quizzes` (paste, mark correct, save/list/edit/delete)
-- **Increment 4** — Launch live sessions, student join at `/join`, attempt placeholder at `/quiz/[attemptId]`
-- **Increment 5** — Shuffled MCQ quiz taking, submit, auto-grading, student score screen
-- **Increment 6** — Session results on each quiz detail page with live updates
-- **Increment 7** — Quiz stats per session and student quiz history
-- **Increment 8** — Teacher dashboard at `/teacher/dashboard` (stats, charts, rankings, recent sessions)
-
-**Increment 2** includes:
-
-- Student roster: add, edit name, delete, search, bulk import
-
-**Increment 3** includes:
-
-- Create MCQ quizzes via **manual builder** (Google Forms style) or **paste import**
-- Paste format: blank line between questions, `A)` options (count auto-detected)
-- Quiz list, detail view, edit, and delete (editing or deleting after a session removes all related session data)
-
-**Increment 4** includes:
-
-- Teacher launches a quiz from the quiz detail page (one active session globally)
-- Copyable join URL for the classroom network
-- Students join at `/join` with their registered ID
-- Attempt created or resumed; placeholder start screen at `/quiz/[attemptId]`
-
-**Increment 5** includes:
-
-- Questions and answer options shuffled per student attempt
-- Full quiz UI at `/quiz/[attemptId]` with radio MCQ answers
-- Submit with confirmation; server-side grading
-- Results screen: score %, correct, wrong, and skipped counts (no answer review)
-
-**Increment 6** includes:
-
-- Results section on `/teacher/quizzes/[id]` for every session of that quiz
-- Student scores, status, and summary stats per session
-- Live refresh while a session is active
-- Jump links from the launch panel and live banner
-
-**Increment 7** includes:
-
-- Quiz stats in session results: highest/average/lowest score, participation, most missed / easiest question, per-question correct %
-- Quiz stats totals: correct, wrong, and skipped (across submitted attempts in that session)
-- Student quiz history at `/teacher/students/[id]/history` with the same summary stats and an attempts table
-- History links from the student roster and session results table
-
-**Increment 8** includes:
-
-- Dashboard at `/teacher/dashboard` with all-time platform stats: registered students, total quizzes, total sessions, submitted, in progress, didn't finish, and average score
-- Aggregate quiz stats across all submissions: total correct, wrong, and skipped
-- Charts (Recharts): answer breakdown, participation mix, and average score trend for the **last 10** quiz runs
-- Recent sessions table for the **most recent 5** runs, with links to each session's results
-- **Top attempts** (student submissions) and **Top results** (session averages), each with highest/lowest tabs (**top 10**)
-- Live session banner on the dashboard when a quiz is running
-- Quick actions: **Manage students** and **Manage quizzes**
-
-Lists across the app use pagination on large tables (students, quizzes, session results, answer key, quiz taker, student history).
-
-## Environment variables
-
-| Variable            | Description                                                               |
-| ------------------- | ------------------------------------------------------------------------- |
-| `POSTGRES_USER`     | PostgreSQL username                                                       |
-| `POSTGRES_PASSWORD` | PostgreSQL password                                                       |
-| `POSTGRES_DB`       | Database name                                                             |
-| `POSTGRES_PORT`     | Host port for Postgres (use `5433` if local Postgres already uses `5432`) |
-| `APP_PORT`          | Host port for the web app (default `3000`)                                |
-| `LAN_HOST`          | Optional LAN IP or host for student join links (auto-detected if omitted) |
-| `TEACHER_USERNAME`  | Seed teacher username                                                     |
-| `TEACHER_PASSWORD`  | Seed teacher password                                                     |
-| `SESSION_SECRET`    | Cookie encryption secret (32+ characters)                                 |
-| `DATABASE_URL`      | Local dev — use `localhost` as host                                       |
+👤 **Omar Mahmoud**
+📧 [omrmhd54@gmail.com](mailto:omrmhd54@gmail.com)
+💼 [LinkedIn](https://www.linkedin.com/in/omrmhd5/)
+🌐 [Portfolio](https://omarmahmoud.dev/)
+🔗 [GitHub](https://github.com/omrmhd5)
