@@ -2,6 +2,35 @@
 
 Local-network quiz platform for classroom use. One teacher runs the app on their device; students join from phones or tablets on the same Wi‑Fi using their student ID.
 
+## 🎬 Site Demo
+
+**[▶ Watch site walkthrough](./docs/quiz-platform-demo.mp4)** (~1 min)
+
+Login → dashboard → students → quizzes → student join → Arabic.
+
+## 📸 Screenshots
+
+- Teacher login
+  <img width="1600" height="900" alt="Teacher login" src="./docs/screenshots/01-login.png" />
+
+- Dashboard
+  <img width="1600" height="776" alt="Teacher dashboard" src="./docs/screenshots/02-dashboard.png" />
+
+- Students
+  <img width="1600" height="776" alt="Student roster" src="./docs/screenshots/03-students.png" />
+
+- Quizzes
+  <img width="1600" height="776" alt="Quiz list" src="./docs/screenshots/04-quizzes.png" />
+
+- Student join
+  <img width="1600" height="900" alt="Student join" src="./docs/screenshots/05-join.png" />
+
+- Arabic login
+  <img width="1600" height="776" alt="Arabic teacher login" src="./docs/screenshots/06-login-arabic.png" />
+
+- Mobile login
+  <img width="390" height="844" alt="Mobile teacher login" src="./docs/screenshots/07-mobile-login.png" />
+
 ## Stack
 
 - Next.js 16 (App Router)
