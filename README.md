@@ -73,9 +73,9 @@ The app gives teachers a single place to run a class quiz end to end: import stu
 
 ## 🎬 Site Demo
 
-**[▶ Watch site walkthrough](./docs/quiz-platform-demo.mp4)** (~2 min)
+**[▶ Watch site walkthrough](./docs/quiz-platform-demo.mp4)** (~1½ min)
 
-Login → add a student → build a 2-question quiz → save & launch live → student joins and submits → session results → student history → dashboard analytics (smooth scroll) → Arabic login.
+Login → Arabic dashboard glance → add student → build a 2-question quiz → save & launch live → student joins and submits → session results → student history → dashboard analytics (smooth scroll, top results).
 
 ---
 
