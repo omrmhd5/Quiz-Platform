@@ -1,8 +1,8 @@
 # 📝 Quiz Platform — Live Classroom Quizzes
 
-A bilingual classroom quiz platform built so a teacher can launch multiple-choice quizzes from one device while students join from their phones on the same network — or from the public demo — using a student ID. The console covers roster management, quiz authoring, live sessions, auto-grading, and an all-time results dashboard.
+A classroom quiz platform built to replace paper-based quizzes and manual grading with a single teacher console and live student sessions. Teachers launch multiple-choice quizzes from one device on the same network while students join from their phones using a student ID — importing rosters, building questions by hand or paste, running live sessions with join counts, and reviewing scores, participation, and question-level stats from one all-time dashboard.
 
-The app gives teachers a single place to run a class quiz end to end: import students, build questions by hand or paste, launch a live session, watch join counts, then review scores, participation, and question-level stats in English or Arabic.
+The platform delivers **100% auto-graded results on submit** with **no manual marking**, **fully paperless** quiz delivery and score tracking, and **faster class-wide results** the moment students finish — instead of collecting sheets and grading by hand.
 
 ---
 
@@ -39,10 +39,10 @@ The app gives teachers a single place to run a class quiz end to end: import stu
 
 ## 💡 Impact
 
-- Turned a LAN classroom quiz flow into a public, bilingual demo teachers can explore without setup
-- Centralized roster, authoring, live launch, and results in one Next.js console
-- Gave students a phone-friendly join path that only needs a student ID
-- Made session outcomes visible immediately: scores, participation, and question difficulty
+- Eliminated manual grading — every submitted attempt is scored automatically on submit
+- Replaced printed quizzes and paper score sheets with a fully digital delivery and results workflow
+- Delivered faster class-wide outcomes: scores, participation, and question stats available as soon as students submit
+- Centralized roster, authoring, live sessions, and analytics in one teacher console
 
 ---
 
