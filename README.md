@@ -196,7 +196,7 @@ Login → Arabic dashboard glance → add student → build a 2-question quiz �
 
 ## Live Demo 🚀
 
-[**View Live Demo**](https://quiz-platform-demo-nine.vercel.app)
+[**View Live Demo**](https://quiz-platform-demo-kk.vercel.app/)
 
 | Role    | Username | Password   |
 | ------- | -------- | ---------- |
