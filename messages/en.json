@@ -5,7 +5,7 @@
   },
   "banner": {
     "demo": "DEMO MODE",
-    "wake": "First load may take a few seconds."
+    "wake": "First load after idle may take a few seconds."
   },
   "language": {
     "toggle": "Toggle language",
