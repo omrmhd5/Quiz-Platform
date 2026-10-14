@@ -15,9 +15,9 @@ declare global {
 
 function createDb() {
   const connectionString = getDatabaseUrl();
-  const needsSsl =
-    process.env.NODE_ENV === "production" ||
-    /render\.com|sslmode=require/i.test(connectionString);
+  const needsSsl = /render\.com|neon\.tech|sslmode=require/i.test(
+    connectionString,
+  );
 
   const client = postgres(connectionString, {
     max: 10,

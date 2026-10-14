@@ -33,6 +33,7 @@ if (envHost) {
 }
 
 const nextConfig: NextConfig = {
+  output: "standalone",
   allowedDevOrigins: [...devOrigins],
 };
 
